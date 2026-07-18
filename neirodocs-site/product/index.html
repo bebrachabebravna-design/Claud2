@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="yandex-verification" content="02fc3fa5ffdf743b" />
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
@@ -2585,6 +2586,9 @@ h1, h2, h3{ text-wrap: balance; }
 .demo-speed{position:absolute;top:14px;right:14px;z-index:2;display:none;padding:9px 16px;border:0;border-radius:999px;background:rgba(10,20,40,.72);color:#fff;font:700 .9rem/1 Manrope,system-ui,sans-serif;cursor:pointer}
 .demo-speed:hover{background:rgba(10,20,40,.9)}
 .demo-video-frame.playing-sound .demo-speed{display:block}
+.demo-fs{position:absolute;top:14px;right:76px;z-index:2;display:none;align-items:center;justify-content:center;width:38px;height:34px;padding:0;border:0;border-radius:999px;background:rgba(10,20,40,.72);color:#fff;cursor:pointer}
+.demo-fs:hover{background:rgba(10,20,40,.9)}
+.demo-video-frame.playing-sound .demo-fs{display:flex}
 .demo-video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(10,20,40,0) 55%,rgba(10,20,40,.55));transition:opacity .3s}
 .demo-video-play{display:flex;align-items:center;gap:12px;padding:14px 26px;border:0;border-radius:999px;background:rgba(255,255,255,.96);color:#0D3CB8;font:600 1.02rem/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(10,20,40,.35);transition:transform .2s}
 .demo-video-frame:hover .demo-video-play{transform:scale(1.05)}
@@ -2608,6 +2612,7 @@ h1, h2, h3{ text-wrap: balance; }
         </button>
       </div>
       <button class="demo-speed" id="demoSpeed" type="button" aria-label="Скорость воспроизведения">1×</button>
+      <button class="demo-fs" id="demoFs" type="button" aria-label="На весь экран" title="На весь экран"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
   </div>
 </section>
@@ -3026,6 +3031,15 @@ document.addEventListener('DOMContentLoaded', function () {
       si=(si+1)%speeds.length;
       v.playbackRate=speeds[si];
       sp.textContent=String(speeds[si]).replace('.',',')+'×';
+    });
+  }
+  var fs=document.getElementById('demoFs');
+  if(fs){
+    fs.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(v.requestFullscreen) v.requestFullscreen();
+      else if(v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+      else if(frame.requestFullscreen) frame.requestFullscreen();
     });
   }
 })();
