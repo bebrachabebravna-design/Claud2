@@ -3472,12 +3472,18 @@ document.addEventListener('DOMContentLoaded', function () {
     +'</ul></div>'
     +'</div>'
     +'<div id="nrdrAi"><div class="nrdr-ai-wait">Готовим персональные рекомендации под вашу сферу…</div></div>'
-    +'<h3>Что можно сделать уже сегодня — без внедрений</h3>'
-    +'<p style="margin:0 0 12px;line-height:1.6;font-size:.97rem">Даже обычные нейросети (YandexGPT, GigaChat, ChatGPT) снимают часть рутины, если дать им правильный промпт. Три готовых — копируйте и пользуйтесь:</p>'
-    +'<div class="nrdr-prompt"><div class="t">1. Ответ клиенту по регламенту</div><div class="p">Вот выдержка из нашего регламента: [вставьте текст]. Клиент спрашивает: [вопрос клиента]. Составь короткий вежливый ответ клиенту строго по регламенту и укажи пункт, на который ссылаешься. Если в тексте нет ответа — напиши, чего не хватает.</div><button type="button" class="copy">Скопировать промпт</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">2. Выжимка договора за 2 минуты</div><div class="p">Вот текст договора: [вставьте текст]. Сделай таблицу: предмет, сроки, сумма, штрафы, условия расторжения, риски для нас. Отдельно отметь пункты, которые стоит перепроверить юристу.</div><button type="button" class="copy">Скопировать промпт</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">3. Памятка для новичка из инструкции</div><div class="p">Вот наша рабочая инструкция: [вставьте текст]. Преврати её в пошаговую памятку для нового сотрудника: 5–7 шагов простыми словами и список частых ошибок.</div><button type="button" class="copy">Скопировать промпт</button></div>'
-    +'<p class="nrdr-bridge">Так вы вернёте 10–15% потерь: каждый документ придётся вставлять руками. ИИ-агент делает то же самое сразу по всем документам компании и сам находит нужный пункт — это разница между 15% и 90% возврата.</p>'
+    +'<h3>Попробуйте сами прямо сейчас — инструкция для тех, кто никогда не пользовался ИИ</h3>'
+    +'<ol style="margin:0 0 14px">'
+    +'<li><b>Откройте нейросеть.</b> Проще всего: Claude — claude.ai (сильнее всего работает с документами) или GigaChat — giga.chat (российский, работает без VPN). Регистрация за минуту, бесплатно.</li>'
+    +'<li><b>Скопируйте готовый запрос ниже</b> кнопкой «Скопировать» и вставьте в окно чата.</li>'
+    +'<li><b>Вместо [вставьте ваш документ] вставьте текст</b> своего договора, регламента или шаблона — просто скопируйте из Word.</li>'
+    +'<li><b>Получите результат за 10–20 секунд</b> и проверьте его глазами — важные документы всегда финально проверяет человек.</li>'
+    +'</ol>'
+    +'<div class="nrdr-prompt"><div class="t">1. Заполнить документ по шаблону <span style="font-weight:500;color:#6B7896">(лучше всего в Claude)</span></div><div class="p">Вот шаблон нашего документа: [вставьте шаблон — акт, договор, заявку]. Вот данные для заполнения: [перечислите: название компании, суммы, даты, реквизиты]. Заполни шаблон этими данными. Формулировки шаблона не меняй, ничего не придумывай. Если каких-то данных не хватает — оставь пропуск и напиши список того, чего не хватило.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">2. Проверить договор и найти риски</div><div class="p">Вот текст договора: [вставьте ваш документ]. Сделай таблицу: предмет, сроки, сумма, штрафы, условия расторжения, риски для нас. Отдельно отметь пункты, которые стоит перепроверить юристу.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">3. Ответ клиенту по вашим правилам</div><div class="p">Вот выдержка из нашего регламента: [вставьте ваш документ]. Клиент спрашивает: [вопрос клиента]. Составь короткий вежливый ответ строго по регламенту и укажи пункт, на который ссылаешься. Если ответа в тексте нет — так и напиши.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">4. Памятка новичку из инструкции</div><div class="p">Вот наша рабочая инструкция: [вставьте ваш документ]. Преврати её в пошаговую памятку для нового сотрудника: 5–7 шагов простыми словами и список частых ошибок.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<p class="nrdr-bridge">Эти приёмы вернут 10–15% потерь, но каждый документ придётся вставлять в нейросеть руками. ИИ-агент Нейродокс уже знает все документы компании сразу: сотрудник просто спрашивает — и получает ответ за 5 секунд. Это разница между 15% и 90% возврата.</p>'
     +'<h3>Как вернуть эти деньги — 3 шага</h3>'
     +'<ol>'
     +'<li><b>Собираем ваши документы.</b> Регламенты, договоры, инструкции — как есть, наводить порядок заранее не нужно.</li>'
@@ -3494,23 +3500,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // Кэш в sessionStorage: повторное открытие отчёта не тратит запросы к ИИ.
   function esc(s){ var d=document.createElement('div'); d.textContent=String(s); return d.innerHTML; }
   function renderAi(el, d){
-    var html='<div class="nrdr-ai"><span class="tag">Персонально под вашу сферу</span>';
-    if(d.scenarios && d.scenarios.length){
-      html+='<h3>Где у вас теряется больше всего</h3><ul>';
-      d.scenarios.slice(0,3).forEach(function(s){
+    var html='<div class="nrdr-ai"><span class="tag">Персонально под вашу компанию</span>';
+    if(d.pains && d.pains.length){
+      html+='<h3>Где у вас утекают деньги и время</h3><ul>';
+      d.pains.slice(0,3).forEach(function(s){
         html+='<li><b>'+esc(s.title)+'.</b> '+esc(s.text)+'</li>';
       });
       html+='</ul>';
     }
-    if(d.quick_wins && d.quick_wins.length){
-      html+='<h3>Быстрые победы на этой неделе</h3><ul>';
-      d.quick_wins.slice(0,3).forEach(function(s){ html+='<li>'+esc(s)+'</li>'; });
-      html+='</ul>';
+    if(d.how_to && d.how_to.length){
+      html+='<h3>Как вашей команде начать пользоваться ИИ на этой неделе</h3><ol>';
+      d.how_to.slice(0,4).forEach(function(s){ html+='<li>'+esc(s)+'</li>'; });
+      html+='</ol>';
     }
-    if(d.prompts && d.prompts.length){
-      html+='<h3>Промпты под вашу сферу</h3>';
-      d.prompts.slice(0,3).forEach(function(p){
-        html+='<div class="nrdr-prompt"><div class="t">'+esc(p.title)+(p['for']?' <span style="font-weight:500;color:#6B7896">('+esc(p['for'])+')</span>':'')+'</div>'
+    if(d.templates && d.templates.length){
+      html+='<h3>Готовые запросы под вашу сферу</h3>';
+      d.templates.slice(0,3).forEach(function(p){
+        html+='<div class="nrdr-prompt"><div class="t">'+esc(p.title)+'</div>'
+          +(p.where?'<div style="font-size:.85rem;color:#6B7896;margin-bottom:6px">'+esc(p.where)+'</div>':'')
           +'<div class="p">'+esc(p.prompt)+'</div>'
           +'<button type="button" class="copy">Скопировать промпт</button></div>';
       });
@@ -3518,6 +3525,25 @@ document.addEventListener('DOMContentLoaded', function () {
     if(d.reduction) html+='<p style="margin:12px 0 0;font-weight:600;line-height:1.55">'+esc(d.reduction)+'</p>';
     html+='</div>';
     el.innerHTML=html;
+  }
+  // Прямой запрос к Polza из браузера — запасной путь, если PHP-бекенд недоступен.
+  function askPolzaDirect(c, sphere){
+    var SYS='Ты — консультант компании «Нейродокс» (внедряет ИИ-агентов по внутренним документам: агент отвечает сотрудникам на вопросы по регламентам и договорам за 5 секунд со ссылкой на пункт). Читатель — руководитель, он НЕ разбирается в нейросетях: пиши просто, без терминов, по-деловому. Его волнует: меньше рутины с документами, меньше штрафов, быстрее ответы клиентам. Ответь СТРОГО валидным JSON без markdown, по-русски: {"pains":[{"title":"...","text":"..."}],"how_to":["..."],"templates":[{"title":"...","where":"...","prompt":"..."}],"reduction":"..."}. pains — ровно 3: где в ЕГО сфере утекают деньги из-за документов и что там делает ИИ-агент. how_to — ровно 4 шага, как его команде (учти её размер) начать пользоваться ИИ на этой неделе, каждый шаг выполним за день. templates — ровно 3 готовых запроса для нейросети (Claude/GigaChat) под его сферу: один про заполнение документа по шаблону, один про проверку важного документа, один про ответ клиенту по правилам компании; в where — куда вставлять запрос простыми словами, в prompt — полный текст с местами [вставьте ваш документ]. reduction — 1 предложение: вручную вернёте 10–15%, ИИ-агент по всем документам — до 90%. Не выдумывай факты, не упоминай цены.';
+    var usr='Сфера компании: '+(sphere||'не указана')+'. Сотрудников: '+c.N+'. Обращений в день: '+c.S+'. Минут на поиск: '+c.M+'. Ставка: '+c.H+' ₽/час.';
+    return fetch('https://api.polza.ai/api/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer pza_iOEjjuDpfCJZL1tKr-RFW62sF5oUsHqa'},
+      body:JSON.stringify({model:'openai/gpt-4o-mini',
+        messages:[{role:'system',content:SYS},{role:'user',content:usr}],
+        temperature:0.4,max_tokens:1400,response_format:{type:'json_object'}})
+    }).then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(j){
+        var t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+        t=t.replace(/^```(?:json)?\s*|\s*```$/g,'').trim();
+        var d=JSON.parse(t);
+        if(!d.pains||!d.templates) throw 0;
+        return d;
+      });
   }
   function loadAi(m){
     var el=m.querySelector('#nrdrAi');
@@ -3529,6 +3555,10 @@ document.addEventListener('DOMContentLoaded', function () {
       var cached=sessionStorage.getItem(key);
       if(cached){ renderAi(el, JSON.parse(cached)); return; }
     }catch(e){}
+    function ok(d){
+      try{ sessionStorage.setItem(key, JSON.stringify(d)); }catch(e){}
+      renderAi(el, d);
+    }
     var ctrl=('AbortController' in window)?new AbortController():null;
     var t=setTimeout(function(){ if(ctrl) ctrl.abort(); }, 40000);
     fetch('/api/report.php',{
@@ -3540,12 +3570,14 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function(r){ return r.json(); })
       .then(function(j){
         clearTimeout(t);
-        if(j && j.ok && j.data){
-          try{ sessionStorage.setItem(key, JSON.stringify(j.data)); }catch(e){}
-          renderAi(el, j.data);
-        } else { el.innerHTML=''; }
+        if(j && j.ok && j.data){ ok(j.data); }
+        else { throw 0; }
       })
-      .catch(function(){ clearTimeout(t); el.innerHTML=''; });
+      .catch(function(){
+        clearTimeout(t);
+        // запасной путь: напрямую из браузера
+        askPolzaDirect(c, sphere).then(ok).catch(function(){ el.innerHTML=''; });
+      });
   }
   function openReport(){
     var m=document.getElementById('lcReportModal');
