@@ -1,0 +1,9 @@
+# Наружу доступен только report.php; конфиг с ключом и данные закрыты
+<FilesMatch "^config\.php$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^data/ - [F]
+</IfModule>

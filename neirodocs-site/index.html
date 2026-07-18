@@ -2988,6 +2988,16 @@ h1, h2, h3{ text-wrap: balance; }
         .nrdr-cta .p{background:#1D5DE3;color:#fff}
         .nrdr-cta .g{border:1.5px solid #1D5DE3;color:#1D5DE3}
         .nrdr-note{font-size:.8rem;color:#9099B0;margin:20px 0 0;line-height:1.5}
+        .nrdr-prompt{background:#F4F7FD;border:1px solid #E4E8F0;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+        .nrdr-prompt .t{font-weight:700;font-size:.95rem;margin-bottom:6px}
+        .nrdr-prompt .p{font-size:.9rem;line-height:1.55;color:#1F2A47;background:#fff;border:1px dashed #C9D4E8;border-radius:8px;padding:10px 12px;white-space:pre-wrap}
+        .nrdr-prompt .copy{margin-top:8px;padding:7px 14px;border:0;border-radius:999px;background:#E0EAFF;color:#0D3CB8;font:700 .82rem/1 Manrope,system-ui,sans-serif;cursor:pointer}
+        .nrdr-prompt .copy:hover{background:#CBDBFF}
+        .nrdr-ai-wait{background:#FFF7E8;border:1px solid #F2DFB6;border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:.95rem;color:#7A5B16}
+        .nrdr-ai{background:#F0F5FF;border:1px solid #C9D9F7;border-radius:14px;padding:20px 22px;margin-bottom:24px}
+        .nrdr-ai h3{margin-top:0}
+        .nrdr-ai .tag{display:inline-block;background:#1D5DE3;color:#fff;font:700 .72rem/1 Manrope,sans-serif;border-radius:999px;padding:5px 10px;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase}
+        .nrdr-bridge{background:#EAF7EF;border-left:3px solid #17A45C;border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0 22px;font-size:.95rem;line-height:1.55;color:#0B6B39;font-weight:500}
         @media print{
           body.nrdr-open>*:not(#lcReportModal){display:none!important}
           #lcReportModal{position:static;background:#fff;padding:0;overflow:visible}
@@ -2998,6 +3008,7 @@ h1, h2, h3{ text-wrap: balance; }
         <div class="lc-capture">
           <div class="lc-capture-title">Забрать этот расчёт в&nbsp;PDF с&nbsp;планом, как вернуть деньги</div>
           <form id="calcForm" novalidate>
+            <input type="text" name="Сфера" id="calcSphere" placeholder="Чем занимается компания (например, логистика)">
             <input type="text" name="Контакт" placeholder="Телефон, @telegram или email" required>
             <input type="hidden" name="Расчёт" id="calcData" value="">
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
@@ -3460,6 +3471,13 @@ document.addEventListener('DOMContentLoaded', function () {
     +'<li>Перед проверкой — неделя аврала с папками</li>'
     +'</ul></div>'
     +'</div>'
+    +'<div id="nrdrAi"><div class="nrdr-ai-wait">Готовим персональные рекомендации под вашу сферу…</div></div>'
+    +'<h3>Что можно сделать уже сегодня — без внедрений</h3>'
+    +'<p style="margin:0 0 12px;line-height:1.6;font-size:.97rem">Даже обычные нейросети (YandexGPT, GigaChat, ChatGPT) снимают часть рутины, если дать им правильный промпт. Три готовых — копируйте и пользуйтесь:</p>'
+    +'<div class="nrdr-prompt"><div class="t">1. Ответ клиенту по регламенту</div><div class="p">Вот выдержка из нашего регламента: [вставьте текст]. Клиент спрашивает: [вопрос клиента]. Составь короткий вежливый ответ клиенту строго по регламенту и укажи пункт, на который ссылаешься. Если в тексте нет ответа — напиши, чего не хватает.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">2. Выжимка договора за 2 минуты</div><div class="p">Вот текст договора: [вставьте текст]. Сделай таблицу: предмет, сроки, сумма, штрафы, условия расторжения, риски для нас. Отдельно отметь пункты, которые стоит перепроверить юристу.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">3. Памятка для новичка из инструкции</div><div class="p">Вот наша рабочая инструкция: [вставьте текст]. Преврати её в пошаговую памятку для нового сотрудника: 5–7 шагов простыми словами и список частых ошибок.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<p class="nrdr-bridge">Так вы вернёте 10–15% потерь: каждый документ придётся вставлять руками. ИИ-агент делает то же самое сразу по всем документам компании и сам находит нужный пункт — это разница между 15% и 90% возврата.</p>'
     +'<h3>Как вернуть эти деньги — 3 шага</h3>'
     +'<ol>'
     +'<li><b>Собираем ваши документы.</b> Регламенты, договоры, инструкции — как есть, наводить порядок заранее не нужно.</li>'
@@ -3471,6 +3489,63 @@ document.addEventListener('DOMContentLoaded', function () {
     +'<a class="g" href="https://t.me/Novikoff_off" target="_blank" rel="noopener">Написать напрямую</a></div>'
     +'<p class="nrdr-note">Расчёт оценочный: 21 рабочий день в месяце, возврат времени с агентом — до 90%. Нейродокс · neirodocs.ru · neirodocs.support@gmail.com</p>'
     +'</div></div>';
+  }
+  // Персональные рекомендации от нейросети (через наш сервер /api/report.php).
+  // Кэш в sessionStorage: повторное открытие отчёта не тратит запросы к ИИ.
+  function esc(s){ var d=document.createElement('div'); d.textContent=String(s); return d.innerHTML; }
+  function renderAi(el, d){
+    var html='<div class="nrdr-ai"><span class="tag">Персонально под вашу сферу</span>';
+    if(d.scenarios && d.scenarios.length){
+      html+='<h3>Где у вас теряется больше всего</h3><ul>';
+      d.scenarios.slice(0,3).forEach(function(s){
+        html+='<li><b>'+esc(s.title)+'.</b> '+esc(s.text)+'</li>';
+      });
+      html+='</ul>';
+    }
+    if(d.quick_wins && d.quick_wins.length){
+      html+='<h3>Быстрые победы на этой неделе</h3><ul>';
+      d.quick_wins.slice(0,3).forEach(function(s){ html+='<li>'+esc(s)+'</li>'; });
+      html+='</ul>';
+    }
+    if(d.prompts && d.prompts.length){
+      html+='<h3>Промпты под вашу сферу</h3>';
+      d.prompts.slice(0,3).forEach(function(p){
+        html+='<div class="nrdr-prompt"><div class="t">'+esc(p.title)+(p['for']?' <span style="font-weight:500;color:#6B7896">('+esc(p['for'])+')</span>':'')+'</div>'
+          +'<div class="p">'+esc(p.prompt)+'</div>'
+          +'<button type="button" class="copy">Скопировать промпт</button></div>';
+      });
+    }
+    if(d.reduction) html+='<p style="margin:12px 0 0;font-weight:600;line-height:1.55">'+esc(d.reduction)+'</p>';
+    html+='</div>';
+    el.innerHTML=html;
+  }
+  function loadAi(m){
+    var el=m.querySelector('#nrdrAi');
+    if(!el) return;
+    var c=window.__calc; if(!c){ el.innerHTML=''; return; }
+    var sphere=(document.getElementById('calcSphere')||{}).value||'';
+    var key='nrdAi_'+[sphere,c.N,c.S,c.M,c.H].join('_');
+    try{
+      var cached=sessionStorage.getItem(key);
+      if(cached){ renderAi(el, JSON.parse(cached)); return; }
+    }catch(e){}
+    var ctrl=('AbortController' in window)?new AbortController():null;
+    var t=setTimeout(function(){ if(ctrl) ctrl.abort(); }, 40000);
+    fetch('/api/report.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sphere:sphere,employees:c.N,requests:c.S,minutes:c.M,rate:c.H}),
+      signal:ctrl?ctrl.signal:undefined
+    })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        clearTimeout(t);
+        if(j && j.ok && j.data){
+          try{ sessionStorage.setItem(key, JSON.stringify(j.data)); }catch(e){}
+          renderAi(el, j.data);
+        } else { el.innerHTML=''; }
+      })
+      .catch(function(){ clearTimeout(t); el.innerHTML=''; });
   }
   function openReport(){
     var m=document.getElementById('lcReportModal');
@@ -3487,6 +3562,19 @@ document.addEventListener('DOMContentLoaded', function () {
     m.querySelector('.nrdr-close').addEventListener('click', function(){
       m.hidden=true; document.body.classList.remove('nrdr-open');
     });
+    // кнопки «Скопировать промпт» (и статические, и от ИИ — через делегирование)
+    m.addEventListener('click', function(e){
+      var b=e.target.closest?e.target.closest('.copy'):null;
+      if(!b) return;
+      var p=b.parentElement.querySelector('.p');
+      if(!p) return;
+      var txt=p.textContent;
+      function done(){ b.textContent='Скопировано ✓'; setTimeout(function(){ b.textContent='Скопировать промпт'; },1600); }
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,done); }
+      else{ var ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); }catch(err){} document.body.removeChild(ta); done(); }
+    });
+    loadAi(m);
     m.scrollTop=0;
   }
   // после успешной отправки формы калькулятора показываем кнопку «Открыть мой расчёт»
