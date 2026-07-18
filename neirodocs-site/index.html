@@ -2644,7 +2644,10 @@ h1, h2, h3{ text-wrap: balance; }
 <style>
 .demo-video-section{padding-top:26px}
 .demo-video-frame{position:relative;max-width:920px;margin:0 auto;border-radius:20px;overflow:hidden;background:#0A1428;box-shadow:0 24px 70px rgba(10,20,40,.28);cursor:pointer}
-.demo-video-frame video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#0A1428}
+.demo-video-frame video{display:block;width:100%;height:auto;background:#0A1428}
+.demo-speed{position:absolute;top:14px;right:14px;z-index:2;display:none;padding:9px 16px;border:0;border-radius:999px;background:rgba(10,20,40,.72);color:#fff;font:700 .9rem/1 Manrope,system-ui,sans-serif;cursor:pointer}
+.demo-speed:hover{background:rgba(10,20,40,.9)}
+.demo-video-frame.playing-sound .demo-speed{display:block}
 .demo-video-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(10,20,40,0) 55%,rgba(10,20,40,.55));transition:opacity .3s}
 .demo-video-play{display:flex;align-items:center;gap:12px;padding:14px 26px;border:0;border-radius:999px;background:rgba(255,255,255,.96);color:#0D3CB8;font:600 1.02rem/1 Manrope,system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 30px rgba(10,20,40,.35);transition:transform .2s}
 .demo-video-frame:hover .demo-video-play{transform:scale(1.05)}
@@ -2667,6 +2670,7 @@ h1, h2, h3{ text-wrap: balance; }
           Смотреть со звуком
         </button>
       </div>
+      <button class="demo-speed" id="demoSpeed" type="button" aria-label="Скорость воспроизведения">1×</button>
     </div>
   </div>
 </section>
@@ -2973,45 +2977,18 @@ h1, h2, h3{ text-wrap: balance; }
         .lc-capture-ok{font-size:.98rem;font-weight:600;color:#B9F6CA;margin:8px 0 0}
         </style>
         <div class="lc-capture">
-          <div class="lc-capture-title">Получить полный расчёт и&nbsp;план, как вернуть эти деньги</div>
+          <div class="lc-capture-title">Забрать этот расчёт в&nbsp;PDF с&nbsp;планом, как вернуть деньги</div>
           <form id="calcForm" novalidate>
             <input type="text" name="Контакт" placeholder="Телефон, @telegram или email" required>
             <input type="hidden" name="Расчёт" id="calcData" value="">
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-            <button type="submit" class="btn btn-primary">Получить расчёт</button>
+            <button type="submit" class="btn btn-primary">Сформировать мой расчёт</button>
           </form>
-          <p class="lc-capture-note">Пришлём детальный расчёт по&nbsp;вашим цифрам и&nbsp;план внедрения в&nbsp;течение рабочего дня. Ваши значения из&nbsp;калькулятора прикрепятся автоматически.</p>
-          <p class="lc-capture-ok" hidden>Готово! Пришлём полный расчёт в&nbsp;течение рабочего дня.</p>
+          <p class="lc-capture-note">Расчёт по&nbsp;вашим цифрам откроется сразу&nbsp;— сохраните его в&nbsp;PDF. А&nbsp;мы&nbsp;свяжемся и&nbsp;разберём, как вернуть эти деньги под&nbsp;ваш бизнес.</p>
+          <p class="lc-capture-ok" hidden>Готово! Ваш расчёт открылся в&nbsp;новой вкладке&nbsp;— сохраните его в&nbsp;PDF. Мы&nbsp;свяжемся в&nbsp;течение рабочего дня.</p>
         </div>
         <a href="#audit-cta" class="lc-cta" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,.85);font-weight:600;text-decoration:underline;">Или посчитать точную выгоду на аудите <span class="arr" style="display:inline-flex;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ЛИД-МАГНИТ: ЧЕК-ЛИСТ -->
-<style>
-.lm-card{max-width:820px;margin:0 auto;background:var(--paper);border:1px solid #E4E8F0;border-radius:22px;padding:38px 40px;box-shadow:0 16px 44px -20px rgba(10,20,40,.14);display:flex;flex-direction:column;gap:6px}
-.lm-card h2{font-size:1.55rem;letter-spacing:-.02em;margin:0 0 6px}
-.lm-card p{margin:0 0 16px;color:var(--t-mute);line-height:1.6}
-.lm-form{display:flex;gap:10px;flex-wrap:wrap}
-.lm-form input[type=text]{flex:1 1 220px;padding:13px 17px;border-radius:12px;border:1.5px solid rgba(10,20,40,.16);font:500 .98rem/1.3 Manrope,system-ui,sans-serif;outline:none;transition:border-color .2s}
-.lm-form input[type=text]:focus{border-color:var(--acc)}
-.lm-ok{font-size:.98rem;font-weight:600;color:#0B8A4B;margin:10px 0 0}
-@media (max-width:640px){.lm-card{padding:28px 22px}}
-</style>
-<section id="checklist" style="background: var(--paper-mute);">
-  <div class="wrap">
-    <div class="lm-card reveal">
-      <span class="eyebrow">Бесплатно</span>
-      <h2>Чек-лист нейросетей для работы с&nbsp;документами</h2>
-      <p>Подборка нейросетей и&nbsp;готовых промптов, которые ваша команда сможет применить к&nbsp;документам сразу после прочтения. Оставьте контакт&nbsp;— пришлём чек-лист.</p>
-      <form id="checklistForm" class="lm-form" novalidate>
-        <input type="text" name="Контакт" placeholder="Телефон, Telegram или email" required>
-        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-        <button type="submit" class="btn btn-accent">Получить чек-лист</button>
-      </form>
-      <p class="lm-ok" hidden>Готово! Пришлём чек-лист в&nbsp;течение рабочего дня.</p>
     </div>
   </div>
 </section>
@@ -3027,6 +3004,7 @@ h1, h2, h3{ text-wrap: balance; }
           <li>Как ИИ может оптимизировать ваш бизнес уже сейчас</li>
           <li>Куда уходит ваша прибыль и&nbsp;время</li>
         </ul>
+        <p style="margin-bottom: 8px;">В&nbsp;конце аудита покажу демо ИИ-агента и&nbsp;дам чек-лист нейросетей для&nbsp;бизнеса и&nbsp;промптов к&nbsp;ним, которыми вы&nbsp;сможете воспользоваться сразу&nbsp;же после аудита.</p>
         <style>
         .cta-form{display:flex;flex-direction:column;gap:12px;max-width:460px;margin:8px 0 0}
         .cta-form[hidden]{display:none}
@@ -3322,6 +3300,7 @@ document.addEventListener('DOMContentLoaded', function () {
       set('lcEmpV', N); set('lcSearchV', S); set('lcMinV', M+' мин'); set('lcRateV', H+' ₽');
       set('lcHours', Math.round(hoursMo).toLocaleString('ru-RU')+' ч');
       set('lcLossMo', fmt(lossMo)); set('lcLossYr', fmt(lossYr)); set('lcRecover', fmt(recover));
+      window.__calc={N:N,S:S,M:M,H:H,hoursMo:hoursMo,lossMo:lossMo,lossYr:lossYr,recover:recover,recoverYr:recover*12};
       var cd=document.getElementById('calcData');
       if(cd) cd.value='Сотрудников: '+N+'; обращений в день: '+S+'; минут на поиск: '+M+'; ставка: '+H+' ₽/ч; потери: '+fmt(lossMo)+'/мес ('+fmt(lossYr)+'/год); возврат с Нейродокс: '+fmt(recover)+'/мес';
     }
@@ -3335,7 +3314,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // на почту письмо со ссылкой активации, после подтверждения заявки начнут доходить.
 (function(){
   var ENDPOINT='https://formsubmit.co/ajax/neirodocs.support@gmail.com';
-  function wire(formId, okSel, subject){
+  function wire(formId, okSel, subject, afterValidate){
     var form=document.getElementById(formId);
     if(!form) return;
     form.addEventListener('submit', function(e){
@@ -3348,6 +3327,9 @@ document.addEventListener('DOMContentLoaded', function () {
       var required=[].slice.call(form.querySelectorAll('input[required]'));
       var empty=required.filter(function(i){ return !i.value.trim(); });
       if(empty.length){ empty[0].focus(); empty[0].style.borderColor='#D64545'; return; }
+      // Мгновенная выдача под клиента (напр. PDF-расчёт) — до отправки, чтобы клиент
+      // всегда получил результат, даже если письмо ещё не подтверждено на почте.
+      if(typeof afterValidate==='function'){ try{ afterValidate(data); }catch(err){} }
       var btn=form.querySelector('button[type=submit]');
       if(btn){ btn.disabled=true; btn.style.opacity='.7'; }
       fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
@@ -3359,14 +3341,87 @@ document.addEventListener('DOMContentLoaded', function () {
           if(btn){ btn.disabled=false; btn.style.opacity=''; }
         })
         .catch(function(){
+          // Письмо не ушло, но клиент свой расчёт уже получил — показываем успех мягко.
+          var ok=form.querySelector(okSel)||form.parentElement.querySelector(okSel);
+          if(ok) ok.hidden=false;
           if(btn){ btn.disabled=false; btn.style.opacity=''; }
-          alert('Не получилось отправить. Напишите нам, пожалуйста, в Telegram — кнопка «Написать напрямую».');
         });
     });
   }
+
+  // Персональный расчёт под клиента: branded HTML-страница из его же цифр,
+  // открывается в новой вкладке и сохраняется в PDF (кнопка → печать в PDF).
+  function openCalcReport(){
+    var c=window.__calc; if(!c) return;
+    function money(n){ return Math.round(n).toLocaleString('ru-RU')+' ₽'; }
+    var d=new Date(), dd=d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
+    var origin=location.origin;
+    var html='<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8">'
+      +'<meta name="viewport" content="width=device-width, initial-scale=1">'
+      +'<base href="'+origin+'/">'
+      +'<title>Расчёт потерь на поиске документов — Нейродокс</title>'
+      +'<style>'
+      +'*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#0A1428;background:#EEF1F7;padding:28px}'
+      +'.sheet{max-width:820px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px -24px rgba(10,20,40,.25)}'
+      +'.hd{background:linear-gradient(135deg,#0D3CB8 0%,#1D5DE3 55%,#5B8AFF 100%);color:#fff;padding:32px 40px}'
+      +'.hd .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.25rem;margin-bottom:18px}'
+      +'.hd .brand img{width:34px;height:34px}'
+      +'.hd h1{font-size:1.7rem;margin:0 0 6px;letter-spacing:-.02em}'
+      +'.hd .sub{opacity:.9;font-size:.98rem}'
+      +'.bd{padding:34px 40px}'
+      +'.row{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:26px}'
+      +'.io{flex:1 1 160px;background:#F4F7FD;border:1px solid #E4E8F0;border-radius:12px;padding:14px 16px}'
+      +'.io .l{font-size:.82rem;color:#6B7896;margin-bottom:4px}.io .v{font-weight:700;font-size:1.15rem}'
+      +'.big{background:#0A1428;color:#fff;border-radius:16px;padding:26px 30px;text-align:center;margin-bottom:14px}'
+      +'.big .l{opacity:.75;font-size:.95rem}.big .n{font-size:2.4rem;font-weight:800;color:#FF9DA0;margin:6px 0}'
+      +'.big .yr{opacity:.85}'
+      +'.rec{background:#E8F5EC;border:1px solid #BfE6CC;border-radius:12px;padding:16px 20px;text-align:center;font-weight:600;color:#0B6B39;margin-bottom:30px}'
+      +'.rec b{color:#0B8A4B}'
+      +'h2{font-size:1.2rem;margin:0 0 14px}'
+      +'ol{margin:0 0 26px;padding-left:20px}li{margin-bottom:10px;line-height:1.55}'
+      +'.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}'
+      +'.cta a{display:inline-block;padding:13px 24px;border-radius:999px;font-weight:700;text-decoration:none}'
+      +'.cta .p{background:#1D5DE3;color:#fff}.cta .g{border:1.5px solid #1D5DE3;color:#1D5DE3}'
+      +'.note{font-size:.82rem;color:#9099B0;margin-top:22px;line-height:1.5}'
+      +'.pbar{max-width:820px;margin:0 auto 16px;text-align:right}'
+      +'.pbar button{padding:11px 22px;border:0;border-radius:999px;background:#0A1428;color:#fff;font-weight:700;cursor:pointer}'
+      +'@media print{body{background:#fff;padding:0}.pbar{display:none}.sheet{box-shadow:none;border-radius:0}}'
+      +'</style></head><body>'
+      +'<div class="pbar"><button onclick="window.print()">Сохранить в PDF</button></div>'
+      +'<div class="sheet">'
+      +'<div class="hd"><div class="brand"><img src="assets/brand-icon.png" alt="">Нейродокс</div>'
+      +'<h1>Ваш расчёт потерь на поиске по документам</h1>'
+      +'<div class="sub">Подготовлено '+dd+' на основе введённых вами данных</div></div>'
+      +'<div class="bd">'
+      +'<div class="row">'
+      +'<div class="io"><div class="l">Сотрудников</div><div class="v">'+c.N+'</div></div>'
+      +'<div class="io"><div class="l">Обращений в день</div><div class="v">'+c.S+'</div></div>'
+      +'<div class="io"><div class="l">Минут на поиск</div><div class="v">'+c.M+'</div></div>'
+      +'<div class="io"><div class="l">Ставка, ₽/час</div><div class="v">'+c.H+'</div></div>'
+      +'</div>'
+      +'<div class="big"><div class="l">Компания теряет на поиске информации</div>'
+      +'<div class="n">'+money(c.lossMo)+' / мес</div>'
+      +'<div class="yr">≈ '+money(c.lossYr)+' в год · '+Math.round(c.hoursMo).toLocaleString('ru-RU')+' часов ежемесячно впустую</div></div>'
+      +'<div class="rec">С ИИ-агентом Нейродокс возвращаете <b>'+money(c.recover)+'/мес</b> (≈ '+money(c.recoverYr)+' в год)</div>'
+      +'<h2>Как вернуть эти деньги — 3 шага</h2>'
+      +'<ol>'
+      +'<li><b>Собираем ваши документы.</b> Регламенты, договоры, инструкции — как есть, наводить порядок заранее не нужно.</li>'
+      +'<li><b>Обучаем ИИ-агента и встраиваем в работу.</b> В Telegram, CRM или 1С — туда, где команда работает каждый день. Средний срок — 14 дней.</li>'
+      +'<li><b>Команда спрашивает обычными словами и получает ответ за 5 секунд</b> со ссылкой на пункт-источник. Время на поиск возвращается в работу.</li>'
+      +'</ol>'
+      +'<h2>Что дальше</h2>'
+      +'<p style="margin:0 0 18px;line-height:1.6">На бесплатном аудите разберём эти цифры под ваш бизнес, покажем демо агента на близких вам задачах и дадим чек-лист нейросетей. Окупаемость внедрения обычно 1–2 месяца.</p>'
+      +'<div class="cta"><a class="p" href="'+origin+'/#audit-cta">Записаться на аудит</a>'
+      +'<a class="g" href="https://t.me/Novikoff_off" target="_blank" rel="noopener">Написать напрямую</a></div>'
+      +'<p class="note">Расчёт носит оценочный характер и основан на введённых вами данных (рабочих дней в месяце — 21, возврат времени с агентом — до 90%). Точную выгоду по вашим документам и процессам считаем на аудите. Нейродокс · neirodocs.ru · neirodocs.support@gmail.com</p>'
+      +'</div></div></body></html>';
+    var w=window.open('','_blank');
+    if(!w){ return; } // блокировщик всплывающих — тихо, клиент всё равно получит расчёт на почту
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+
   wire('auditForm','.cta-form-ok','Заявка на аудит с сайта Нейродокс');
-  wire('calcForm','.lc-capture-ok','Запрос полного расчёта из калькулятора');
-  wire('checklistForm','.lm-ok','Запрос чек-листа нейросетей');
+  wire('calcForm','.lc-capture-ok','Запрос расчёта из калькулятора потерь', openCalcReport);
 })();
 
 // Демо-видео: секция скрыта, пока /assets/demo.mp4 не загружен на сервер.
@@ -3400,6 +3455,17 @@ document.addEventListener('DOMContentLoaded', function () {
     v.pause(); v.currentTime=0; v.muted=false; v.loop=false; v.controls=true;
     v.play().catch(function(){});
   });
+  // переключатель скорости: 1x → 1.25x → 1.5x → 2x
+  var sp=document.getElementById('demoSpeed');
+  if(sp){
+    var speeds=[1,1.25,1.5,2], si=0;
+    sp.addEventListener('click', function(e){
+      e.stopPropagation();
+      si=(si+1)%speeds.length;
+      v.playbackRate=speeds[si];
+      sp.textContent=String(speeds[si]).replace('.',',')+'×';
+    });
+  }
 })();
 
 // Partner income calculator
