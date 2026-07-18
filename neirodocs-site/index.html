@@ -2625,7 +2625,7 @@ h1, h2, h3{ text-wrap: balance; }
         <span class="italic grad-text">все ваши документы</span>
       </h1>
       <p class="hero-lead reveal">
-        Сотрудники ищут ответы в&nbsp;документах по&nbsp;часу&nbsp;— агент отвечает за&nbsp;<span class="accent">пять секунд</span>. Команда возвращает <span class="accent">1,5–2&nbsp;часа в&nbsp;день</span> на&nbsp;человека, а&nbsp;вы&nbsp;— прибыль, которая утекала на&nbsp;рутину. Суммарно сэкономили клиентам <span class="accent">больше 20&nbsp;млн&nbsp;₽</span>.
+        Отвечает на&nbsp;любой вопрос за&nbsp;<span class="accent">пять секунд</span> со&nbsp;ссылкой на&nbsp;пункт-источник. Команда возвращает <span class="accent">1,5–2&nbsp;часа в&nbsp;день</span> на&nbsp;человека, а&nbsp;вы&nbsp;— прибыль, которая утекала на&nbsp;рутину. Суммарно сэкономили бизнесам <span class="accent">больше 20&nbsp;млн&nbsp;₽</span> на&nbsp;рутине в&nbsp;документах.
       </p>
       <div class="hero-actions reveal">
         <a href="#audit-cta" class="hero-btn hero-btn-primary">
@@ -2760,7 +2760,6 @@ h1, h2, h3{ text-wrap: balance; }
     <div class="s-head reveal" style="text-align:center;max-width:760px;margin:0 auto 30px;">
       <span class="eyebrow">Живое демо</span>
       <h2 class="t-h1">Посмотрите, как агент <span class="italic" style="color: var(--acc);">отвечает</span></h2>
-      <p class="lead" style="margin:16px auto 0;">Реальный вопрос обычными словами — ответ за секунды со ссылкой на пункт документа.</p>
     </div>
     <div class="demo-video-frame reveal" id="demoFrame">
       <video id="demoVideo" playsinline muted loop preload="metadata" poster="/assets/video-poster.jpg" aria-label="Демо ИИ-агента Нейродокс">
@@ -2997,6 +2996,16 @@ h1, h2, h3{ text-wrap: balance; }
         .nrdr-ai{background:#F0F5FF;border:1px solid #C9D9F7;border-radius:14px;padding:20px 22px;margin-bottom:24px}
         .nrdr-ai h3{margin-top:0}
         .nrdr-ai .tag{display:inline-block;background:#1D5DE3;color:#fff;font:700 .72rem/1 Manrope,sans-serif;border-radius:999px;padding:5px 10px;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase}
+        .nrdr-tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+        @media(max-width:640px){.nrdr-tools{grid-template-columns:1fr}}
+        .nrdr-tool{background:#F4F7FD;border:1px solid #E4E8F0;border-radius:12px;padding:12px 14px;font-size:.9rem;line-height:1.5}
+        .nrdr-tool b{display:inline}
+        .nrdr-tool .ok,.nrdr-tool .vpn{display:block;font-size:.78rem;font-weight:700;margin:3px 0 4px}
+        .nrdr-tool .ok{color:#0B8A4B}
+        .nrdr-tool .vpn{color:#B54708}
+        .nrdr-safety{background:#FFF7E8;border:1px solid #F2DFB6;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:.92rem;line-height:1.55;color:#5C4A15}
+        .nrdr-safety ul{padding-left:18px}
+        .nrdr-safety li{margin-bottom:6px}
         .nrdr-bridge{background:#EAF7EF;border-left:3px solid #17A45C;border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0 22px;font-size:.95rem;line-height:1.55;color:#0B6B39;font-weight:500}
         @media print{
           body.nrdr-open>*:not(#lcReportModal){display:none!important}
@@ -3008,13 +3017,13 @@ h1, h2, h3{ text-wrap: balance; }
         <div class="lc-capture">
           <div class="lc-capture-title">Забрать этот расчёт в&nbsp;PDF с&nbsp;планом, как вернуть деньги</div>
           <form id="calcForm" novalidate>
-            <input type="text" name="Сфера" id="calcSphere" placeholder="Чем занимается компания (например, логистика)">
+            <input type="text" name="Сфера" id="calcSphere" placeholder="Чем занимается компания (например, логистика)" style="flex:1 1 100%;">
             <input type="text" name="Контакт" placeholder="Телефон, @telegram или email" required>
             <input type="hidden" name="Расчёт" id="calcData" value="">
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
             <button type="submit" class="btn btn-primary">Сформировать мой расчёт</button>
           </form>
-          <p class="lc-capture-note">Расчёт по&nbsp;вашим цифрам откроется сразу&nbsp;— сохраните его в&nbsp;PDF. А&nbsp;мы&nbsp;свяжемся и&nbsp;разберём, как вернуть эти деньги под&nbsp;ваш бизнес.</p>
+          <p class="lc-capture-note">Отчёт формируется за&nbsp;пару секунд и&nbsp;сразу даёт результат: готовые запросы для нейросетей под&nbsp;вашу сферу и&nbsp;план, с&nbsp;чего начать. Сохраните его в&nbsp;PDF&nbsp;— а&nbsp;мы&nbsp;свяжемся и&nbsp;разберём, как вернуть эти деньги под&nbsp;ваш бизнес.</p>
           <p class="lc-capture-ok" hidden>Готово! Ваш расчёт открылся в&nbsp;новой вкладке&nbsp;— сохраните его в&nbsp;PDF. Мы&nbsp;свяжемся в&nbsp;течение рабочего дня.</p>
         </div>
         <a href="#audit-cta" class="lc-cta" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,.85);font-weight:600;text-decoration:underline;">Или посчитать точную выгоду на аудите <span class="arr" style="display:inline-flex;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
@@ -3034,7 +3043,7 @@ h1, h2, h3{ text-wrap: balance; }
           <li>Как ИИ может оптимизировать ваш бизнес уже сейчас</li>
           <li>Куда уходит ваша прибыль и&nbsp;время</li>
         </ul>
-        <p style="margin-bottom: 8px;">В&nbsp;конце аудита дам чек-лист нейросетей для&nbsp;бизнеса и&nbsp;промптов к&nbsp;ним, которыми вы&nbsp;сможете воспользоваться сразу&nbsp;же после аудита.</p>
+        <p style="margin-bottom: 8px;">В&nbsp;конце аудита дам чек-лист нейросетей для&nbsp;бизнеса и&nbsp;работы с&nbsp;документами&nbsp;— с&nbsp;готовыми запросами, которыми вы&nbsp;сможете воспользоваться сразу&nbsp;же после аудита.</p>
         <style>
         .cta-form{display:flex;flex-direction:column;gap:12px;max-width:460px;margin:8px 0 0}
         .cta-form[hidden]{display:none}
@@ -3057,7 +3066,7 @@ h1, h2, h3{ text-wrap: balance; }
             <p class="cta-form-ok" hidden>Заявка отправлена! Свяжусь с&nbsp;вами в&nbsp;течение рабочего дня.</p>
           </form>
           <p style="margin:14px 0 2px;font-size:.98rem;color:rgba(255,255,255,.85);">Либо свяжитесь напрямую&nbsp;— ответим на&nbsp;любой вопрос:</p>
-          <a href="https://t.me/Novikoff_off?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%BD%D0%B0%20%D0%B0%D1%83%D0%B4%D0%B8%D1%82" target="_blank" rel="noopener" class="btn" style="background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6);margin-top:6px;">Написать напрямую <span class="arr"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          <a href="https://t.me/Novikoff_off?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%BD%D0%B0%20%D0%B0%D1%83%D0%B4%D0%B8%D1%82" target="_blank" rel="noopener" class="btn" style="background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6);margin-top:6px;">Написать напрямую <span class="arr" style="display:inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.51l-.38 5.34c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.65.25 1.91-.9l3.46-16.2c.31-1.43-.52-1.99-1.46-1.64L1.13 10.87c-1.39.54-1.37 1.31-.24 1.66l5.2 1.62L18.16 6.5c.57-.37 1.09-.17.66.2L9.04 15.51z"/></svg></span></a>
         </div>
       </div>
     </div>
@@ -3074,130 +3083,130 @@ h1, h2, h3{ text-wrap: balance; }
       <p class="lead" style="margin:18px auto 0;max-width:680px;">Собрали главное: какие задачи решает ИИ-агент, как проходит внедрение, что с безопасностью и экономикой.</p>
     </div>
     <div class="faq-cat reveal">
-      <div class="faq-cat-title"><span class="faq-cat-num">01</span>Боли, которые решает агент</div>
+      <div class="faq-cat-title"><span class="faq-cat-num">01</span>Безопасность, оплата и гарантии</div>
       <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q">Почему сотрудники не могут найти нужный документ?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Потому что документы разбросаны по папкам, чатам, почте и головам коллег, а обычный поиск ищет по названию файла, а не по смыслу. По исследованиям, 42% сотрудников периодически тратят на поиск файла больше времени, чем на работу с ним. ИИ-агент собирает все документы в одну точку и находит не файл, а конкретный ответ со ссылкой на источник.</div></div>
+<div class="faq-item">
+        <button class="faq-q">Какая модель оплаты?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">В два этапа: 50% предоплата на старте работ и 50% — после запуска, когда агент уже работает на ваших документах. Дальше — техническая поддержка и полное сопровождение: следим за качеством ответов, дообучаем агента под новые документы и держим всё в рабочем состоянии. Вы платите за результат, а не за обещания.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Как навести порядок в документах компании?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Идеальный порядок в папках наводить необязательно — достаточно, чтобы по документам можно было мгновенно найти ответ. ИИ-агент индексирует регламенты, договоры и инструкции как есть и отвечает на вопросы обычными словами, показывая, из какого пункта взят ответ. Порядок появляется не в папках, а в доступе к знаниям.</div></div>
+<div class="faq-item">
+        <button class="faq-q">Насколько это безопасно? Что со 152-ФЗ?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Документы хранятся на серверах в РФ и не уходят в ChatGPT или OpenAI. Используются локальные модели и локальное хранение — продукт соответствует требованиям 152-ФЗ. Доступ только у самой компании, на старте подписываем NDA.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Что делать, если все знания держатся в голове одного сотрудника?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Это прямой риск: уходит человек — уходят знания, и процессы встают. Если выгрузить его опыт и рабочие регламенты в ИИ-агента, ответы останутся в компании навсегда и будут доступны любому сотруднику за секунды, без зависимости от одного «незаменимого».</div></div>
+<div class="faq-item">
+        <button class="faq-q">Можно ли доверить ИИ работу с документами компании?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Да, если это агент внутреннего контура, а не публичный чат в интернете. Наш агент отвечает только по документам вашей компании, к каждому ответу прикладывает ссылку на пункт-источник — любой ответ проверяется за секунду. Данные не уходят наружу: локальные модели, хранение в РФ, соответствие 152-ФЗ, NDA на старте.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Как передать дела при увольнении ключевого сотрудника?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Обычная передача дел — это пара недель хаоса и забытые детали. Если знания собраны в ИИ-агенте, новый человек просто задаёт вопросы обычными словами и получает ответы по вашим документам — вместо того чтобы восстанавливать всё по крупицам.</div></div>
+<div class="faq-item">
+        <button class="faq-q">ИИ может ошибаться? Что с «галлюцинациями» нейросетей?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Публичные нейросети действительно могут выдумывать, потому что отвечают «из интернета». Корпоративный агент отвечает только по документам компании и к каждому ответу прикладывает ссылку на пункт-источник — проверить ответ можно за секунду. Если ответа в документах нет, агент так и скажет, а не сочинит.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Как сократить адаптацию новых сотрудников?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Дать новичку инструмент, который отвечает на его вопросы вместо коллег. Первые месяцы новый сотрудник дёргает всех по мелочам: «где взять», «как оформить», «к кому идти». ИИ-агент отвечает мгновенно и по вашим регламентам — новичок выходит на рабочий темп в разы быстрее, а команда не отвлекается.</div></div>
+<div class="faq-item">
+        <button class="faq-q">А вдруг ИИ нам не подойдёт?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Сначала задача, потом ИИ. На аудите мы разбираемся, что у вас болит и сколько это стоит в деньгах. Если ИИ задачу не решит, скажем честно. Если решит, посчитаем эффект ещё до старта работ.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Как разгрузить бухгалтерию, HR и юристов от повторяющихся вопросов?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Передать типовые вопросы ИИ-агенту. Эти отделы перегружены одним и тем же: «какой лимит по командировке», «где шаблон договора», «какой порядок отпуска». Агент отвечает по вашим документам сам, а специалисты занимаются реальной работой, а не справочной.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Сколько денег компания теряет на поиске информации?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Больше, чем кажется: в среднем сотрудник тратит на поиск информации 1,5–2 часа в день — это почти три месяца рабочего времени в год. Для команды из 30 человек потери исчисляются миллионами рублей ежегодно. На бесплатном аудите мы считаем вашу конкретную цифру и показываем, сколько вернёт агент.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Почему менеджеры долго отвечают клиентам и как это ускорить?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Чаще всего менеджер не ленится, а ищет условия, цену или пункт договора, пока клиент остывает. ИИ-агент подсказывает ответ прямо во время звонка или переписки — за пару секунд, со ссылкой на источник. Сделки не успевают остыть.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Как не платить штрафы за документ, который не нашли вовремя?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Держать документы в системе, которая находит их мгновенно. Документ есть, но в момент проверки его не нашли — и это уже штраф от 50 000 ₽. ИИ-агент находит любой документ за секунды и показывает чек-лист: что на месте, чего не хватает, что просрочено.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Как ИИ помогает в продажах?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Убирает паузы, на которых остывают сделки. Менеджер прямо во время звонка спрашивает агента про условия, цены или пункт договора — и отвечает клиенту через пару секунд, а не «я уточню и перезвоню». Плюс типовые документы по сделке — заявки, акты, коммерческие предложения — собираются по шаблону за секунды. Итог: быстрее ответ, быстрее счёт, меньше потерянных клиентов.</div></div>
+<div class="faq-item">
+        <button class="faq-q">Кто поддерживает агента после запуска?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Мы сопровождаем проект после внедрения: следим за качеством ответов, дообучаем агента под новые типы документов и обновляем базу при изменении регламентов. Вы получаете не разовую настройку, а работающий инструмент с поддержкой.</div></div>
       </div>
       </div>
     </div>
     <div class="faq-cat reveal">
       <div class="faq-cat-title"><span class="faq-cat-num">02</span>Что такое ИИ-агент</div>
       <div class="faq-list">
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Что такое ИИ-агент простыми словами?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Это цифровой сотрудник, который прочитал все документы компании и отвечает на вопросы команды, как опытный коллега: понимает вопрос обычными словами, сам находит ответ и показывает источник. В отличие от чат-бота с кнопками, ему не нужны заранее прописанные сценарии.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Это что, обычный чат-бот?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Нет. Чат-бот работает по заранее прописанным кнопкам и сценариям и умеет отвечать только на то, что в него заложили. Агент понимает вопрос, заданный обычными словами, сам находит ответ в ваших документах и показывает, из какого пункта он взят. Это разница между справочником с кнопками и сотрудником, который прочитал все бумаги.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">А если у нас уже есть ChatGPT?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">ChatGPT отвечает из интернета и может выдумать. Наш агент знает только документы самой компании, каждый ответ даёт со ссылкой на пункт, а данные не уходят с её серверов. Это разные инструменты для разных задач.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">ИИ может ошибаться? Что с «галлюцинациями» нейросетей?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Публичные нейросети действительно могут выдумывать, потому что отвечают «из интернета». Корпоративный агент отвечает только по документам компании и к каждому ответу прикладывает ссылку на пункт-источник — проверить ответ можно за секунду. Если ответа в документах нет, агент так и скажет, а не сочинит.</div></div>
-      </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Может ли ИИ-агент заменить целый отдел?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Не заменить, а усилить. Агент берёт на себя рутину — поиск информации и ответы на типовые вопросы по документам, — а сотрудники занимаются сложными задачами и решениями. В итоге команда работает так, будто людей стало больше, без раздувания штата.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Подходит ли ИИ-агент малому и среднему бизнесу?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Да. Внедрение окупается уже в компаниях от 10–15 человек, где есть регламенты, договоры и поток однотипных вопросов. Чем больше времени команда тратит на поиск, тем быстрее окупаемость — обычно 1–2 месяца.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Каким отраслям ИИ-агент по документам полезен больше всего?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Везде, где много регламентов и повторяющихся вопросов: логистика и ВЭД, производство, строительство и девелопмент, финансы, юридические и бухгалтерские услуги, медицина, франшизы и розничные сети. Общий признак один — сотрудники регулярно ищут ответы в документах или спрашивают коллег.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Как ИИ-агент помогает логистическим компаниям?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">В логистике всё завязано на документах: договоры перевозки, транспортные накладные, таможенные требования, регламенты по грузам. Сотрудники теряют часы на поиск нужного условия или правила. ИИ-агент мгновенно находит ответ по всей документации со ссылкой на источник — логист или менеджер получает точный пункт за секунды, а не роется в папках.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Можно ли доверить ИИ работу с документами компании?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Да, если это агент внутреннего контура, а не публичный чат в интернете. Наш агент отвечает только по документам вашей компании, к каждому ответу прикладывает ссылку на пункт-источник — любой ответ проверяется за секунду. Данные не уходят наружу: локальные модели, хранение в РФ, соответствие 152-ФЗ, NDA на старте.</div></div>
       </div>
       </div>
     </div>
     <div class="faq-cat reveal">
       <div class="faq-cat-title"><span class="faq-cat-num">03</span>Внедрение и экономика</div>
       <div class="faq-list">
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Сколько стоит внедрение ИИ-агента и когда он окупится?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Внедрение под ключ — от 45 000 ₽, средний срок — 14 дней. Окупаемость обычно 1–2 месяца за счёт времени, которое команда перестаёт тратить на поиск и повторяющиеся вопросы. Точную выгоду по вашим цифрам считаем на бесплатном аудите — ещё до старта работ.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Сколько времени занимает внедрение?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">В среднем 14 дней. Мы берём ваши документы, встраиваем агента в ваши процессы и структуру, после запуска сопровождаем: следим за работой моделей и дообучаем под новые типы документов.</div></div>
       </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">Мы можем настроить такое сами?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Собрать самому можно, но это месяцы работы и ошибок. Вы получаете готовое и проверенное решение в среднем за 14 дней и ни в чём не разбираетесь сами. Каждый проект собираем индивидуально под ваши документы и процессы.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">А вдруг ИИ нам не подойдёт?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Сначала задача, потом ИИ. На аудите мы разбираемся, что у вас болит и сколько это стоит в деньгах. Если ИИ задачу не решит, скажем честно. Если решит, посчитаем эффект ещё до старта работ.</div></div>
-      </div>
-      <div class="faq-item">
+<div class="faq-item">
         <button class="faq-q">У нас документы в беспорядке — по папкам, чатам и почте. Это проблема?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
         <div class="faq-a"><div class="faq-a-in">Нет, это типовая ситуация — с неё начинаются почти все проекты. На внедрении мы собираем документы, структурируем их и загружаем в агента. Наводить идеальный порядок заранее не нужно.</div></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Какая модель оплаты?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Прозрачная, в два этапа: 50% предоплата на старте работ и 50% — после запуска, когда агент уже работает на ваших документах. Дальше — техническая поддержка и полное сопровождение: следим за качеством ответов, дообучаем агента под новые документы и держим всё в рабочем состоянии. Вы платите за результат, а не за обещания.</div></div>
       </div>
       </div>
     </div>
     <div class="faq-cat reveal">
-      <div class="faq-cat-title"><span class="faq-cat-num">04</span>Безопасность и поддержка</div>
+      <div class="faq-cat-title"><span class="faq-cat-num">04</span>Боли, которые решает агент</div>
       <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q">Насколько это безопасно? Что со 152-ФЗ?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Документы хранятся на серверах в РФ и не уходят в ChatGPT или OpenAI. Используются локальные модели и локальное хранение — продукт соответствует требованиям 152-ФЗ. Доступ только у самой компании, на старте подписываем NDA.</div></div>
+<div class="faq-item">
+        <button class="faq-q">Почему сотрудники не могут найти нужный документ?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Потому что документы разбросаны по папкам, чатам, почте и головам коллег, а обычный поиск ищет по названию файла, а не по смыслу. По исследованиям, 42% сотрудников периодически тратят на поиск файла больше времени, чем на работу с ним. ИИ-агент собирает все документы в одну точку и находит не файл, а конкретный ответ со ссылкой на источник.</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Кто поддерживает агента после запуска?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
-        <div class="faq-a"><div class="faq-a-in">Мы сопровождаем проект после внедрения: следим за качеством ответов, дообучаем агента под новые типы документов и обновляем базу при изменении регламентов. Вы получаете не разовую настройку, а работающий инструмент с поддержкой.</div></div>
+<div class="faq-item">
+        <button class="faq-q">Как навести порядок в документах компании?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Идеальный порядок в папках наводить необязательно — достаточно, чтобы по документам можно было мгновенно найти ответ. ИИ-агент индексирует регламенты, договоры и инструкции как есть и отвечает на вопросы обычными словами, показывая, из какого пункта взят ответ. Порядок появляется не в папках, а в доступе к знаниям.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Что делать, если все знания держатся в голове одного сотрудника?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Это прямой риск: уходит человек — уходят знания, и процессы встают. Если выгрузить его опыт и рабочие регламенты в ИИ-агента, ответы останутся в компании навсегда и будут доступны любому сотруднику за секунды, без зависимости от одного «незаменимого».</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Как передать дела при увольнении ключевого сотрудника?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Обычная передача дел — это пара недель хаоса и забытые детали. Если знания собраны в ИИ-агенте, новый человек просто задаёт вопросы обычными словами и получает ответы по вашим документам — вместо того чтобы восстанавливать всё по крупицам.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Как сократить адаптацию новых сотрудников?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Дать новичку инструмент, который отвечает на его вопросы вместо коллег. Первые месяцы новый сотрудник дёргает всех по мелочам: «где взять», «как оформить», «к кому идти». ИИ-агент отвечает мгновенно и по вашим регламентам — новичок выходит на рабочий темп в разы быстрее, а команда не отвлекается.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Как разгрузить бухгалтерию, HR и юристов от повторяющихся вопросов?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Передать типовые вопросы ИИ-агенту. Эти отделы перегружены одним и тем же: «какой лимит по командировке», «где шаблон договора», «какой порядок отпуска». Агент отвечает по вашим документам сам, а специалисты занимаются реальной работой, а не справочной.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Сколько денег компания теряет на поиске информации?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Больше, чем кажется: в среднем сотрудник тратит на поиск информации 1,5–2 часа в день — это почти три месяца рабочего времени в год. Для команды из 30 человек потери исчисляются миллионами рублей ежегодно. На бесплатном аудите мы считаем вашу конкретную цифру и показываем, сколько вернёт агент.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Почему менеджеры долго отвечают клиентам и как это ускорить?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Чаще всего менеджер не ленится, а ищет условия, цену или пункт договора, пока клиент остывает. ИИ-агент подсказывает ответ прямо во время звонка или переписки — за пару секунд, со ссылкой на источник. Сделки не успевают остыть.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Как не платить штрафы за документ, который не нашли вовремя?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Держать документы в системе, которая находит их мгновенно. Документ есть, но в момент проверки его не нашли — и это уже штраф от 50 000 ₽. ИИ-агент находит любой документ за секунды и показывает чек-лист: что на месте, чего не хватает, что просрочено.</div></div>
+      </div>
+<div class="faq-item">
+        <button class="faq-q">Как ИИ помогает в продажах?<span class="pls"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></button>
+        <div class="faq-a"><div class="faq-a-in">Убирает паузы, на которых остывают сделки. Менеджер прямо во время звонка спрашивает агента про условия, цены или пункт договора — и отвечает клиенту через пару секунд, а не «я уточню и перезвоню». Плюс типовые документы по сделке — заявки, акты, коммерческие предложения — собираются по шаблону за секунды. Итог: быстрее ответ, быстрее счёт, меньше потерянных клиентов.</div></div>
       </div>
       </div>
     </div>
@@ -3472,17 +3481,30 @@ document.addEventListener('DOMContentLoaded', function () {
     +'</ul></div>'
     +'</div>'
     +'<div id="nrdrAi"><div class="nrdr-ai-wait">Готовим персональные рекомендации под вашу сферу…</div></div>'
-    +'<h3>Попробуйте сами прямо сейчас — инструкция для тех, кто никогда не пользовался ИИ</h3>'
+    +'<h3>Попробуйте сами прямо сейчас — даже если никогда не открывали нейросеть</h3>'
+    +'<p style="margin:0 0 10px;line-height:1.6;font-size:.95rem"><b>Шпаргалка: какая нейросеть для чего</b></p>'
+    +'<div class="nrdr-tools">'
+    +'<div class="nrdr-tool"><b>GigaChat</b> — giga.chat<span class="ok">российский, без VPN</span>Безопаснее для рабочих документов с реквизитами</div>'
+    +'<div class="nrdr-tool"><b>Алиса (YandexGPT)</b> — alice.yandex.ru<span class="ok">российский, без VPN</span>Быстрые ответы, письма, короткие тексты</div>'
+    +'<div class="nrdr-tool"><b>Claude</b> — claude.ai<span class="vpn">открывается через VPN</span>Лучший для генерации документов по шаблону и разбора больших договоров</div>'
+    +'<div class="nrdr-tool"><b>ChatGPT</b> — chatgpt.com<span class="vpn">открывается через VPN</span>Универсальные задачи</div>'
+    +'</div>'
+    +'<div class="nrdr-safety"><b>Правила безопасности — прочитайте до первого запроса:</b><ul style="margin:8px 0 0">'
+    +'<li>Документы с реквизитами, персональными данными клиентов и суммами вставляйте только в российские нейросети (GigaChat, Алиса) — либо удаляйте реквизиты и фамилии перед вставкой в Claude и ChatGPT.</li>'
+    +'<li>Не вставляйте базы клиентов и полные выгрузки — только тот документ, с которым работаете.</li>'
+    +'<li>Финальную версию важного документа всегда проверяет человек.</li>'
+    +'</ul></div>'
+    +'<p style="margin:0 0 10px;line-height:1.6;font-size:.95rem"><b>Как пользоваться — 4 шага:</b></p>'
     +'<ol style="margin:0 0 14px">'
-    +'<li><b>Откройте нейросеть.</b> Проще всего: Claude — claude.ai (сильнее всего работает с документами) или GigaChat — giga.chat (российский, работает без VPN). Регистрация за минуту, бесплатно.</li>'
+    +'<li><b>Откройте нейросеть из шпаргалки выше.</b> Начните с GigaChat — регистрация за минуту, бесплатно, без VPN.</li>'
     +'<li><b>Скопируйте готовый запрос ниже</b> кнопкой «Скопировать» и вставьте в окно чата.</li>'
     +'<li><b>Вместо [вставьте ваш документ] вставьте текст</b> своего договора, регламента или шаблона — просто скопируйте из Word.</li>'
-    +'<li><b>Получите результат за 10–20 секунд</b> и проверьте его глазами — важные документы всегда финально проверяет человек.</li>'
+    +'<li><b>Получите результат за 10–20 секунд</b> и проверьте его глазами.</li>'
     +'</ol>'
-    +'<div class="nrdr-prompt"><div class="t">1. Заполнить документ по шаблону <span style="font-weight:500;color:#6B7896">(лучше всего в Claude)</span></div><div class="p">Вот шаблон нашего документа: [вставьте шаблон — акт, договор, заявку]. Вот данные для заполнения: [перечислите: название компании, суммы, даты, реквизиты]. Заполни шаблон этими данными. Формулировки шаблона не меняй, ничего не придумывай. Если каких-то данных не хватает — оставь пропуск и напиши список того, чего не хватило.</div><button type="button" class="copy">Скопировать промпт</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">2. Проверить договор и найти риски</div><div class="p">Вот текст договора: [вставьте ваш документ]. Сделай таблицу: предмет, сроки, сумма, штрафы, условия расторжения, риски для нас. Отдельно отметь пункты, которые стоит перепроверить юристу.</div><button type="button" class="copy">Скопировать промпт</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">3. Ответ клиенту по вашим правилам</div><div class="p">Вот выдержка из нашего регламента: [вставьте ваш документ]. Клиент спрашивает: [вопрос клиента]. Составь короткий вежливый ответ строго по регламенту и укажи пункт, на который ссылаешься. Если ответа в тексте нет — так и напиши.</div><button type="button" class="copy">Скопировать промпт</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">4. Памятка новичку из инструкции</div><div class="p">Вот наша рабочая инструкция: [вставьте ваш документ]. Преврати её в пошаговую памятку для нового сотрудника: 5–7 шагов простыми словами и список частых ошибок.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">1. Заполнить документ по шаблону <span style="font-weight:500;color:#6B7896">(лучше всего в Claude — через VPN; безопасный вариант — GigaChat)</span></div><div class="p">Вот шаблон нашего документа: [вставьте шаблон — акт, договор, заявку]. Вот данные для заполнения: [перечислите: название компании, суммы, даты, реквизиты]. Заполни шаблон этими данными. Формулировки шаблона не меняй, ничего не придумывай. Если каких-то данных не хватает — оставь пропуск и напиши список того, чего не хватило.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">2. Проверить договор и найти риски <span style="font-weight:500;color:#6B7896">(Claude или GigaChat)</span></div><div class="p">Вот текст договора: [вставьте ваш документ]. Сделай таблицу: предмет, сроки, сумма, штрафы, условия расторжения, риски для нас. Отдельно отметь пункты, которые стоит перепроверить юристу.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">3. Ответ клиенту по вашим правилам <span style="font-weight:500;color:#6B7896">(GigaChat или Алиса — безопасно для рабочих данных)</span></div><div class="p">Вот выдержка из нашего регламента: [вставьте ваш документ]. Клиент спрашивает: [вопрос клиента]. Составь короткий вежливый ответ строго по регламенту и укажи пункт, на который ссылаешься. Если ответа в тексте нет — так и напиши.</div><button type="button" class="copy">Скопировать промпт</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">4. Памятка новичку из инструкции <span style="font-weight:500;color:#6B7896">(любая нейросеть)</span></div><div class="p">Вот наша рабочая инструкция: [вставьте ваш документ]. Преврати её в пошаговую памятку для нового сотрудника: 5–7 шагов простыми словами и список частых ошибок.</div><button type="button" class="copy">Скопировать промпт</button></div>'
     +'<p class="nrdr-bridge">Эти приёмы вернут 10–15% потерь, но каждый документ придётся вставлять в нейросеть руками. ИИ-агент Нейродокс уже знает все документы компании сразу: сотрудник просто спрашивает — и получает ответ за 5 секунд. Это разница между 15% и 90% возврата.</p>'
     +'<h3>Как вернуть эти деньги — 3 шага</h3>'
     +'<ol>'
@@ -3528,22 +3550,28 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   // Прямой запрос к Polza из браузера — запасной путь, если PHP-бекенд недоступен.
   function askPolzaDirect(c, sphere){
-    var SYS='Ты — консультант компании «Нейродокс» (внедряет ИИ-агентов по внутренним документам: агент отвечает сотрудникам на вопросы по регламентам и договорам за 5 секунд со ссылкой на пункт). Читатель — руководитель, он НЕ разбирается в нейросетях: пиши просто, без терминов, по-деловому. Его волнует: меньше рутины с документами, меньше штрафов, быстрее ответы клиентам. Ответь СТРОГО валидным JSON без markdown, по-русски: {"pains":[{"title":"...","text":"..."}],"how_to":["..."],"templates":[{"title":"...","where":"...","prompt":"..."}],"reduction":"..."}. pains — ровно 3: где в ЕГО сфере утекают деньги из-за документов и что там делает ИИ-агент. how_to — ровно 4 шага, как его команде (учти её размер) начать пользоваться ИИ на этой неделе, каждый шаг выполним за день. templates — ровно 3 готовых запроса для нейросети (Claude/GigaChat) под его сферу: один про заполнение документа по шаблону, один про проверку важного документа, один про ответ клиенту по правилам компании; в where — куда вставлять запрос простыми словами, в prompt — полный текст с местами [вставьте ваш документ]. reduction — 1 предложение: вручную вернёте 10–15%, ИИ-агент по всем документам — до 90%. Не выдумывай факты, не упоминай цены.';
+    var SYS='Ты — консультант компании «Нейродокс» (внедряет ИИ-агентов по внутренним документам: агент отвечает сотрудникам на вопросы по регламентам и договорам за 5 секунд со ссылкой на пункт). Читатель — руководитель, он НЕ разбирается в нейросетях и сначала будет пробовать обычные нейросети сам — помоги ему честно. Пиши просто, без терминов. Нейросети для советов: GigaChat (giga.chat) и Алиса (alice.yandex.ru) — российские, без VPN, безопаснее для рабочих данных; Claude (claude.ai) — через VPN, лучший для генерации документов по шаблону; ChatGPT — через VPN. Правило: документы с реквизитами — только в российские нейросети. Ответь СТРОГО валидным JSON без markdown, по-русски: {"pains":[{"title":"...","text":"..."}],"how_to":["..."],"templates":[{"title":"...","where":"...","prompt":"..."}],"reduction":"..."}. pains — ровно 3: где в ЕГО сфере утекают деньги из-за документов. how_to — ровно 4 шага, как его команде (учти размер) начать пользоваться обычными нейросетями на этой неделе. templates — ровно 3 запроса под его сферу: заполнение документа по шаблону (советуй Claude, пометь VPN; безопасный вариант GigaChat), проверка важного документа, ответ клиенту по правилам (советуй российские); в where — куда вставлять и почему, с пометкой про VPN; в prompt — полный текст с [вставьте ваш документ]. reduction — 1 предложение: вручную 10–15%, ИИ-агент — до 90%. Не выдумывай факты, не называй цены.';
     var usr='Сфера компании: '+(sphere||'не указана')+'. Сотрудников: '+c.N+'. Обращений в день: '+c.S+'. Минут на поиск: '+c.M+'. Ставка: '+c.H+' ₽/час.';
-    return fetch('https://api.polza.ai/api/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer pza_iOEjjuDpfCJZL1tKr-RFW62sF5oUsHqa'},
-      body:JSON.stringify({model:'openai/gpt-4o-mini',
-        messages:[{role:'system',content:SYS},{role:'user',content:usr}],
-        temperature:0.4,max_tokens:1400,response_format:{type:'json_object'}})
-    }).then(function(r){ if(!r.ok) throw 0; return r.json(); })
-      .then(function(j){
-        var t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
-        t=t.replace(/^```(?:json)?\s*|\s*```$/g,'').trim();
-        var d=JSON.parse(t);
-        if(!d.pains||!d.templates) throw 0;
-        return d;
-      });
+    function call(model){
+      return fetch('https://api.polza.ai/api/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer pza_iOEjjuDpfCJZL1tKr-RFW62sF5oUsHqa'},
+        body:JSON.stringify({model:model,
+          messages:[{role:'system',content:SYS},{role:'user',content:usr}],
+          temperature:0.4,max_tokens:1600})
+      }).then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(j){
+          var t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+          var s=t.indexOf('{'), e=t.lastIndexOf('}');
+          if(s<0||e<=s) throw 0;
+          var d=JSON.parse(t.slice(s,e+1));
+          if(!d.pains||!d.templates) throw 0;
+          return d;
+        });
+    }
+    return call('anthropic/claude-haiku-4.5')
+      .catch(function(){ return call('anthropic/claude-3.5-haiku'); })
+      .catch(function(){ return call('openai/gpt-4o-mini'); });
   }
   function loadAi(m){
     var el=m.querySelector('#nrdrAi');
@@ -3590,7 +3618,32 @@ document.addEventListener('DOMContentLoaded', function () {
       +'<button type="button" class="nrdr-close">Закрыть &#10005;</button></div>'+buildReportHtml();
     m.hidden=false;
     document.body.classList.add('nrdr-open');
-    m.querySelector('.nrdr-print').addEventListener('click', function(){ window.print(); });
+    // Печать через скрытый iframe: в PDF попадает только отчёт, работает во всех браузерах
+    function printReport(){
+      var sheet=m.querySelector('.nrdr-sheet'); if(!sheet){ window.print(); return; }
+      var styles='';
+      [].forEach.call(document.querySelectorAll('style'), function(s){
+        if(s.textContent.indexOf('.nrdr-')!==-1) styles+=s.textContent;
+      });
+      var f=document.createElement('iframe');
+      f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+      document.body.appendChild(f);
+      var doc=f.contentDocument||f.contentWindow.document;
+      doc.open();
+      doc.write('<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Расчёт потерь — Нейродокс</title>'
+        +'<style>body{margin:0;font-family:Manrope,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#0A1428;background:#fff}'
+        +styles
+        +'#lcReportModal{position:static;background:#fff;padding:0;overflow:visible}'
+        +'.nrdr-sheet{box-shadow:none;border-radius:0;max-width:none}'
+        +'.copy{display:none!important}.nrdr-cta{display:none!important}'
+        +'</style></head><body><div id="lcReportModal">'+sheet.outerHTML+'</div></body></html>');
+      doc.close();
+      setTimeout(function(){
+        try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ window.print(); }
+        setTimeout(function(){ if(f.parentNode) f.parentNode.removeChild(f); }, 3000);
+      }, 400);
+    }
+    m.querySelector('.nrdr-print').addEventListener('click', printReport);
     m.querySelector('.nrdr-close').addEventListener('click', function(){
       m.hidden=true; document.body.classList.remove('nrdr-open');
     });
