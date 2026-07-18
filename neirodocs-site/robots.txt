@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /blog/admin.php
+Disallow: /blog/config.php
+Disallow: /blog/lib.php
+Disallow: /blog/data/
+
+Sitemap: https://neirodocs.ru/sitemap.xml
