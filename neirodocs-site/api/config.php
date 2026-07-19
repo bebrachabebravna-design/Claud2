@@ -9,4 +9,4 @@ define('POLZA_MODEL', 'anthropic/claude-haiku-4.5');
 // Запасные модели, если основная недоступна у провайдера:
 define('POLZA_MODELS_FALLBACK', 'anthropic/claude-3.5-haiku,openai/gpt-4o-mini');
 // Лимит запросов к ИИ с одного IP в сутки (защита бюджета от ботов).
-define('REPORT_IP_LIMIT', 8);
+define('REPORT_IP_LIMIT', 40);

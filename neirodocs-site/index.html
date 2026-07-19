@@ -3520,10 +3520,10 @@ document.addEventListener('DOMContentLoaded', function () {
       +'<div class="nrdr-sk w2"></div><div class="nrdr-sk w1"></div>'
     +'</div></div>'
     +'<div id="nrdrFallback" hidden>'
-    +'<h3>Готовые запросы — скопируйте и пользуйтесь</h3>'
-    +'<div class="nrdr-prompt"><div class="t">1. Заполнить документ по шаблону <span class="w">Claude (через VPN) — лучший для этого; безопасно — GigaChat</span></div><div class="p">Вот шаблон нашего документа: [вставьте шаблон — акт, договор, заявку]. Вот данные для заполнения: [перечислите: название компании, суммы, даты, реквизиты]. Заполни шаблон этими данными. Формулировки шаблона не меняй, ничего не придумывай. Если каких-то данных не хватает — оставь пропуск и напиши список того, чего не хватило.</div><button type="button" class="copy">Скопировать запрос</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">2. Проверить договор и найти риски <span class="w">Claude или GigaChat</span></div><div class="p">Вот текст договора: [вставьте ваш документ]. Сделай таблицу: предмет, сроки, сумма, штрафы, условия расторжения, риски для нас. Отдельно отметь пункты, которые стоит перепроверить юристу.</div><button type="button" class="copy">Скопировать запрос</button></div>'
-    +'<div class="nrdr-prompt"><div class="t">3. Ответ клиенту по вашим правилам <span class="w">GigaChat или Алиса — без VPN, безопасно</span></div><div class="p">Вот выдержка из нашего регламента: [вставьте ваш документ]. Клиент спрашивает: [вопрос клиента]. Составь короткий вежливый ответ строго по регламенту и укажи пункт, на который ссылаешься. Если ответа в тексте нет — так и напиши.</div><button type="button" class="copy">Скопировать запрос</button></div>'
+    +'<h3>Готовые запросы — скопируйте, вставьте свой документ и пользуйтесь</h3>'
+    +'<div class="nrdr-prompt"><div class="t">1. Заполнить документ по шаблону <span class="w">Claude (через VPN) — лучший для этого; безопасно — GigaChat</span></div><div class="p">Ты — внимательный офис-менеджер, который безошибочно заполняет документы по шаблону. Вот шаблон нашего документа: [вставьте шаблон — акт, договор, заявку]. Вот данные для заполнения: [название компании, суммы, даты, реквизиты]. Заполни шаблон строго этими данными, формулировки шаблона не меняй и ничего не придумывай. Если каких-то данных не хватает — сначала задай мне 2–3 уточняющих вопроса, а потом заполняй. В конце перечисли, что осталось проверить человеку.</div><button type="button" class="copy">Скопировать запрос</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">2. Проверить договор и найти риски <span class="w">Claude или GigaChat</span></div><div class="p">Ты — опытный юрист по договорам. Проверь договор ниже с позиции защиты наших интересов. Вот текст: [вставьте ваш документ]. Сделай таблицу по пунктам: предмет, сроки, сумма и порядок оплаты, штрафы и пени, условия расторжения, гарантии, ответственность сторон. Отдельным блоком выпиши 3–5 самых рискованных для нас пунктов и что в них изменить. Если чего-то в договоре нет, но оно должно быть — так и укажи.</div><button type="button" class="copy">Скопировать запрос</button></div>'
+    +'<div class="nrdr-prompt"><div class="t">3. Ответ клиенту по вашим правилам <span class="w">GigaChat или Алиса — без VPN, безопасно</span></div><div class="p">Ты — вежливый менеджер по работе с клиентами. Отвечай строго по нашему регламенту, ничего не выдумывай. Вот выдержка из регламента: [вставьте ваш документ]. Клиент спрашивает: [вопрос клиента]. Составь короткий понятный ответ клиенту и укажи, на какой пункт регламента он опирается. Если точного ответа в тексте нет — честно напиши об этом и предложи, к кому уточнить.</div><button type="button" class="copy">Скопировать запрос</button></div>'
     +'<p class="nrdr-bridge">Эти приёмы вернут 10–15% потерь, но каждый документ придётся вставлять в нейросеть руками. ИИ-агент Нейродокс знает все документы компании сразу: сотрудник просто спрашивает — и получает ответ за 5 секунд.</p>'
     +'</div>'
     +'<h3>Факты, о которых стоит знать</h3>'
@@ -3597,31 +3597,6 @@ document.addEventListener('DOMContentLoaded', function () {
     html+='</div>';
     el.innerHTML=html;
   }
-  // Прямой запрос к Polza из браузера — запасной путь, если PHP-бекенд недоступен.
-  function askPolzaDirect(c, sphere){
-    var SYS='Ты — эксперт по оптимизации бизнес-процессов с помощью ИИ в компании «Нейродокс». Готовишь посетителю БЕСПЛАТНЫЙ ПЕРСОНАЛЬНЫЙ РАЗБОР: как оптимизировать рутину в документах. Читатель — руководитель, НЕ разбирается в нейросетях: пиши просто, без терминов. ГЛАВНОЕ — КОНКРЕТИКА ПОД ЕГО НИШУ: каждый пункт обязан называть реальные документы, процессы и роли его отрасли (пример глубины для стройки: сметы, акты КС-2/КС-3, договоры с подрядчиками, прорабы, сметчики — адаптируй под сферу клиента, не копируй). Общие фразы типа «сотрудники долго ищут информацию» ЗАПРЕЩЕНЫ. ЦИФРЫ: используй только переданные, выдумывать суммы и статистику ЗАПРЕЩЕНО. ТОН: «обычно в вашей сфере», не категорично; если сфера непонятна — дай общий разбор для бизнеса, не выдумывай отрасль. Нейросети: GigaChat (giga.chat), Алиса (alice.yandex.ru) — российские, без VPN, безопасны для рабочих данных; Claude (claude.ai) — через VPN, лучший для документов; ChatGPT — через VPN. Ответь СТРОГО валидным JSON без markdown: {"quick_win":{"title":"...","text":"...","result":"..."},"pains":[{"title":"...","text":"..."}],"plan":[{"day":"...","title":"...","text":"..."}],"templates":[{"title":"...","where":"...","prompt":"..."}],"security":["..."],"agent_next":"..."}. quick_win — что даст результат прямо сейчас за 10 минут: конкретное действие с документом его сферы (заполнить шаблон или проверить договор через нейросеть); text — точные шаги (какую нейросеть открыть, что вставить); result — ОБЯЗАТЕЛЬНО что это действие даёт в итоге ощутимой выгодой (напр. «таблица рисков за 2 минуты вместо часа юриста»). pains — ровно 3, с документами и ролями отрасли. plan — ровно 4 дня с учётом размера команды: кому поручить (роль отрасли), с чего начать. templates — ровно 3 ПРОРАБОТАННЫХ, ДЛИННЫХ запроса под нишу, каждый с конкретным документом отрасли: 1) заполнение/автосоставление типового документа сферы по шаблону — обязательно советуй Claude (через VPN, лучший для этого), безопасная альтернатива GigaChat; 2) проверка важного документа сферы на риски; 3) ответ клиенту или сотруднику по правилам (российские нейросети). prompt — полный, подробный, готовый к вставке текст с [вставьте ваш документ] и пояснением, что подставить. security — 3 правила с примерами документов его сферы. agent_next — мягко, без продажи: ручной способ = вставлять каждый документ самому; если захочется, чтобы ИИ знал все документы сразу — можно просто спросить нас в Telegram. Без цен.';
-    var usr='Сфера компании: '+(sphere||'не указана')+'. Сотрудников: '+c.N+'. Обращений в день: '+c.S+'. Минут на поиск: '+c.M+'. Ставка: '+c.H+' ₽/час.';
-    function call(model){
-      return fetch('https://api.polza.ai/api/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer pza_iOEjjuDpfCJZL1tKr-RFW62sF5oUsHqa'},
-        body:JSON.stringify({model:model,
-          messages:[{role:'system',content:SYS},{role:'user',content:usr}],
-          temperature:0.4,max_tokens:1600})
-      }).then(function(r){ if(!r.ok) throw 0; return r.json(); })
-        .then(function(j){
-          var t=(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
-          var s=t.indexOf('{'), e=t.lastIndexOf('}');
-          if(s<0||e<=s) throw 0;
-          var d=JSON.parse(t.slice(s,e+1));
-          if(!d.pains||!d.plan||!d.templates) throw 0;
-          return d;
-        });
-    }
-    return call('anthropic/claude-haiku-4.5')
-      .catch(function(){ return call('anthropic/claude-3.5-haiku'); })
-      .catch(function(){ return call('openai/gpt-4o-mini'); });
-  }
   // анимированная смена сообщений в плашке загрузки
   var nrdrMsgTimer=null;
   function startLoaderMsgs(){
@@ -3676,20 +3651,28 @@ document.addEventListener('DOMContentLoaded', function () {
       var cached=sessionStorage.getItem(key);
       if(cached){ stopLoaderMsgs(); renderAi(el, JSON.parse(cached)); return; }
     }catch(e){}
+    var done=false;
     function ok(d){
+      if(done) return; done=true;
       stopLoaderMsgs();
       try{ sessionStorage.setItem(key, JSON.stringify(d)); }catch(e){}
       renderAi(el, d);
     }
+    function giveUp(){ if(done) return; done=true; fail(); }
+    // жёсткий сторож: что бы ни случилось, загрузка НИКОГДА не висит вечно —
+    // максимум через 65 секунд показываем полезный запасной блок.
+    var watchdog=setTimeout(giveUp, 65000);
+    function finish(fn){ clearTimeout(watchdog); fn(); }
+
     var payload={sphere:sphere,employees:c.N,requests:c.S,minutes:c.M,rate:c.H};
-    // 1) сервер, при сбое (кроме лимита) — 2) повтор сервера, при сбое — 3) прямой путь, иначе — общий блок
-    serverReport(payload, 35000)
-      .then(ok)
-      .catch(function(err){
-        if(err && err.why==='limit'){ return askPolzaDirect(c, sphere).then(ok).catch(fail); }
-        return serverReport(payload, 35000).then(ok).catch(function(){
-          askPolzaDirect(c, sphere).then(ok).catch(fail);
-        });
+    // Только надёжный серверный путь (сервер→Polza, без CORS): попытка + один повтор.
+    // При любом сбое — понятный запасной блок. Никаких прямых запросов из браузера.
+    serverReport(payload, 28000)
+      .then(function(d){ finish(function(){ ok(d); }); })
+      .catch(function(){
+        serverReport(payload, 28000)
+          .then(function(d){ finish(function(){ ok(d); }); })
+          .catch(function(){ finish(giveUp); });
       });
   }
   function openReport(){
