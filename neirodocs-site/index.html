@@ -2998,6 +2998,16 @@ h1, h2, h3{ text-wrap: balance; }
         .nrdr-prompt .copy{margin-top:8px;padding:7px 14px;border:0;border-radius:999px;background:#E0EAFF;color:#0D3CB8;font:700 .82rem/1 Manrope,system-ui,sans-serif;cursor:pointer}
         .nrdr-prompt .copy:hover{background:#CBDBFF}
         .nrdr-ai-wait{background:#EAF1FF;border:1px solid #C9D9F7;border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:.95rem;color:#0D3CB8}
+        .nrdr-loader{padding:4px 0 8px;margin-bottom:20px}
+        .nrdr-loader-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+        .nrdr-spin{width:26px;height:26px;border-radius:50%;border:3px solid #D9E4F7;border-top-color:#1D5DE3;animation:nrdrspin .8s linear infinite;flex:0 0 auto}
+        @keyframes nrdrspin{to{transform:rotate(360deg)}}
+        .nrdr-loader-msg{font-weight:700;color:#0D3CB8;font-size:1.02rem;transition:opacity .25s}
+        .nrdr-sk{height:14px;border-radius:7px;background:linear-gradient(90deg,#EEF2FA 25%,#DCE6F6 37%,#EEF2FA 63%);background-size:400% 100%;animation:nrdrsk 1.4s ease infinite;margin-bottom:11px}
+        @keyframes nrdrsk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+        .nrdr-sk.w1{width:55%}.nrdr-sk.w2{width:92%}.nrdr-sk.w3{width:74%}
+        .nrdr-sk.card{height:70px;border-radius:14px;margin-bottom:16px}
+        @media(prefers-reduced-motion:reduce){.nrdr-spin,.nrdr-sk{animation:none}}
         .nrdr-ai{background:#F0F5FF;border:1px solid #C9D9F7;border-radius:14px;padding:20px 22px;margin-bottom:24px}
         .nrdr-ai h3{margin-top:0}
         .nrdr-ai .tag{display:inline-block;background:#1D5DE3;color:#fff;font:700 .72rem/1 Manrope,sans-serif;border-radius:999px;padding:5px 10px;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase}
@@ -3503,7 +3513,12 @@ document.addEventListener('DOMContentLoaded', function () {
     +'<div class="yr">≈ '+money(c.lossYr)+' в год · '+Math.round(c.hoursMo).toLocaleString('ru-RU')+' часов ежемесячно · ≈ '+months+' человеко-месяцев в год впустую</div></div>'
     +'<div class="nrdr-rec">До 90% этих потерь можно вернуть: из '+money(c.lossMo)+'/мес это <b>'+money(c.recover)+'/мес</b> (≈ '+money(c.recoverYr)+' в год)'
     +'<br>'+payline+'</div>'
-    +'<div id="nrdrAi"><div class="nrdr-ai-wait">Готовим персональный разбор под вашу сферу…</div></div>'
+    +'<div id="nrdrAi"><div class="nrdr-loader">'
+      +'<div class="nrdr-loader-head"><div class="nrdr-spin"></div><div class="nrdr-loader-msg" id="nrdrMsg">Анализируем вашу нишу…</div></div>'
+      +'<div class="nrdr-sk card"></div>'
+      +'<div class="nrdr-sk w2"></div><div class="nrdr-sk w1"></div><div class="nrdr-sk w3"></div>'
+      +'<div class="nrdr-sk w2"></div><div class="nrdr-sk w1"></div>'
+    +'</div></div>'
     +'<div id="nrdrFallback" hidden>'
     +'<h3>Готовые запросы — скопируйте и пользуйтесь</h3>'
     +'<div class="nrdr-prompt"><div class="t">1. Заполнить документ по шаблону <span class="w">Claude (через VPN) — лучший для этого; безопасно — GigaChat</span></div><div class="p">Вот шаблон нашего документа: [вставьте шаблон — акт, договор, заявку]. Вот данные для заполнения: [перечислите: название компании, суммы, даты, реквизиты]. Заполни шаблон этими данными. Формулировки шаблона не меняй, ничего не придумывай. Если каких-то данных не хватает — оставь пропуск и напиши список того, чего не хватило.</div><button type="button" class="copy">Скопировать запрос</button></div>'
@@ -3607,11 +3622,49 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(function(){ return call('anthropic/claude-3.5-haiku'); })
       .catch(function(){ return call('openai/gpt-4o-mini'); });
   }
+  // анимированная смена сообщений в плашке загрузки
+  var nrdrMsgTimer=null;
+  function startLoaderMsgs(){
+    stopLoaderMsgs();
+    var msgs=['Анализируем вашу нишу…','Ищем, где утекают деньги на документах…',
+      'Подбираем запросы для нейросетей под вашу сферу…','Составляем план на неделю…',
+      'Проверяем правила безопасности…','Почти готово…'];
+    var i=0;
+    nrdrMsgTimer=setInterval(function(){
+      var el=document.getElementById('nrdrMsg');
+      if(!el){ stopLoaderMsgs(); return; }
+      i=(i+1)%msgs.length;
+      el.style.opacity='0';
+      setTimeout(function(){ if(el){ el.textContent=msgs[i]; el.style.opacity='1'; } }, 250);
+    }, 2200);
+  }
+  function stopLoaderMsgs(){ if(nrdrMsgTimer){ clearInterval(nrdrMsgTimer); nrdrMsgTimer=null; } }
+
+  // один POST на сервер с таймаутом; возвращает промис с данными или reject
+  function serverReport(payload, ms){
+    var ctrl=('AbortController' in window)?new AbortController():null;
+    var t=setTimeout(function(){ if(ctrl) ctrl.abort(); }, ms);
+    return fetch('/api/report.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload),
+      signal:ctrl?ctrl.signal:undefined
+    }).then(function(r){ return r.json(); })
+      .then(function(j){
+        clearTimeout(t);
+        if(j && j.ok && j.data){ return j.data; }
+        // 'limit' — не ретраим, сразу к прямому пути; остальное можно ретраить
+        var e=new Error(j&&j.why||'fail'); e.why=j&&j.why; throw e;
+      }, function(err){ clearTimeout(t); throw err; });
+  }
+
   function loadAi(m){
     var el=m.querySelector('#nrdrAi');
     if(!el) return;
+    startLoaderMsgs();
     // если ИИ не сработал — показываем общий запасной блок с одним набором запросов
     function fail(){
+      stopLoaderMsgs();
       el.innerHTML='';
       var fb=m.querySelector('#nrdrFallback');
       if(fb) fb.hidden=false;
@@ -3621,30 +3674,22 @@ document.addEventListener('DOMContentLoaded', function () {
     var key='nrdAi_'+[sphere,c.N,c.S,c.M,c.H].join('_');
     try{
       var cached=sessionStorage.getItem(key);
-      if(cached){ renderAi(el, JSON.parse(cached)); return; }
+      if(cached){ stopLoaderMsgs(); renderAi(el, JSON.parse(cached)); return; }
     }catch(e){}
     function ok(d){
+      stopLoaderMsgs();
       try{ sessionStorage.setItem(key, JSON.stringify(d)); }catch(e){}
       renderAi(el, d);
     }
-    var ctrl=('AbortController' in window)?new AbortController():null;
-    var t=setTimeout(function(){ if(ctrl) ctrl.abort(); }, 40000);
-    fetch('/api/report.php',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sphere:sphere,employees:c.N,requests:c.S,minutes:c.M,rate:c.H}),
-      signal:ctrl?ctrl.signal:undefined
-    })
-      .then(function(r){ return r.json(); })
-      .then(function(j){
-        clearTimeout(t);
-        if(j && j.ok && j.data){ ok(j.data); }
-        else { throw 0; }
-      })
-      .catch(function(){
-        clearTimeout(t);
-        // запасной путь: напрямую из браузера, если и он упал — общий блок
-        askPolzaDirect(c, sphere).then(ok).catch(fail);
+    var payload={sphere:sphere,employees:c.N,requests:c.S,minutes:c.M,rate:c.H};
+    // 1) сервер, при сбое (кроме лимита) — 2) повтор сервера, при сбое — 3) прямой путь, иначе — общий блок
+    serverReport(payload, 35000)
+      .then(ok)
+      .catch(function(err){
+        if(err && err.why==='limit'){ return askPolzaDirect(c, sphere).then(ok).catch(fail); }
+        return serverReport(payload, 35000).then(ok).catch(function(){
+          askPolzaDirect(c, sphere).then(ok).catch(fail);
+        });
       });
   }
   function openReport(){

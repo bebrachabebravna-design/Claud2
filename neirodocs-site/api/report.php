@@ -148,8 +148,8 @@ foreach ($models as $model) {
             'Authorization: Bearer ' . POLZA_API_KEY,
         ],
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT => 18,
+        CURLOPT_CONNECTTIMEOUT => 8,
     ]);
     $resp = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
