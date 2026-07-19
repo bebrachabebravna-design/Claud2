@@ -2628,12 +2628,12 @@ h1, h2, h3{ text-wrap: balance; }
         Отвечает на&nbsp;любой вопрос за&nbsp;<span class="accent">пять секунд</span> со&nbsp;ссылкой на&nbsp;пункт-источник. Команда возвращает <span class="accent">1,5–2&nbsp;часа в&nbsp;день</span> на&nbsp;человека, а&nbsp;вы&nbsp;— прибыль, которая утекала на&nbsp;рутину. Суммарно сэкономили бизнесам <span class="accent">больше 20&nbsp;млн&nbsp;₽</span> на&nbsp;рутине в&nbsp;документах.
       </p>
       <div class="hero-actions reveal">
-        <a href="#audit-cta" class="hero-btn hero-btn-primary">
-          Записаться на&nbsp;аудит
+        <a href="#calc" class="hero-btn hero-btn-primary">
+          Получить план внедрения ИИ бесплатно
           <svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M1 7h12m0 0L8 2m5 5L8 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <a href="/cases/" class="hero-btn hero-btn-ghost">
-          Смотреть кейсы
+        <a href="#audit-cta" class="hero-btn hero-btn-ghost">
+          Записаться на&nbsp;аудит
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
@@ -2905,12 +2905,12 @@ h1, h2, h3{ text-wrap: balance; }
 
 <!-- ФИНАЛЬНЫЙ CTA -->
 <!-- КАЛЬКУЛЯТОР ПОТЕРЬ -->
-<section class="loss-calc-section" style="background: var(--paper-mute);">
+<section class="loss-calc-section" id="calc" style="background: var(--paper-mute); scroll-margin-top: 84px;">
   <div class="wrap">
     <div class="s-head reveal" style="text-align:center;max-width:760px;margin:0 auto 44px;">
-      <span class="eyebrow">Калькулятор потерь</span>
-      <h2 class="t-h1">Сколько ваша компания <span class="italic" style="color:var(--acc);">теряет</span> на поиске информации</h2>
-      <p class="lead" style="margin:18px auto 0;">Сотрудники каждый день ищут ответы в документах, чатах и у коллег. Посчитайте, во сколько это обходится — и сколько вернёт ИИ-агент.</p>
+      <span class="eyebrow">Бесплатно · за 2 минуты</span>
+      <h2 class="t-h1">Персональный план внедрения ИИ <span class="italic" style="color:var(--acc);">в вашу компанию</span></h2>
+      <p class="lead" style="margin:18px auto 0;">Подвиньте ползунки под свою компанию — и получите бесплатный план: где вы теряете деньги на документах и что запустить уже на этой неделе, чтобы вернуть их.</p>
     </div>
     <div class="lc-wrap reveal">
       <div class="lc-controls">
@@ -2951,6 +2951,9 @@ h1, h2, h3{ text-wrap: balance; }
         .lc-capture input[type=text]:focus{border-color:#fff;background:rgba(255,255,255,.18)}
         .lc-capture-note{font-size:.86rem;color:rgba(255,255,255,.7);margin:8px 0 0}
         .lc-capture-ok{font-size:.98rem;font-weight:600;color:#B9F6CA;margin:8px 0 0}
+        .lc-inside{list-style:none;padding:0;margin:0 0 16px;display:grid;gap:7px}
+        .lc-inside li{position:relative;padding-left:26px;font-size:.96rem;line-height:1.45;color:rgba(255,255,255,.92)}
+        .lc-inside li::before{content:"";position:absolute;left:0;top:2px;width:17px;height:17px;border-radius:50%;background:#17A45C url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') center/11px no-repeat}
         /* Модальный отчёт из калькулятора */
         #lcReportModal{position:fixed;inset:0;z-index:1000;overflow-y:auto;background:rgba(10,20,40,.65);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);padding:28px 16px 48px}
         #lcReportModal[hidden]{display:none}
@@ -2996,6 +2999,16 @@ h1, h2, h3{ text-wrap: balance; }
         .nrdr-ai{background:#F0F5FF;border:1px solid #C9D9F7;border-radius:14px;padding:20px 22px;margin-bottom:24px}
         .nrdr-ai h3{margin-top:0}
         .nrdr-ai .tag{display:inline-block;background:#1D5DE3;color:#fff;font:700 .72rem/1 Manrope,sans-serif;border-radius:999px;padding:5px 10px;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase}
+        .nrdr-pains li{margin-bottom:8px;line-height:1.5}
+        .nrdr-plan{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+        .nrdr-day{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid #D9E4F7;border-radius:12px;padding:12px 14px}
+        .nrdr-day .d{flex:0 0 auto;background:#1D5DE3;color:#fff;font:700 .8rem/1 Manrope,sans-serif;border-radius:8px;padding:7px 10px;white-space:nowrap}
+        .nrdr-day .dc{display:flex;flex-direction:column;gap:3px;font-size:.94rem;line-height:1.5}
+        .nrdr-day .dc b{color:#0A1428}
+        .nrdr-day .dc span{color:#41506F}
+        .nrdr-prompt .w{font-size:.85rem;color:#6B7896;margin-bottom:6px}
+        .nrdr-sec li{margin-bottom:7px;line-height:1.5;font-size:.95rem}
+        .nrdr-agentnext{background:#EAF7EF;border-left:3px solid #17A45C;border-radius:0 10px 10px 0;padding:12px 16px;margin-top:14px;font-size:.95rem;line-height:1.55;color:#0B6B39}
         .nrdr-tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
         @media(max-width:640px){.nrdr-tools{grid-template-columns:1fr}}
         .nrdr-tool{background:#F4F7FD;border:1px solid #E4E8F0;border-radius:12px;padding:12px 14px;font-size:.9rem;line-height:1.5}
@@ -3015,16 +3028,23 @@ h1, h2, h3{ text-wrap: balance; }
         }
         </style>
         <div class="lc-capture">
-          <div class="lc-capture-title">Забрать этот расчёт в&nbsp;PDF с&nbsp;планом, как вернуть деньги</div>
+          <div class="lc-capture-title">Получить бесплатный план внедрения ИИ под вашу компанию</div>
+          <ul class="lc-inside">
+            <li>Где именно в&nbsp;вашей нише утекают деньги на&nbsp;документах</li>
+            <li>План на&nbsp;эту неделю по&nbsp;дням: с&nbsp;чего начать и&nbsp;кому поручить</li>
+            <li>Готовые запросы для нейросетей под&nbsp;вашу сферу&nbsp;— скопировал и&nbsp;пользуешься</li>
+            <li>Как безопасно дать команде ИИ и&nbsp;не&nbsp;слить данные компании</li>
+            <li>Окупаемость под&nbsp;ваши цифры</li>
+          </ul>
           <form id="calcForm" novalidate>
             <input type="text" name="Сфера" id="calcSphere" placeholder="Чем занимается компания (например, логистика)" style="flex:1 1 100%;">
             <input type="text" name="Контакт" placeholder="Телефон, @telegram или email" required>
             <input type="hidden" name="Расчёт" id="calcData" value="">
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-            <button type="submit" class="btn btn-primary">Сформировать мой расчёт</button>
+            <button type="submit" class="btn btn-primary">Получить план бесплатно</button>
           </form>
-          <p class="lc-capture-note">Отчёт формируется за&nbsp;пару секунд и&nbsp;сразу даёт результат: готовые запросы для нейросетей под&nbsp;вашу сферу и&nbsp;план, с&nbsp;чего начать. Сохраните его в&nbsp;PDF&nbsp;— а&nbsp;мы&nbsp;свяжемся и&nbsp;разберём, как вернуть эти деньги под&nbsp;ваш бизнес.</p>
-          <p class="lc-capture-ok" hidden>Готово! Ваш расчёт открылся в&nbsp;новой вкладке&nbsp;— сохраните его в&nbsp;PDF. Мы&nbsp;свяжемся в&nbsp;течение рабочего дня.</p>
+          <p class="lc-capture-note">Готовится за&nbsp;пару секунд под&nbsp;вашу сферу&nbsp;— можно сохранить в&nbsp;PDF. Это не&nbsp;созвон: пользу получаете сразу, а&nbsp;мы&nbsp;свяжемся, только чтобы разобрать ваш случай, если захотите.</p>
+          <p class="lc-capture-ok" hidden>Готово! Ваш план открылся&nbsp;— сохраните его в&nbsp;PDF кнопкой сверху. Мы&nbsp;свяжемся в&nbsp;течение рабочего дня.</p>
         </div>
         <a href="#audit-cta" class="lc-cta" style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:rgba(255,255,255,.85);font-weight:600;text-decoration:underline;">Или посчитать точную выгоду на аудите <span class="arr" style="display:inline-flex;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
       </div>
@@ -3446,15 +3466,20 @@ document.addEventListener('DOMContentLoaded', function () {
   function buildReportHtml(){
     var c=window.__calc; if(!c) return '';
     var d=new Date(), dd=d.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
-    // окупаемость внедрения из его же цифр: от 45 000 ₽ / возврат в день
-    var perDay=c.recover/21;
-    var payback=perDay>0?Math.max(1,Math.ceil(45000/perDay)):null;
+    // Честная окупаемость: цена внедрения / месячный возврат. Показываем правдоподобно,
+    // без «за 3 дня» — консервативно, диапазоном в месяцах.
+    var payMonthsHi=c.recover>0?45000/c.recover:99;   // при минимальной цене 45 000
+    var payMonthsMax=c.recover>0?150000/c.recover:99;  // при верхней цене ~150 000
+    var payline;
+    if(payMonthsMax<=1) payline='При ваших цифрах внедрение (от 45 000 ₽) окупается <b>уже в первый месяц</b> — дальше это чистая экономия.';
+    else { var mm=Math.max(1,Math.round(payMonthsMax)); payline='При ваших цифрах внедрение окупается примерно за <b>'+mm+' '+(mm===1?'месяц':(mm<5?'месяца':'месяцев'))+'</b>. В среднем по клиентам — 1–2 месяца.'; }
     var months=(c.hoursMo*12/168).toFixed(0); // человеко-месяцев в год впустую
     return ''
     +'<div class="nrdr-sheet">'
     +'<div class="nrdr-hd"><div class="nrdr-brand"><img src="/assets/brand-icon.png" alt="">Нейродокс</div>'
-    +'<h2>Ваш расчёт потерь на поиске по документам</h2>'
-    +'<div class="nrdr-sub">Подготовлено '+dd+' на основе введённых вами данных</div></div>'
+    +'<span style="display:inline-block;background:rgba(255,255,255,.22);color:#fff;font:700 .72rem/1 Manrope,sans-serif;border-radius:999px;padding:5px 11px;margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase">Бесплатный план внедрения ИИ</span>'
+    +'<h2>Как внедрить ИИ в вашу компанию — план на эту неделю</h2>'
+    +'<div class="nrdr-sub">Подготовлено '+dd+' под вашу нишу на основе введённых вами данных</div></div>'
     +'<div class="nrdr-bd">'
     +'<div class="nrdr-row">'
     +'<div class="nrdr-io"><div class="l">Сотрудников</div><div class="v">'+c.N+'</div></div>'
@@ -3466,7 +3491,7 @@ document.addEventListener('DOMContentLoaded', function () {
     +'<div class="n">'+money(c.lossMo)+' / мес</div>'
     +'<div class="yr">≈ '+money(c.lossYr)+' в год · '+Math.round(c.hoursMo).toLocaleString('ru-RU')+' часов ежемесячно · ≈ '+months+' человеко-месяцев в год впустую</div></div>'
     +'<div class="nrdr-rec">С ИИ-агентом возвращаете <b>'+money(c.recover)+'/мес</b> (≈ '+money(c.recoverYr)+' в год)'
-    +(payback?'<br>Внедрение от 45 000 ₽ окупается у вас примерно за <b>'+payback+' '+(payback===1?'рабочий день':(payback<5?'рабочих дня':'рабочих дней'))+'</b>':'')+'</div>'
+    +'<br>'+payline+'</div>'
     +'<div class="nrdr-cols">'
     +'<div><h3>Для сравнения</h3><ul>'
     +'<li>По исследованиям, сотрудник тратит на поиск информации 1,5–2 часа в день — почти 3 месяца рабочего времени в год.</li>'
@@ -3522,35 +3547,43 @@ document.addEventListener('DOMContentLoaded', function () {
   // Кэш в sessionStorage: повторное открытие отчёта не тратит запросы к ИИ.
   function esc(s){ var d=document.createElement('div'); d.textContent=String(s); return d.innerHTML; }
   function renderAi(el, d){
-    var html='<div class="nrdr-ai"><span class="tag">Персонально под вашу компанию</span>';
+    var html='<div class="nrdr-ai"><span class="tag">Персональный план под вашу нишу</span>';
     if(d.pains && d.pains.length){
-      html+='<h3>Где у вас утекают деньги и время</h3><ul>';
+      html+='<h3>Где именно в вашей нише утекают деньги</h3><ul class="nrdr-pains">';
       d.pains.slice(0,3).forEach(function(s){
         html+='<li><b>'+esc(s.title)+'.</b> '+esc(s.text)+'</li>';
       });
       html+='</ul>';
     }
-    if(d.how_to && d.how_to.length){
-      html+='<h3>Как вашей команде начать пользоваться ИИ на этой неделе</h3><ol>';
-      d.how_to.slice(0,4).forEach(function(s){ html+='<li>'+esc(s)+'</li>'; });
-      html+='</ol>';
+    if(d.plan && d.plan.length){
+      html+='<h3>Ваш план на эту неделю — по дням</h3><div class="nrdr-plan">';
+      d.plan.slice(0,4).forEach(function(s){
+        html+='<div class="nrdr-day"><div class="d">'+esc(s.day||'')+'</div>'
+          +'<div class="dc"><b>'+esc(s.title||'')+'</b>'+(s.text?'<span>'+esc(s.text)+'</span>':'')+'</div></div>';
+      });
+      html+='</div>';
     }
     if(d.templates && d.templates.length){
-      html+='<h3>Готовые запросы под вашу сферу</h3>';
+      html+='<h3>Готовые запросы под вашу нишу — скопируйте и пользуйтесь</h3>';
       d.templates.slice(0,3).forEach(function(p){
         html+='<div class="nrdr-prompt"><div class="t">'+esc(p.title)+'</div>'
-          +(p.where?'<div style="font-size:.85rem;color:#6B7896;margin-bottom:6px">'+esc(p.where)+'</div>':'')
+          +(p.where?'<div class="w">'+esc(p.where)+'</div>':'')
           +'<div class="p">'+esc(p.prompt)+'</div>'
-          +'<button type="button" class="copy">Скопировать промпт</button></div>';
+          +'<button type="button" class="copy">Скопировать запрос</button></div>';
       });
     }
-    if(d.reduction) html+='<p style="margin:12px 0 0;font-weight:600;line-height:1.55">'+esc(d.reduction)+'</p>';
+    if(d.security && d.security.length){
+      html+='<h3>Как разрешить команде ИИ и не слить данные</h3><ul class="nrdr-sec">';
+      d.security.slice(0,4).forEach(function(s){ html+='<li>'+esc(s)+'</li>'; });
+      html+='</ul>';
+    }
+    if(d.agent_next) html+='<div class="nrdr-agentnext"><b>Где ручной способ упирается в потолок:</b> '+esc(d.agent_next)+'</div>';
     html+='</div>';
     el.innerHTML=html;
   }
   // Прямой запрос к Polza из браузера — запасной путь, если PHP-бекенд недоступен.
   function askPolzaDirect(c, sphere){
-    var SYS='Ты — консультант компании «Нейродокс» (внедряет ИИ-агентов по внутренним документам: агент отвечает сотрудникам на вопросы по регламентам и договорам за 5 секунд со ссылкой на пункт). Читатель — руководитель, он НЕ разбирается в нейросетях и сначала будет пробовать обычные нейросети сам — помоги ему честно. Пиши просто, без терминов. Нейросети для советов: GigaChat (giga.chat) и Алиса (alice.yandex.ru) — российские, без VPN, безопаснее для рабочих данных; Claude (claude.ai) — через VPN, лучший для генерации документов по шаблону; ChatGPT — через VPN. Правило: документы с реквизитами — только в российские нейросети. Ответь СТРОГО валидным JSON без markdown, по-русски: {"pains":[{"title":"...","text":"..."}],"how_to":["..."],"templates":[{"title":"...","where":"...","prompt":"..."}],"reduction":"..."}. pains — ровно 3: где в ЕГО сфере утекают деньги из-за документов. how_to — ровно 4 шага, как его команде (учти размер) начать пользоваться обычными нейросетями на этой неделе. templates — ровно 3 запроса под его сферу: заполнение документа по шаблону (советуй Claude, пометь VPN; безопасный вариант GigaChat), проверка важного документа, ответ клиенту по правилам (советуй российские); в where — куда вставлять и почему, с пометкой про VPN; в prompt — полный текст с [вставьте ваш документ]. reduction — 1 предложение: вручную 10–15%, ИИ-агент — до 90%. Не выдумывай факты, не называй цены.';
+    var SYS='Ты — консультант компании «Нейродокс» (внедряет ИИ-агентов по документам: агент отвечает сотрудникам по регламентам и договорам за 5 секунд со ссылкой на пункт). Готовишь ПЕРСОНАЛЬНЫЙ ПЛАН ВНЕДРЕНИЯ ИИ в его компанию на эту неделю. Читатель — руководитель, НЕ разбирается в нейросетях, сначала пробует обычные нейросети сам. Пиши просто, без терминов, БЕЗ ВОДЫ — только конкретика под его нишу: называй реальные документы, задачи и роли именно этой отрасли. Нейросети: GigaChat (giga.chat) и Алиса (alice.yandex.ru) — российские, без VPN, безопасны для рабочих данных; Claude (claude.ai) — через VPN, лучший для генерации документов по шаблону; ChatGPT — через VPN. Ответь СТРОГО валидным JSON без markdown, по-русски: {"pains":[{"title":"...","text":"..."}],"plan":[{"day":"...","title":"...","text":"..."}],"templates":[{"title":"...","where":"...","prompt":"..."}],"security":["..."],"agent_next":"..."}. pains — ровно 3 конкретных места в ЕГО нише, где документы съедают деньги/время (называй реальные документы отрасли). plan — ровно 4 шага «День 1»..«День 4» с учётом размера команды: кому поручить (роль из его отрасли), с чего начать. templates — ровно 3 готовых запроса под его нишу: заполнение документа по шаблону (Claude через VPN, безопасно GigaChat), проверка важного документа, ответ клиенту по правилам (российские нейросети); where — куда вставлять и пометка про VPN; prompt — полный текст с [вставьте ваш документ]. security — ровно 3 правила «как дать команде ИИ и не слить данные». agent_next — 1-2 предложения: где ручные нейросети упираются и что делает ИИ-агент. Не выдумывай факты, не называй цены.';
     var usr='Сфера компании: '+(sphere||'не указана')+'. Сотрудников: '+c.N+'. Обращений в день: '+c.S+'. Минут на поиск: '+c.M+'. Ставка: '+c.H+' ₽/час.';
     function call(model){
       return fetch('https://api.polza.ai/api/v1/chat/completions',{
@@ -3565,7 +3598,7 @@ document.addEventListener('DOMContentLoaded', function () {
           var s=t.indexOf('{'), e=t.lastIndexOf('}');
           if(s<0||e<=s) throw 0;
           var d=JSON.parse(t.slice(s,e+1));
-          if(!d.pains||!d.templates) throw 0;
+          if(!d.pains||!d.plan||!d.templates) throw 0;
           return d;
         });
     }
