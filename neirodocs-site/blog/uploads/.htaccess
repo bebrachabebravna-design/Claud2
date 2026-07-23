@@ -1,0 +1,7 @@
+# Папка с картинками статей: отдаём только изображения, запрещаем исполнение скриптов
+<FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|cgi|sh)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+Options -ExecCGI
+AddType text/plain .php .phtml .pl .py

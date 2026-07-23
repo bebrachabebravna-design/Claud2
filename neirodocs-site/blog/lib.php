@@ -172,6 +172,10 @@ HTML;
 // ---------- Рендер статьи в статический SEO-файл ----------
 function render_article(array $p): string {
     $canonical = DOMAIN . '/blog/' . $p['slug'] . '/';
+    // обложка как og:image статьи (должно быть до page_head)
+    if (!empty($p['cover'])) {
+        $GLOBALS['og'] = (strpos($p['cover'], 'http') === 0) ? $p['cover'] : DOMAIN . $p['cover'];
+    }
     $rt = reading_time($p['body']);
     $date = $p['date']; $dfmt = date('d.m.Y', strtotime($date));
     $faqJson = '';
@@ -213,6 +217,10 @@ function render_article(array $p): string {
         $faqHtml .= '</section>';
     }
     $q = e($p['question'] ?? $p['title']);
+    $coverHtml = '';
+    if (!empty($p['cover'])) {
+        $coverHtml = '<div class="art-cover"><img src="'.e($p['cover']).'" alt="'.e($p['title']).'" loading="eager"></div>';
+    }
     $css = <<<CSS
 .art-css{}
 .art-hero{padding:52px 0 28px}
@@ -223,6 +231,8 @@ function render_article(array $p): string {
 .art-meta{display:flex;gap:16px;flex-wrap:wrap;color:var(--t-faint);font-size:.9rem;margin-top:20px;align-items:center}
 .art-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--t-faint)}
 .art-body{font-size:1.12rem;line-height:1.72;color:var(--t-body);padding-top:8px}
+.art-cover{max-width:900px;margin:0 auto 8px;padding:0 24px}
+.art-cover img{width:100%;max-height:440px;object-fit:cover;border-radius:var(--r-lg);box-shadow:0 24px 60px -28px rgba(10,20,40,.35)}
 .art-body h2{font-size:1.6rem;margin:40px 0 16px;letter-spacing:-.02em}
 .art-body h3{font-size:1.25rem;margin:30px 0 12px}
 .art-body p{margin:0 0 20px}
@@ -230,7 +240,7 @@ function render_article(array $p): string {
 .art-body li{margin-bottom:8px}
 .art-body blockquote{border-left:3px solid var(--acc);background:var(--paper-mute);margin:24px 0;padding:16px 22px;border-radius:0 var(--r-md) var(--r-md) 0;color:var(--t-h);font-size:1.08rem}
 .art-body a{text-decoration:underline}
-.art-body img{max-width:100%;border-radius:var(--r-md);margin:24px 0}
+.art-body img{max-width:100%;height:auto;border-radius:var(--r-md);margin:26px auto;display:block;box-shadow:0 16px 40px -22px rgba(10,20,40,.28)}
 .art-body strong{color:var(--t-h);font-weight:600}
 .art-faq{margin-top:56px;border-top:1px solid var(--rule);padding-top:36px}
 .art-faq h2{font-size:1.6rem;margin-bottom:22px}
@@ -265,6 +275,7 @@ CSS;
     <h1 class=\"art-title\">".e($p['title'])."</h1>
     <div class=\"art-meta\"><span>Нейродокс</span><span class=\"dot\"></span><time datetime=\"$date\">$dfmt</time><span class=\"dot\"></span><span>$rt мин чтения</span></div>
   </div></div>
+  $coverHtml
   <div class=\"wrap\">
     <div class=\"art-body\">$body</div>
     $faqHtml
@@ -306,15 +317,25 @@ function render_index(array $posts): string {
         $canonical, $extra);
     $cards = '';
     $searchData = [];
-    foreach ($posts as $p) {
+    foreach ($posts as $i => $p) {
         $url = '/blog/'.$p['slug'].'/';
         $dfmt = date('d.m.Y', strtotime($p['date']));
         $rt = reading_time($p['body']);
+        // обложка: своя картинка или аккуратный фирменный плейсхолдер с инициалом
+        if (!empty($p['cover'])) {
+            $cover = '<div class="pc-cover"><img src="'.e($p['cover']).'" alt="'.e($p['title']).'" loading="lazy"></div>';
+        } else {
+            $letter = mb_strtoupper(mb_substr(trim($p['title']), 0, 1, 'UTF-8'), 'UTF-8');
+            $cover = '<div class="pc-cover pc-cover-ph"><span>'.e($letter).'</span></div>';
+        }
         $cards .= '<a class="post-card" href="'.$url.'" data-search="'.e(mb_strtolower($p['title'].' '.($p['question']??'').' '.($p['keywords']??''))).'">'
+            . $cover
+            . '<div class="pc-body">'
             . '<div class="pc-q">'.e($p['question'] ?? 'Статья').'</div>'
             . '<h2 class="pc-title">'.e($p['title']).'</h2>'
             . '<p class="pc-ex">'.e($p['excerpt']).'</p>'
             . '<div class="pc-meta"><time>'.$dfmt.'</time><span class="dot"></span><span>'.$rt.' мин</span></div>'
+            . '</div>'
             . '</a>';
     }
     if (!$cards) $cards = '<p style="color:var(--t-mute);grid-column:1/-1">Пока нет опубликованных статей.</p>';
@@ -329,10 +350,16 @@ function render_index(array $posts): string {
 .blog-search svg{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--t-faint)}
 .posts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;padding:20px 0 0}
 @media(max-width:760px){.posts-grid{grid-template-columns:1fr}}
-.post-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-lg);padding:28px;box-shadow:var(--sh-md);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s}
+.post-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-md);transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .3s}
 .post-card:hover{transform:translateY(-4px);border-color:var(--acc);box-shadow:0 24px 50px -20px rgba(29,93,227,.28);text-decoration:none}
+.pc-cover{aspect-ratio:16/9;overflow:hidden;background:var(--paper-mute)}
+.pc-cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.post-card:hover .pc-cover img{transform:scale(1.04)}
+.pc-cover-ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0D3CB8 0%,#1D5DE3 55%,#5B8AFF 100%)}
+.pc-cover-ph span{font-family:'Manrope',sans-serif;font-weight:800;font-size:3.4rem;color:rgba(255,255,255,.92)}
+.pc-body{display:flex;flex-direction:column;flex:1;padding:24px 26px 26px}
 .pc-q{font-size:.78rem;font-weight:600;color:var(--acc);background:var(--acc-soft);align-self:flex-start;padding:5px 12px;border-radius:99px;margin-bottom:14px}
-.pc-title{font-size:1.32rem;line-height:1.22;margin-bottom:10px;color:var(--t-h)}
+.pc-title{font-size:1.3rem;line-height:1.22;margin-bottom:10px;color:var(--t-h)}
 .pc-ex{color:var(--t-mute);font-size:1rem;margin:0 0 18px;flex:1}
 .pc-meta{display:flex;align-items:center;gap:10px;color:var(--t-faint);font-size:.85rem}
 .pc-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--t-faint)}

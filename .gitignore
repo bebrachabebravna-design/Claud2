@@ -1,0 +1,4 @@
+neirodocs-site/api/config.php
+neirodocs-site/api/data/
+neirodocs-site/blog/uploads/*
+!neirodocs-site/blog/uploads/.htaccess
