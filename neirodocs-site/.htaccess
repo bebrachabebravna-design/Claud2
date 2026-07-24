@@ -10,8 +10,10 @@
 # --- Кэширование в браузере ---
 <IfModule mod_expires.c>
   ExpiresActive On
-  # HTML — короткий кэш, чтобы обновления статей были видны быстро
-  ExpiresByType text/html "access plus 1 hours"
+  # HTML НЕ кэшируем: браузер каждый раз берёт свежую страницу, поэтому обновления
+  # сайта (и новый код ИИ) видны сразу, а не через час. Иначе основной адрес
+  # показывает старую версию из кэша, а ?что-то=1 — новую (разные URL).
+  ExpiresByType text/html "access plus 0 seconds"
   # Картинки, шрифты, стили — надолго
   ExpiresByType image/jpeg "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
@@ -30,7 +32,7 @@
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
   <FilesMatch "\.html$">
-    Header set Cache-Control "public, max-age=3600"
+    Header set Cache-Control "no-cache, must-revalidate"
   </FilesMatch>
   # безопасность
   Header set X-Content-Type-Options "nosniff"
