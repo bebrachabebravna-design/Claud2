@@ -3628,8 +3628,10 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(function(j){
         clearTimeout(t);
         if(j && j.ok && j.data){ return j.data; }
-        // 'limit' — не ретраим, сразу к прямому пути; остальное можно ретраить
-        var e=new Error(j&&j.why||'fail'); e.why=j&&j.why; throw e;
+        // Собираем понятную причину: why + http-код + текст ошибки cURL от сервера
+        var why=(j&&j.why)||'fail';
+        var extra=[]; if(j&&j.http) extra.push('http'+j.http); if(j&&j.curl) extra.push(j.curl);
+        var e=new Error(why+(extra.length?(' ('+extra.join(', ')+')'):'')); e.why=why; throw e;
       }, function(err){ clearTimeout(t); throw err; });
   }
 
@@ -3714,13 +3716,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   // Прямой путь: перебираем модели в рамках общего бюджета времени.
   function directReport(c, sphere, budgetMs){
-    var sys=AI_SYSTEM, usr=aiUserMsg(c, sphere), start=Date.now();
+    var sys=AI_SYSTEM, usr=aiUserMsg(c, sphere), start=Date.now(), last='exhausted';
     function tryFrom(i){
-      if(i>=POLZA_MODELS.length) return Promise.reject(new Error('exhausted'));
+      if(i>=POLZA_MODELS.length) return Promise.reject(new Error(last));
       var left=budgetMs-(Date.now()-start);
-      if(left<8000) return Promise.reject(new Error('nobudget'));
+      if(left<8000) return Promise.reject(new Error(last));
       var per=Math.min(40000, left);
-      return askPolzaModel(POLZA_MODELS[i], sys, usr, per).catch(function(){ return tryFrom(i+1); });
+      return askPolzaModel(POLZA_MODELS[i], sys, usr, per).catch(function(err){
+        last=POLZA_MODELS[i].split('/').pop()+': '+((err&&err.message)||err);
+        return tryFrom(i+1);
+      });
     }
     return tryFrom(0);
   }
@@ -3729,12 +3734,22 @@ document.addEventListener('DOMContentLoaded', function () {
     var el=m.querySelector('#nrdrAi');
     if(!el) return;
     startLoaderMsgs();
+    // копим причины сбоя для диагностики
+    window.__nrdAiErr={server:null, direct:null};
     // если ИИ не сработал — показываем общий запасной блок с одним набором запросов
     function fail(){
       stopLoaderMsgs();
       el.innerHTML='';
       var fb=m.querySelector('#nrdrFallback');
       if(fb) fb.hidden=false;
+      // Видимая диагностика по адресу ?aidebug=1 — чтобы не лазить в консоль.
+      if(/[?&]aidebug=1/.test(location.search)){
+        var e=window.__nrdAiErr||{};
+        var box=document.createElement('div');
+        box.style.cssText='margin:14px 0;padding:12px 14px;border:1px solid #FFB3B5;border-radius:10px;background:#FFF4F4;color:#8A1F22;font:600 .9rem/1.5 Manrope,sans-serif;white-space:pre-wrap';
+        box.textContent='Диагностика ИИ (виден только с ?aidebug=1):\nсервер → '+(e.server||'?')+'\nбраузер→Polza → '+(e.direct||'?');
+        if(fb&&fb.parentNode) fb.parentNode.insertBefore(box, fb);
+      }
     }
     var c=window.__calc; if(!c){ fail(); return; }
     var sphere=(document.getElementById('calcSphere')||{}).value||'';
@@ -3763,14 +3778,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // (тогда выигрывает сервер). Оба провалились → понятный запасной блок.
     var settled=0, attempts=2;
     function win(d){ if(done) return; finish(function(){ ok(d); }); }
-    function lose(tag){ return function(err){
-      // Диагностика в консоли (F12): видно, почему путь не сработал —
-      // http401=ключ, http404=имя модели, TypeError/Failed to fetch=сеть/CORS.
-      try{ console.warn('[Нейродокс ИИ] '+tag+' не сработал:', (err&&err.message)||err); }catch(e){}
+    function lose(tag, slot){ return function(err){
+      var msg=(err&&err.message)||String(err);
+      window.__nrdAiErr[slot]=msg;
+      // Диагностика в консоли (F12): http401=ключ, http404=имя модели,
+      // "Failed to fetch"/TypeError=сеть или CORS блокирует прямой запрос.
+      try{ console.warn('[Нейродокс ИИ] '+tag+' не сработал:', msg); }catch(e){}
       settled++; if(settled>=attempts && !done){ finish(giveUp); }
     }; }
-    serverReport(payload, 42000).then(win, lose('сервер'));
-    directReport(c, sphere, 42000).then(win, lose('браузер→Polza'));
+    serverReport(payload, 42000).then(win, lose('сервер','server'));
+    directReport(c, sphere, 42000).then(win, lose('браузер→Polza','direct'));
   }
   function openReport(){
     var m=document.getElementById('lcReportModal');
