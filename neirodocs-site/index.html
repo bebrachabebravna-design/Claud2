@@ -3633,6 +3633,98 @@ document.addEventListener('DOMContentLoaded', function () {
       }, function(err){ clearTimeout(t); throw err; });
   }
 
+  // ── ПРЯМОЙ ПУТЬ К ИИ ИЗ БРАУЗЕРА ──────────────────────────────────────────
+  // Многие хостинги (в т.ч. shared) НЕ пускают PHP наружу — тогда сервер до Polza
+  // не достучится и покажется запасной блок. Поэтому мы параллельно спрашиваем ИИ
+  // прямо из браузера. Ключ тестовый; по договорённости с владельцем допустимо,
+  // что он виден в коде страницы. Что первым вернёт валидный разбор — то и покажем.
+  var POLZA_URL='https://api.polza.ai/api/v1/chat/completions';
+  var POLZA_KEY='pza_iOEjjuDpfCJZL1tKr-RFW62sF5oUsHqa';
+  var POLZA_MODELS=['anthropic/claude-haiku-4.5','anthropic/claude-3.5-haiku','openai/gpt-4o-mini'];
+  var AI_SYSTEM=[
+    'Ты — эксперт по оптимизации бизнес-процессов с помощью ИИ в компании «Нейродокс».',
+    'Посетитель сайта ввёл цифры своей компании и сферу. Готовишь ему БЕСПЛАТНЫЙ ПЕРСОНАЛЬНЫЙ РАЗБОР:',
+    'как оптимизировать рутину в документах. Это подарок, а не продажа — дай максимум пользы.',
+    'ПРО ЧИТАТЕЛЯ: собственник или руководитель, НЕ разбирается в нейросетях, слова «промпт», «LLM» ему непонятны —',
+    'пиши «запрос для нейросети», «ИИ». Пиши просто, по-деловому, коротко.',
+    'ПОЛЕ «СФЕРА» — ЭТО ВИД ДЕЯТЕЛЬНОСТИ КОМПАНИИ, даже если одним словом. Понимай широко: «перевозки»=логистика,',
+    '«стройка»=строительство, «юрист»=юруслуги, «бухгалтерия»=бухаутсорсинг, «магазин»=розница. НИКОГДА не считай это',
+    'случайным словом и не переспрашивай — сразу давай разбор под эту отрасль.',
+    'ГЛАВНОЕ ТРЕБОВАНИЕ — КОНКРЕТИКА ПОД НИШУ. Каждый пункт обязан упоминать реальные документы, процессы и роли',
+    'именно его отрасли (для перевозок: транспортные накладные, ТТН, договоры перевозки, путевые листы, диспетчеры,',
+    'логисты; для юристов: исковые, договоры, доверенности). Общие фразы («сотрудники долго ищут информацию») ЗАПРЕЩЕНЫ.',
+    'ПРО ЦИФРЫ СТРОГО: используй ТОЛЬКО переданные цифры. ЗАПРЕЩЕНО выдумывать любые другие суммы, проценты, статистику.',
+    'ТОН: «обычно в вашей сфере», «как правило». Если сфера не указана — дай крепкий общий разбор для МСБ.',
+    'Отвечай СТРОГО валидным JSON без markdown, по-русски:',
+    '{"quick_win":{"title":"...","text":"...","result":"..."},',
+    ' "pains":[{"title":"...","text":"..."}],',
+    ' "plan":[{"day":"...","title":"...","text":"..."}],',
+    ' "templates":[{"title":"...","where":"...","prompt":"..."}],',
+    ' "security":["..."],',
+    ' "agent_next":"..."}',
+    'quick_win — ЧТО ДАСТ РЕЗУЛЬТАТ ЗА 10 МИНУТ: одно конкретное действие с документом его сферы. title 3-6 слов;',
+    'text 2-3 предложения с точными шагами; result — ощутимая выгода («Таблица рисков по договору за 2 минуты»).',
+    'pains — ровно 3: где ОБЫЧНО в его нише утекают деньги и время из-за документов, с конкретными документами и ролями.',
+    'templates — САМОЕ ВАЖНОЕ. Ровно 3 профессиональных готовых запроса под его нишу. Каждый: 1) начни с роли нейросети',
+    '(«Ты — опытный юрист по договорам…», роль из отрасли); 2) чёткая задача и формат (таблица/заполненный документ);',
+    '3) плейсхолдеры [вставьте ваш документ], [укажите данные]; 4) в конце строка «Если данных не хватает — сначала',
+    'задай 2–3 уточняющих вопроса, потом выполняй». Темы: 1) ЗАПОЛНЕНИЕ типового документа его сферы (советуй Claude',
+    'через VPN, безопасно — GigaChat); 2) ПРОВЕРКА важного документа на риски (результат таблицей); 3) быстрый ответ',
+    'клиенту по правилам компании (российские нейросети GigaChat, Алиса — без VPN). title — короткое название;',
+    'where — куда вставлять и почему; prompt — полный текст (5–9 строк), готовый скопировать.',
+    'plan — ровно 4 шага («День 1»…«День 4») с учётом размера команды: кому поручить (роль отрасли), с какого документа',
+    'начать. security — ровно 3 коротких правила «как дать команде ИИ и не слить данные» с примерами документов его сферы.',
+    'agent_next — 1-2 предложения МЯГКО без продажи: ручной способ = вставлять каждый документ самому; если захочется,',
+    'чтобы ИИ знал все документы сразу — это следующий шаг, можно спросить в Telegram. Без «купите», без цен.',
+    'Нейросети: GigaChat (giga.chat), Алиса (alice.yandex.ru) — российские, без VPN, безопасны; Claude (claude.ai) —',
+    'через VPN, лучший для документов; ChatGPT — через VPN. Не упоминай конкурентов и цены. Не выдумывай факты о компании.'
+  ].join('\n');
+
+  function aiUserMsg(c, sphere){
+    function m(v){ return Math.round(v).toLocaleString('ru-RU')+' ₽'; }
+    var sp=(sphere&&sphere.trim())?sphere.trim():'не указана (обычная компания малого/среднего бизнеса)';
+    return 'Сфера компании: '+sp+'. Сотрудников, которые ищут информацию: '+c.N+'. '
+      +'Обращений за информацией в день на человека: '+c.S+'. Минут на один поиск: '+c.M+'. '
+      +'Ставка: '+c.H+' ₽/час. Потери: '+m(c.lossMo)+'/мес. Возврат с ИИ-агентом: до '+m(c.recover)+'/мес.';
+  }
+  function parseAiJson(text){
+    if(typeof text!=='string') return null;
+    var s=text.indexOf('{'), e=text.lastIndexOf('}');
+    if(s<0||e<=s) return null;
+    try{ var o=JSON.parse(text.slice(s,e+1)); }catch(err){ return null; }
+    if(o && o.pains && o.pains.length && o.plan && o.plan.length && o.templates && o.templates.length) return o;
+    return null;
+  }
+  // Один запрос к конкретной модели напрямую в Polza, с таймаутом.
+  function askPolzaModel(model, sys, usr, ms){
+    var ctrl=('AbortController' in window)?new AbortController():null;
+    var t=setTimeout(function(){ if(ctrl) ctrl.abort(); }, ms);
+    return fetch(POLZA_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+POLZA_KEY},
+      body:JSON.stringify({model:model,messages:[{role:'system',content:sys},{role:'user',content:usr}],temperature:0.4,max_tokens:1800}),
+      signal:ctrl?ctrl.signal:undefined
+    }).then(function(r){ clearTimeout(t); if(!r.ok) throw new Error('http'+r.status); return r.json(); })
+      .then(function(j){
+        var txt=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+        var d=parseAiJson(txt);
+        if(!d) throw new Error('badjson');
+        return d;
+      }, function(err){ clearTimeout(t); throw err; });
+  }
+  // Прямой путь: перебираем модели в рамках общего бюджета времени.
+  function directReport(c, sphere, budgetMs){
+    var sys=AI_SYSTEM, usr=aiUserMsg(c, sphere), start=Date.now();
+    function tryFrom(i){
+      if(i>=POLZA_MODELS.length) return Promise.reject(new Error('exhausted'));
+      var left=budgetMs-(Date.now()-start);
+      if(left<8000) return Promise.reject(new Error('nobudget'));
+      var per=Math.min(40000, left);
+      return askPolzaModel(POLZA_MODELS[i], sys, usr, per).catch(function(){ return tryFrom(i+1); });
+    }
+    return tryFrom(0);
+  }
+
   function loadAi(m){
     var el=m.querySelector('#nrdrAi');
     if(!el) return;
@@ -3660,17 +3752,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     function giveUp(){ if(done) return; done=true; fail(); }
     // жёсткий сторож: что бы ни случилось, загрузка НИКОГДА не висит вечно —
-    // максимум через 60 секунд показываем полезный запасной блок.
-    var watchdog=setTimeout(giveUp, 60000);
+    // максимум через 48 секунд показываем полезный запасной блок.
+    var watchdog=setTimeout(giveUp, 48000);
     function finish(fn){ clearTimeout(watchdog); fn(); }
 
     var payload={sphere:sphere,employees:c.N,requests:c.S,minutes:c.M,rate:c.H};
-    // Надёжный серверный путь (сервер→Polza, без CORS). Ждём до 54с — модель успевает
-    // сгенерировать разбор целиком (сервер внутри сам перебирает запасные модели).
-    // При любом сбое — понятный запасной блок. Никаких прямых запросов из браузера.
-    serverReport(payload, 54000)
-      .then(function(d){ finish(function(){ ok(d); }); })
-      .catch(function(){ finish(giveUp); });
+    // ГОНКА двух путей: сервер→Polza И браузер→Polza напрямую. Что первым вернёт
+    // валидный разбор — то и показываем. Так ИИ работает и когда хостинг не пускает
+    // PHP наружу (тогда выигрывает прямой путь), и когда сеть режет прямой запрос
+    // (тогда выигрывает сервер). Оба провалились → понятный запасной блок.
+    var settled=0, attempts=2;
+    function win(d){ if(done) return; finish(function(){ ok(d); }); }
+    function lose(tag){ return function(err){
+      // Диагностика в консоли (F12): видно, почему путь не сработал —
+      // http401=ключ, http404=имя модели, TypeError/Failed to fetch=сеть/CORS.
+      try{ console.warn('[Нейродокс ИИ] '+tag+' не сработал:', (err&&err.message)||err); }catch(e){}
+      settled++; if(settled>=attempts && !done){ finish(giveUp); }
+    }; }
+    serverReport(payload, 42000).then(win, lose('сервер'));
+    directReport(c, sphere, 42000).then(win, lose('браузер→Polza'));
   }
   function openReport(){
     var m=document.getElementById('lcReportModal');
