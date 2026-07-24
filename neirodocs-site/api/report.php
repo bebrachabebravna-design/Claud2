@@ -10,8 +10,53 @@ require __DIR__ . '/config.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
-function fail(string $why): void {
-    echo json_encode(['ok' => false, 'why' => $why], JSON_UNESCAPED_UNICODE);
+function fail(string $why, array $extra = []): void {
+    echo json_encode(array_merge(['ok' => false, 'why' => $why], $extra), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// ── ДИАГНОСТИКА ──────────────────────────────────────────────────────────────
+// Откройте в браузере: https://neirodocs.ru/api/report.php?diag=1
+// Покажет, почему ИИ не отвечает на живом хосте: есть ли cURL, доходит ли запрос
+// до Polza, верный ли ключ и модель. Никаких секретов в ответе не раскрывается.
+if (($_GET['diag'] ?? '') === '1') {
+    $r = ['ok' => true, 'php' => PHP_VERSION, 'curl' => function_exists('curl_init')];
+    $r['key_set'] = (defined('POLZA_API_KEY') && POLZA_API_KEY !== '' && strpos(POLZA_API_KEY, 'pza_') === 0);
+    $r['models'] = array_merge([POLZA_MODEL],
+        defined('POLZA_MODELS_FALLBACK') ? array_filter(array_map('trim', explode(',', POLZA_MODELS_FALLBACK))) : []);
+    if (!$r['curl']) { $r['verdict'] = 'На хостинге ВЫКЛЮЧЕНО расширение PHP cURL — включите его в панели хостинга.'; echo json_encode($r, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT); exit; }
+    // Пробуем каждую модель мини-запросом и показываем реальный ответ Polza.
+    $r['tests'] = [];
+    foreach ($r['models'] as $model) {
+        $ch = curl_init(POLZA_BASE . '/chat/completions');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode([
+                'model' => $model,
+                'messages' => [['role' => 'user', 'content' => 'Ответь одним словом: тест']],
+                'max_tokens' => 10,
+            ], JSON_UNESCAPED_UNICODE),
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . POLZA_API_KEY],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 25,
+            CURLOPT_CONNECTTIMEOUT => 10,
+        ]);
+        $resp = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        $cerr = curl_error($ch);
+        curl_close($ch);
+        $ok = ($resp !== false && $code >= 200 && $code < 300);
+        $r['tests'][] = [
+            'model' => $model,
+            'http' => $code,
+            'ok' => $ok,
+            'curl_error' => $cerr ?: null,
+            'response' => is_string($resp) ? mb_substr($resp, 0, 400) : null,
+        ];
+        if ($ok) { $r['verdict'] = 'Модель ' . $model . ' работает. ИИ должен отвечать. Если на сайте всё ещё запасной блок — дело в таймауте или в размере ответа.'; break; }
+    }
+    if (empty($r['verdict'])) $r['verdict'] = 'Ни одна модель не ответила. Смотрите http/curl_error/response выше: 401 = неверный ключ, 404 = неверное имя модели, 0 + curl_error = хостинг не пускает наружу к api.polza.ai.';
+    echo json_encode($r, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
     exit;
 }
 
@@ -144,8 +189,20 @@ $user = "Сфера компании: {$sphere}. Сотрудников, кот�
 $models = array_merge([POLZA_MODEL],
     defined('POLZA_MODELS_FALLBACK') ? array_filter(array_map('trim', explode(',', POLZA_MODELS_FALLBACK))) : []);
 
+// Бюджет времени на весь запрос (сек). Клиент ждёт дольше этого — так работающий,
+// но небыстрый ответ модели успевает прийти вместо мгновенного запасного блока.
+$budgetStart = microtime(true);
+$TOTAL_BUDGET = 46.0;   // общий предел; клиентский таймаут выставлен с запасом
+$MIN_MODEL    = 12.0;   // если на модель осталось меньше — не начинаем, идём к запасному
+
 $out = null;
+$lastCode = 0; $lastErr = ''; $tried = 0;
 foreach ($models as $model) {
+    $remaining = $TOTAL_BUDGET - (microtime(true) - $budgetStart);
+    if ($remaining < $MIN_MODEL) break;              // времени на новую модель уже нет
+    $perModel = (int)min(40, max($MIN_MODEL, $remaining));
+    $tried++;
+
     $payload = json_encode([
         'model' => $model,
         'messages' => [
@@ -153,7 +210,7 @@ foreach ($models as $model) {
             ['role' => 'user', 'content' => $user],
         ],
         'temperature' => 0.4,
-        'max_tokens' => 2000,
+        'max_tokens' => 1800,
     ], JSON_UNESCAPED_UNICODE);
 
     $ch = curl_init(POLZA_BASE . '/chat/completions');
@@ -165,12 +222,14 @@ foreach ($models as $model) {
             'Authorization: Bearer ' . POLZA_API_KEY,
         ],
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 18,
+        CURLOPT_TIMEOUT => $perModel,
         CURLOPT_CONNECTTIMEOUT => 8,
     ]);
     $resp = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $cerr = curl_error($ch);
     curl_close($ch);
+    $lastCode = $code; if ($cerr) $lastErr = $cerr;
     if ($resp === false || $code >= 400) continue;
 
     $data = json_decode($resp, true);
@@ -186,6 +245,7 @@ foreach ($models as $model) {
         break;
     }
 }
-if ($out === null) fail('upstream');
+// Причина неудачи попадает в ответ — видно в консоли браузера, помогает диагностике.
+if ($out === null) fail('upstream', ['http' => $lastCode, 'curl' => $lastErr ?: null, 'tried' => $tried]);
 
 echo json_encode(['ok' => true, 'data' => $out], JSON_UNESCAPED_UNICODE);

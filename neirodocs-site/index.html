@@ -887,7 +887,7 @@ section { padding: clamp(72px, 10vw, 128px) 0; position: relative; }
 .faq-item.open .faq-q .pls { transform: rotate(45deg); background: var(--acc); border-color: var(--acc); color: #fff; }
 .faq-a { overflow: hidden; max-height: 0; transition: max-height 540ms var(--e-out); }
 .faq-a-in { padding-bottom: 28px; padding-right: 50px; color: var(--t-mute); font-size: 1rem; line-height: 1.7; }
-.faq-item.open .faq-a { max-height: 1200px; }
+.faq-item.open .faq-a { max-height: 2400px; }
 
 /* Footer — clean, no invented legal items */
 .footer {
@@ -3660,20 +3660,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     function giveUp(){ if(done) return; done=true; fail(); }
     // жёсткий сторож: что бы ни случилось, загрузка НИКОГДА не висит вечно —
-    // максимум через 65 секунд показываем полезный запасной блок.
-    var watchdog=setTimeout(giveUp, 65000);
+    // максимум через 60 секунд показываем полезный запасной блок.
+    var watchdog=setTimeout(giveUp, 60000);
     function finish(fn){ clearTimeout(watchdog); fn(); }
 
     var payload={sphere:sphere,employees:c.N,requests:c.S,minutes:c.M,rate:c.H};
-    // Только надёжный серверный путь (сервер→Polza, без CORS): попытка + один повтор.
+    // Надёжный серверный путь (сервер→Polza, без CORS). Ждём до 54с — модель успевает
+    // сгенерировать разбор целиком (сервер внутри сам перебирает запасные модели).
     // При любом сбое — понятный запасной блок. Никаких прямых запросов из браузера.
-    serverReport(payload, 28000)
+    serverReport(payload, 54000)
       .then(function(d){ finish(function(){ ok(d); }); })
-      .catch(function(){
-        serverReport(payload, 28000)
-          .then(function(d){ finish(function(){ ok(d); }); })
-          .catch(function(){ finish(giveUp); });
-      });
+      .catch(function(){ finish(giveUp); });
   }
   function openReport(){
     var m=document.getElementById('lcReportModal');

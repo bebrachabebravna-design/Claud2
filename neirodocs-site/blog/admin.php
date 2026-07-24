@@ -243,19 +243,50 @@ editor.addEventListener('paste', function(e){
   document.execCommand('insertHTML', false, html);
 });
 
+// Сжимаем фото в браузере ДО отправки: телефонные снимки по 3–6 МБ превращаются
+// в лёгкие JPEG ~200–500 КБ. Так загрузка работает на любом хостинге (не упирается
+// в post_max_size) и сайт грузится быстрее. Если что-то пойдёт не так — шлём как есть.
+function shrinkImage(file, cb){
+  // GIF не трогаем (может быть анимация); мелкие файлы тоже не пережимаем.
+  if(!/^image\//.test(file.type) || file.type==='image/gif' || file.size < 400*1024){ cb(file); return; }
+  var url=URL.createObjectURL(file);
+  var img=new Image();
+  img.onload=function(){
+    try{
+      var MAX=1600;
+      var w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+      var scale=Math.min(1, MAX/Math.max(w,h));
+      var cw=Math.round(w*scale), ch=Math.round(h*scale);
+      var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+      cv.getContext('2d').drawImage(img,0,0,cw,ch);
+      URL.revokeObjectURL(url);
+      cv.toBlob(function(blob){
+        if(blob && blob.size < file.size){ blob.name='photo.jpg'; cb(blob); }
+        else cb(file);
+      }, 'image/jpeg', 0.82);
+    }catch(e){ URL.revokeObjectURL(url); cb(file); }
+  };
+  img.onerror=function(){ URL.revokeObjectURL(url); cb(file); };
+  img.src=url;
+}
+
 // загрузка картинки в текст
 function uploadImage(file, onDone, statusEl){
   if(!file) return;
-  if(statusEl) statusEl.textContent='Загрузка…';
-  var fd=new FormData(); fd.append('image', file);
-  fetch('/blog/upload.php',{method:'POST',body:fd})
-    .then(function(r){ return r.json(); })
-    .then(function(j){
-      if(statusEl) statusEl.textContent='';
-      if(j && j.ok && j.url){ onDone(j.url); }
-      else { alert('Не удалось загрузить: '+((j&&j.error)||'ошибка')); }
-    })
-    .catch(function(){ if(statusEl) statusEl.textContent=''; alert('Ошибка загрузки картинки'); });
+  if(statusEl) statusEl.textContent='Сжимаем…';
+  shrinkImage(file, function(payload){
+    if(statusEl) statusEl.textContent='Загрузка…';
+    var fd=new FormData();
+    fd.append('image', payload, (payload && payload.name) ? payload.name : (file.name||'photo.jpg'));
+    fetch('/blog/upload.php',{method:'POST',body:fd})
+      .then(function(r){ return r.json().catch(function(){ return {ok:false,error:'сервер вернул не JSON (код '+r.status+')'}; }); })
+      .then(function(j){
+        if(statusEl) statusEl.textContent='';
+        if(j && j.ok && j.url){ onDone(j.url); }
+        else { alert('Не удалось загрузить: '+((j&&j.error)||'ошибка')); }
+      })
+      .catch(function(){ if(statusEl) statusEl.textContent=''; alert('Ошибка загрузки картинки. Проверьте, что вы вошли в админку.'); });
+  });
 }
 
 var imgInput=document.createElement('input'); imgInput.type='file'; imgInput.accept='image/*'; imgInput.hidden=true; document.body.appendChild(imgInput);
