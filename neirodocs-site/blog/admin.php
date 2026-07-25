@@ -43,12 +43,24 @@ if (($_POST['action'] ?? '') === 'save') {
     $body = clean_body($_POST['body'] ?? '');
     if ($title && $body && strip_tags($body) !== '') {
         $slug = trim($_POST['slug'] ?? '') ?: slugify($title);
+        // Гарантия уникальности URL: если такой slug уже есть у ДРУГОЙ статьи,
+        // добавляем -2, -3 и т.д. Это защита от каннибализации URL — двух статей
+        // по одному адресу быть не может, sitemap не получит дубликат.
+        $orig = $_POST['orig_slug'] ?? '';
+        $base = $slug; $n = 2;
+        while (true) {
+            $collision = false;
+            foreach ($posts as $pp) {
+                if ($pp['slug'] === $slug && $pp['slug'] !== $orig) { $collision = true; break; }
+            }
+            if (!$collision) break;
+            $slug = $base . '-' . $n++;
+        }
         $faq = [];
         foreach (preg_split('/\r?\n/', $_POST['faq'] ?? '') as $line) {
             if (strpos($line, '::') !== false) { [$q,$a] = array_map('trim', explode('::', $line, 2)); if($q&&$a) $faq[] = ['q'=>$q,'a'=>$a]; }
         }
         $cover = trim($_POST['cover'] ?? '');
-        $orig = $_POST['orig_slug'] ?? '';
         $now = date('c');
         $found = false;
         foreach ($posts as &$p) {
@@ -67,6 +79,21 @@ if (($_POST['action'] ?? '') === 'save') {
         save_posts($posts);
         rebuild_all();
         $msg = 'Статья опубликована и уже на сайте: /blog/'.$slug.'/';
+        // Мягкое предупреждение о каннибализации: похожие заголовки/ключи у других
+        // статей могут делить между собой позиции в Google. Автор увидит подсказку
+        // и сможет уточнить угол либо объединить статьи.
+        $dupes = [];
+        $norm = function(string $s){ return preg_replace('/\s+/', ' ', mb_strtolower(preg_replace('/[^a-zа-яё0-9\s]/iu', ' ', $s))); };
+        $tKey = $norm($title);
+        $kKey = $norm(trim($_POST['keywords'] ?? ''));
+        foreach ($posts as $pp) {
+            if ($pp['slug'] === $slug) continue;
+            $sim = similar_text($tKey, $norm($pp['title']), $pct); if ($pct === null) $pct = 0;
+            $kk  = $kKey && !empty($pp['keywords']) ? $norm($pp['keywords']) : '';
+            $kOverlap = ($kk && $kKey && count(array_intersect(explode(',', $kKey), explode(',', $kk))) >= 2);
+            if ($pct >= 65 || $kOverlap) $dupes[] = $pp['title'];
+        }
+        if ($dupes) $msg .= ' ⚠ Похожие статьи (риск каннибализации в поиске): «' . implode('», «', array_slice($dupes,0,3)) . '». Разведите их по углу или объедините.';
         $posts = load_posts();
     } else { $msg = 'Заполните заголовок и текст статьи.'; $msgType = 'err'; }
 }

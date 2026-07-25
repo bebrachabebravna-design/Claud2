@@ -420,6 +420,11 @@ function rebuild_sitemap(array $posts): void {
         ['loc'=>DOMAIN.'/blog/', 'pri'=>'0.8'],
     ];
     foreach ($posts as $p) $urls[] = ['loc'=>DOMAIN.'/blog/'.$p['slug'].'/', 'pri'=>'0.7', 'lastmod'=>substr($p['updated'] ?? $p['date'],0,10)];
+    // Дедупликация на всякий случай: одинаковых <loc> в sitemap быть не должно —
+    // Яндекс/Google игнорируют дубли и это может понизить доверие к sitemap.
+    $seen = []; $urls = array_values(array_filter($urls, function($u) use (&$seen){
+        if (isset($seen[$u['loc']])) return false; $seen[$u['loc']] = true; return true;
+    }));
     $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
     foreach ($urls as $u) {
         $xml .= "  <url>\n    <loc>{$u['loc']}</loc>\n";
