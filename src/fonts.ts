@@ -17,10 +17,11 @@ const latin =
 const latinExt =
   "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF";
 
-for (const weight of ["600", "700", "900"]) {
-  loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-cyrillic.woff2"), weight, unicodeRange: cyrillic });
-  loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-latin.woff2"), weight, unicodeRange: latin });
-  loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-latin-ext.woff2"), weight, unicodeRange: latinExt });
-}
+// The files are variable across the 600-900 axis, so one face per subset covers
+// every weight used here. Registering fewer faces also means fewer parallel
+// requests per render tab, which is what previously tripped the font timeout.
+loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-cyrillic.woff2"), weight: "600 900", display: "block", unicodeRange: cyrillic });
+loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-latin.woff2"), weight: "600 900", display: "block", unicodeRange: latin });
+loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-latin-ext.woff2"), weight: "600 900", display: "block", unicodeRange: latinExt });
 
 export const displayFont = "Montserrat, sans-serif";
