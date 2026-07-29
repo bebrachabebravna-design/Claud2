@@ -1,15 +1,18 @@
 import { loadFont } from "@remotion/fonts";
-import { staticFile } from "remotion";
+import { cyrillicFont, latinExtFont, latinFont } from "./font-data";
 
 /**
- * Montserrat is served from `public/` rather than Google's CDN so a render never
- * depends on the network — the headless browser here does not trust the egress
- * proxy's certificate, and a missing font would silently fall back mid-render.
+ * Montserrat is inlined as data URIs rather than fetched.
+ *
+ * Remotion recycles render tabs every few hundred frames, and on reload the
+ * font request would occasionally never settle — the render then died on a
+ * delayRender timeout mid-way through. A data URI removes the request, so the
+ * face resolves synchronously and the render cannot stall on it.
  *
  * Google ships one subsetted file per script, so each is registered against the
  * same family with its own unicode-range: Cyrillic for the copy, latin for
- * digits and the URL, latin-ext for the ruble sign. `loadFont()` holds the
- * render until each face is ready.
+ * digits and the URL, latin-ext for the ruble sign. The files are variable
+ * across the 600-900 axis, so one face per subset covers every weight in use.
  */
 const cyrillic = "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116";
 const latin =
@@ -17,11 +20,8 @@ const latin =
 const latinExt =
   "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF";
 
-// The files are variable across the 600-900 axis, so one face per subset covers
-// every weight used here. Registering fewer faces also means fewer parallel
-// requests per render tab, which is what previously tripped the font timeout.
-loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-cyrillic.woff2"), weight: "600 900", display: "block", unicodeRange: cyrillic });
-loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-latin.woff2"), weight: "600 900", display: "block", unicodeRange: latin });
-loadFont({ family: "Montserrat", url: staticFile("fonts/Montserrat-latin-ext.woff2"), weight: "600 900", display: "block", unicodeRange: latinExt });
+loadFont({ family: "Montserrat", url: cyrillicFont, format: "woff2", weight: "600 900", display: "block", unicodeRange: cyrillic });
+loadFont({ family: "Montserrat", url: latinFont, format: "woff2", weight: "600 900", display: "block", unicodeRange: latin });
+loadFont({ family: "Montserrat", url: latinExtFont, format: "woff2", weight: "600 900", display: "block", unicodeRange: latinExt });
 
 export const displayFont = "Montserrat, sans-serif";
