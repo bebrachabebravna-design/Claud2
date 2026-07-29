@@ -1,6 +1,7 @@
 import { AbsoluteFill, Sequence, staticFile } from "remotion";
 import { Audio } from "@remotion/media";
 import { Shot } from "./Shot";
+import { HookText } from "./HookText";
 
 /**
  * The source is one continuous take, so the audio runs as a single uncut element.
@@ -55,13 +56,63 @@ export const ShortEdit: React.FC = () => {
       </AbsoluteFill>
 
       <AbsoluteFill
-        name="Vignette"
         style={{
           background:
             "radial-gradient(ellipse 78% 62% at 50% 42%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.42) 100%)",
           pointerEvents: "none",
         }}
       />
+
+      <AbsoluteFill>
+        <Sequence name="Hook 5 млн" from={95} durationInFrames={118}>
+          <HookText kicker="Компания из 30 человек" main={"−5 000 000 ₽"} mainSize={112} mainColor="#FFC94A" sub="теряет каждый год — и почти никто не замечает" />
+        </Sequence>
+        <Sequence name="Hook не реклама" from={228} durationInFrames={104}>
+          <HookText kicker="Не реклама. Не налоги." main={"ПОИСК\nДОКУМЕНТОВ"} mainSize={104} mainColor="#FFFFFF" />
+        </Sequence>
+        <Sequence name="Hook 42%" from={358} durationInFrames={102}>
+          <HookText main="42%" mainSize={190} mainColor="#FFC94A" sub="тратят на поиск файла больше времени, чем на саму работу с ним" />
+        </Sequence>
+        <Sequence name="Hook 1,5-2 часа" from={464} durationInFrames={103}>
+          <HookText kicker="У каждого, каждый день" main={"1,5–2 ЧАСА"} mainSize={118} mainColor="#FFC94A" sub="почти 3 месяца в году" />
+        </Sequence>
+        <Sequence name="Hook причина" from={578} durationInFrames={38}>
+          <HookText main="ПРИЧИНА ОДНА" mainSize={110} mainColor="#FFFFFF" />
+        </Sequence>
+        <Sequence name="Hook папки чаты почта" from={620} durationInFrames={68}>
+          <HookText main={"ПАПКИ\nЧАТЫ\nПОЧТА"} mainSize={92} mainColor="#FFFFFF" />
+        </Sequence>
+        <Sequence name="Hook по смыслу" from={692} durationInFrames={65}>
+          <HookText kicker="Поиск ищет по названию" main={"А НЕ ПО СМЫСЛУ"} mainSize={98} mainColor="#FFC94A" />
+        </Sequence>
+        <Sequence name="Hook не вовремя" from={774} durationInFrames={75}>
+          <HookText main={"НЕ НАХОДИТСЯ\nВОВРЕМЯ"} mainSize={104} mainColor="#FFFFFF" />
+        </Sequence>
+        <Sequence name="Hook штраф" from={867} durationInFrames={72}>
+          <HookText kicker="Цена вопроса" main={"ШТРАФ\nОТ 50 000 ₽"} mainSize={100} mainColor="#FFC94A" sub="или сорванная сделка" />
+        </Sequence>
+        <Sequence name="Hook агент" from={963} durationInFrames={92}>
+          <HookText main={"АГЕНТ ПРОЧИТАЛ\nВСЕ ДОКУМЕНТЫ"} mainSize={92} mainColor="#FFFFFF" />
+        </Sequence>
+        <Sequence name="Hook 5 секунд" from={1059} durationInFrames={95}>
+          <HookText main={"ОТВЕТ ЗА\n5 СЕКУНД"} mainSize={106} mainColor="#FFC94A" sub="со ссылкой на пункт-источник" />
+        </Sequence>
+        <Sequence name="Hook 11 мин" from={1174} durationInFrames={84}>
+          <HookText kicker="Ответ клиенту" main={"11 МИНУТ\n↓\n9 СЕКУНД"} mainSize={88} mainColor="#5EE9A0" />
+        </Sequence>
+        <Sequence name="Hook экономия" from={1262} durationInFrames={79}>
+          <HookText kicker="Экономия" main={"2–8 МЛН ₽ В ГОД"} mainSize={96} mainColor="#5EE9A0" />
+        </Sequence>
+        <Sequence name="Hook своя цифра" from={1359} durationInFrames={36}>
+          <HookText main={"ХОЧЕШЬ\nСВОЮ ЦИФРУ?"} mainSize={100} mainColor="#FFFFFF" />
+        </Sequence>
+        <Sequence name="Hook сайт" from={1408} durationInFrames={158}>
+          <HookText main="neirodocs.ru" mainSize={108} mainColor="#FFC94A" sub="двигаешь ползунки под свою компанию — расчёт за 10 секунд" />
+        </Sequence>
+        <Sequence name="Hook финал" from={1572} durationInFrames={72}>
+          <HookText main={"СКОЛЬКО\nТЕРЯЕШЬ\nИМЕННО ТЫ?"} mainSize={92} mainColor="#FFFFFF" />
+        </Sequence>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
