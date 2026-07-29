@@ -1,6 +1,15 @@
 {
   "dependencies": {
-    "@remotion/cli": "^4.0.500",
-    "remotion": "^4.0.500"
+    "@remotion/cli": "4.0.500",
+    "@remotion/google-fonts": "4.0.500",
+    "@remotion/media": "4.0.500",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.500"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "typescript": "5.9.3"
   }
 }
