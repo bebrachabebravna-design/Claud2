@@ -1,17 +1,15 @@
-import { Easing, interpolate, useCurrentFrame } from "remotion";
-import { displayFont, scriptFont } from "./fonts";
-
-export const YELLOW = "#FFD60A";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { displayFont, scriptFont, YELLOW } from "./fonts";
 
 /**
- * One caption chunk. Words pop in one after another rather than the whole line
- * appearing at once — the stagger is what makes the line feel spoken instead of
- * pasted on, and it is the single thing that most separates a hand-cut reel from
- * a subtitle track.
+ * One caption chunk, styled after the reference edit: a tight centred block
+ * that alternates a heavy sans with a calligraphic accent, rather than a
+ * subtitle strip.
  *
- * Two faces alternate between chunks: bold uppercase for the statements, the
- * handwritten accent for the asides. Both carry a heavy shadow because the
- * plate behind them is a lit face, not a flat colour.
+ * The whole chunk arrives as one unit on a spring. Staggering individual words
+ * looked ragged at this size — lines were visibly stepping in and the block
+ * shifted as each word landed, which is what made the earlier pass read as
+ * crooked. Popping the line as a block keeps the baseline still.
  */
 export const Caption: React.FC<{
   text: string;
@@ -19,12 +17,16 @@ export const Caption: React.FC<{
   durationInFrames: number;
 }> = ({ text, accent = false, durationInFrames }) => {
   const frame = useCurrentFrame();
-  const words = text.split(" ");
+  const { fps } = useVideoConfig();
 
-  // The whole chunk leaves together, so the exit reads as one motion.
+  const enter = spring({
+    frame,
+    fps,
+    config: { damping: 14, stiffness: 220, mass: 0.55 },
+  });
   const exit = interpolate(
     frame,
-    [durationInFrames - 4, durationInFrames],
+    [durationInFrames - 3, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
@@ -32,56 +34,26 @@ export const Caption: React.FC<{
   return (
     <div
       style={{
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        alignItems: "baseline",
-        gap: accent ? "0 18px" : "0 20px",
-        maxWidth: 900,
         opacity: exit,
+        transform: `scale(${interpolate(enter, [0, 1], [0.82, 1])})`,
+        textAlign: "center",
+        maxWidth: 940,
+        fontFamily: accent ? scriptFont : displayFont,
+        fontWeight: accent ? 400 : 900,
+        // Marck Script has a far smaller x-height than Inter, so it needs a
+        // much larger point size to carry the same visual weight.
+        fontSize: accent ? 148 : 96,
+        lineHeight: accent ? 0.95 : 1.02,
+        letterSpacing: accent ? 0 : -3,
+        color: accent ? YELLOW : "#FFFFFF",
+        textTransform: accent ? "none" : "uppercase",
+        textShadow:
+          "0 8px 30px rgba(0,0,0,0.8), 0 3px 8px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9)",
+        paintOrder: "stroke fill",
+        WebkitTextStroke: accent ? "0" : "8px rgba(6,6,12,0.55)",
       }}
     >
-      {words.map((word, i) => {
-        const start = i * 2.5;
-        const scale = interpolate(frame, [start, start + 7], [0.72, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.34, 1.56, 0.64, 1),
-        });
-        const opacity = interpolate(frame, [start, start + 4], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        });
-        const lift = interpolate(frame, [start, start + 7], [14, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
-
-        return (
-          <span
-            key={`${word}-${i}`}
-            style={{
-              display: "inline-block",
-              opacity,
-              transform: `scale(${scale}) translateY(${lift}px)`,
-              fontFamily: accent ? scriptFont : displayFont,
-              fontWeight: accent ? 700 : 900,
-              // Caveat has a small x-height, so it needs a much larger point
-              // size than Montserrat to read as the same visual weight.
-              fontSize: accent ? 152 : 92,
-              lineHeight: accent ? 0.9 : 1.05,
-              letterSpacing: accent ? 0 : -1.5,
-              color: accent ? "#FFD60A" : "#FFFFFF",
-              textShadow:
-                "0 6px 24px rgba(0,0,0,0.75), 0 2px 6px rgba(0,0,0,0.9)",
-              WebkitTextStroke: accent ? "0" : "2px rgba(0,0,0,0.28)",
-            }}
-          >
-            {word}
-          </span>
-        );
-      })}
+      {text}
     </div>
   );
 };
