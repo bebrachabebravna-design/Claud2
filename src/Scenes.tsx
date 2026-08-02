@@ -6,7 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { BLUE, CYAN, displayFont, impactFont, INK, NAVY, scriptFont, WHITE } from "./fonts";
+import { BLUE, CYAN, displayFont, INK, NAVY, scriptFont, WHITE } from "./fonts";
 import {
   IconAlert,
   IconArrowDown,
@@ -145,7 +145,8 @@ export const SceneLoss: React.FC<{ durationInFrames: number }> = ({ durationInFr
         <Kicker>компания из 30 человек</Kicker>
         <div
           style={{
-            fontFamily: impactFont,
+            fontFamily: displayFont,
+            fontWeight: 800,
             fontSize: 210,
             lineHeight: 1,
             letterSpacing: 1,
@@ -219,7 +220,8 @@ export const ScenePercent: React.FC<{ durationInFrames: number }> = ({ durationI
             style={{
               alignItems: "center",
               justifyContent: "center",
-              fontFamily: impactFont,
+              fontFamily: displayFont,
+              fontWeight: 800,
               fontSize: 168,
               color: WHITE,
               fontVariantNumeric: "tabular-nums",
@@ -262,7 +264,8 @@ export const SceneHours: React.FC<{ durationInFrames: number }> = ({ durationInF
           <IconClock size={92} color={CYAN} strokeWidth={4} />
           <div
             style={{
-              fontFamily: impactFont,
+              fontFamily: displayFont,
+              fontWeight: 800,
               fontSize: 168,
               lineHeight: 1,
               color: WHITE,
@@ -419,7 +422,8 @@ export const ScenePenalty: React.FC<{ durationInFrames: number }> = ({ durationI
         <Kicker>сорванная сделка</Kicker>
         <div
           style={{
-            fontFamily: impactFont,
+            fontFamily: displayFont,
+            fontWeight: 800,
             fontSize: 190,
             lineHeight: 1,
             color: WHITE,
@@ -434,7 +438,8 @@ export const ScenePenalty: React.FC<{ durationInFrames: number }> = ({ durationI
         </div>
         <div
           style={{
-            fontFamily: impactFont,
+            fontFamily: displayFont,
+            fontWeight: 800,
             fontSize: 230,
             lineHeight: 1,
             color: CYAN,
@@ -566,7 +571,8 @@ export const SceneAnswer: React.FC<{ durationInFrames: number }> = ({ durationIn
           <IconBoltInline />
           <div
             style={{
-              fontFamily: impactFont,
+              fontFamily: displayFont,
+              fontWeight: 800,
               fontSize: 120,
               lineHeight: 1,
               color: WHITE,
@@ -625,7 +631,8 @@ export const SceneCase: React.FC<{ durationInFrames: number }> = ({ durationInFr
           <div style={{ position: "relative", opacity: interpolate(swap, [0, 1], [1, 0.45]) }}>
             <div
               style={{
-                fontFamily: impactFont,
+                fontFamily: displayFont,
+                fontWeight: 800,
                 fontSize: 150,
                 lineHeight: 1,
                 color: "rgba(255,255,255,0.65)",
@@ -654,9 +661,11 @@ export const SceneCase: React.FC<{ durationInFrames: number }> = ({ durationInFr
 
           <div
             style={{
-              fontFamily: impactFont,
-              fontSize: 190,
+              fontFamily: displayFont,
+              fontWeight: 800,
+              fontSize: 170,
               lineHeight: 1,
+              whiteSpace: "nowrap",
               color: CYAN,
               opacity: swap,
               transform: `scale(${interpolate(swap, [0, 1], [0.7, 1])})`,
@@ -674,7 +683,8 @@ export const SceneCase: React.FC<{ durationInFrames: number }> = ({ durationInFr
             borderRadius: 24,
             border: `3px solid ${CYAN}`,
             background: "rgba(69,208,255,0.1)",
-            fontFamily: impactFont,
+            fontFamily: displayFont,
+            fontWeight: 800,
             fontSize: 96,
             color: WHITE,
             opacity: swap,
@@ -718,7 +728,8 @@ export const SceneCta: React.FC<{ durationInFrames: number }> = ({ durationInFra
 
         <div
           style={{
-            fontFamily: impactFont,
+            fontFamily: displayFont,
+            fontWeight: 800,
             fontSize: 132,
             lineHeight: 1,
             color: WHITE,

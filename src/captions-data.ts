@@ -22,7 +22,17 @@ export type Chunk = {
 };
 
 export const FPS = 30;
-export const DURATION_SECONDS = 54.83;
+
+/**
+ * The take opens with the founder settling in front of the camera and ends with
+ * him reaching to stop it; neither belongs in the cut. Speech runs 3.02–52.48s,
+ * so the head is trimmed just before the first word and the tail just after the
+ * last. Caption/scene/shot times below stay in SOURCE seconds — the edit
+ * subtracts TRIM_START to place them on the trimmed timeline.
+ */
+export const TRIM_START = 2.9;
+export const CONTENT_END = 52.6;
+export const DURATION_SECONDS = CONTENT_END - TRIM_START;
 
 export const CAPTIONS: Chunk[] = [
   { from: 3.02, to: 4.18, text: "КОМПАНИЯ ИЗ 30 ЧЕЛОВЕК" },

@@ -1,4 +1,4 @@
-import { bebasNeue, goodVibes, sfProBlack, sfProBold, sfProHeavy } from "./font-data";
+import { goodVibes, sfProBlack, sfProBold, sfProHeavy } from "./font-data";
 
 /**
  * Fonts are injected as plain CSS @font-face rules carrying inlined data URIs,
@@ -12,10 +12,10 @@ import { bebasNeue, goodVibes, sfProBlack, sfProBold, sfProHeavy } from "./font-
  * there is no request to lose. `font-display: block` keeps text from painting
  * in a fallback face.
  *
- * Three faces, one role each: SF Pro Display carries every bold/black headline
- * and label, Good Vibes Pro is the handwritten accent, Bebas Neue is reserved
- * for the punchy numeric displays (timers, counters, the score card) — the
- * condensed all-caps cut is built for exactly that, not for running text.
+ * SF Pro Display is the primary face and carries everything — headlines,
+ * labels and the big numeric displays alike (at weight 800/900 the numbers read
+ * as impact without a second display font). Good Vibes Pro is the one secondary
+ * face, used only for the handwritten accent lines.
  *
  * SF Pro ships as static per-weight files rather than a variable font, so each
  * weight actually used in the project gets its own @font-face entry rather
@@ -50,13 +50,6 @@ const faces = `
   font-style: normal;
   font-display: block;
 }
-@font-face {
-  font-family: 'BebasNeue';
-  src: url(${bebasNeue}) format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: block;
-}
 `;
 
 if (typeof document !== "undefined" && !document.getElementById("reel-faces")) {
@@ -68,7 +61,6 @@ if (typeof document !== "undefined" && !document.getElementById("reel-faces")) {
 
 export const displayFont = "SFProDisplay, -apple-system, sans-serif";
 export const scriptFont = "GoodVibes, cursive";
-export const impactFont = "BebasNeue, sans-serif";
 
 /**
  * Neirodocs palette. Cyan is the highlight that used to be yellow, blue carries
