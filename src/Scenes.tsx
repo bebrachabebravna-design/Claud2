@@ -6,7 +6,8 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { displayFont, INK, scriptFont, YELLOW } from "./fonts";
+import { displayFont, impactFont, INK, scriptFont, YELLOW } from "./fonts";
+import { IconArrowDown, IconChat, IconFolder, IconMail, IconSearch } from "./Icons";
 
 /** Slow drifting mesh behind the full-screen scenes so nothing is ever static. */
 const LiveBackdrop: React.FC<{ tint?: string }> = ({ tint = "#1B0F3A" }) => {
@@ -58,9 +59,9 @@ export const SceneScatter: React.FC<{ durationInFrames: number }> = ({
   });
 
   const cards = [
-    { label: "ПАПКИ", icon: "📁", x: -250, y: -170, rot: -11 },
-    { label: "ЧАТ", icon: "💬", x: 240, y: 30, rot: 9 },
-    { label: "ПОЧТА", icon: "✉️", x: -170, y: 250, rot: -6 },
+    { label: "ПАПКИ", Icon: IconFolder, x: -250, y: -170, rot: -11 },
+    { label: "ЧАТ", Icon: IconChat, x: 240, y: 30, rot: 9 },
+    { label: "ПОЧТА", Icon: IconMail, x: -170, y: 250, rot: -6 },
   ];
 
   return (
@@ -93,7 +94,7 @@ export const SceneScatter: React.FC<{ durationInFrames: number }> = ({
                 boxShadow: "0 26px 70px rgba(0,0,0,0.6)",
               }}
             >
-              <div style={{ fontSize: 96, lineHeight: 1 }}>{c.icon}</div>
+              <c.Icon size={72} />
               <div
                 style={{
                   fontFamily: displayFont,
@@ -113,12 +114,11 @@ export const SceneScatter: React.FC<{ durationInFrames: number }> = ({
         <div
           style={{
             position: "absolute",
-            fontSize: 130,
             transform: `translate(${Math.sin(frame / 15) * 300}px, ${Math.cos(frame / 11) * 220}px) rotate(${Math.sin(frame / 15) * 16}deg)`,
             filter: "drop-shadow(0 14px 30px rgba(0,0,0,0.7))",
           }}
         >
-          🔍
+          <IconSearch size={110} color={YELLOW} strokeWidth={7} />
         </div>
       </AbsoluteFill>
     </AbsoluteFill>
@@ -172,11 +172,10 @@ export const SceneWaiting: React.FC<{ durationInFrames: number }> = ({
 
         <div
           style={{
-            fontFamily: displayFont,
-            fontWeight: 900,
-            fontSize: 250,
+            fontFamily: impactFont,
+            fontSize: 300,
             lineHeight: 1,
-            letterSpacing: -12,
+            letterSpacing: 2,
             color: "#FF5A5A",
             fontVariantNumeric: "tabular-nums",
             transform: `scale(${pulse})`,
@@ -288,21 +287,13 @@ export const SceneLoss: React.FC<{ durationInFrames: number }> = ({
           })}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: 18,
-            fontFamily: displayFont,
-            fontWeight: 900,
-            color: "#FFFFFF",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
           <span
             style={{
-              fontSize: 260,
+              fontFamily: impactFont,
+              fontSize: 300,
               lineHeight: 1,
-              letterSpacing: -14,
+              letterSpacing: 2,
               fontVariantNumeric: "tabular-nums",
               color: YELLOW,
               textShadow: "0 0 80px rgba(255,226,74,0.45)",
@@ -310,7 +301,17 @@ export const SceneLoss: React.FC<{ durationInFrames: number }> = ({
           >
             {hours}
           </span>
-          <span style={{ fontSize: 92, letterSpacing: -3 }}>ЧАСА</span>
+          <span
+            style={{
+              fontFamily: displayFont,
+              fontWeight: 900,
+              fontSize: 92,
+              letterSpacing: -3,
+              color: "#FFFFFF",
+            }}
+          >
+            ЧАСА
+          </span>
         </div>
 
         <div
@@ -374,9 +375,8 @@ export const SceneCta: React.FC<{ durationInFrames: number }> = ({
                   background: lit ? YELLOW : "rgba(255,255,255,0.08)",
                   border: lit ? "none" : "4px solid rgba(255,255,255,0.3)",
                   color: lit ? INK : "rgba(255,255,255,0.55)",
-                  fontFamily: displayFont,
-                  fontWeight: 900,
-                  fontSize: 66,
+                  fontFamily: impactFont,
+                  fontSize: 80,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -416,7 +416,9 @@ export const SceneCta: React.FC<{ durationInFrames: number }> = ({
         >
           пиши в комменты
         </div>
-        <div style={{ fontSize: 92, transform: `translateY(${bob * 0.6}px)` }}>👇</div>
+        <div style={{ transform: `translateY(${bob * 0.6}px)` }}>
+          <IconArrowDown size={72} color={YELLOW} strokeWidth={7} />
+        </div>
       </AbsoluteFill>
     </AbsoluteFill>
   );

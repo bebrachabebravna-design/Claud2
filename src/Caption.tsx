@@ -40,9 +40,9 @@ export const Caption: React.FC<{
         maxWidth: 940,
         fontFamily: accent ? scriptFont : displayFont,
         fontWeight: accent ? 400 : 900,
-        // Marck Script has a far smaller x-height than Inter, so it needs a
-        // much larger point size to carry the same visual weight.
-        fontSize: accent ? 148 : 96,
+        // Good Vibes Pro has a far smaller x-height than SF Pro, so it needs a
+        // larger point size to carry the same visual weight on screen.
+        fontSize: accent ? 132 : 96,
         lineHeight: accent ? 0.95 : 1.02,
         letterSpacing: accent ? 0 : -3,
         color: accent ? YELLOW : "#FFFFFF",

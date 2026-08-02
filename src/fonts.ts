@@ -1,4 +1,4 @@
-import { scriptCyrillic, scriptLatin, uiCyrillic, uiLatin } from "./font-data";
+import { bebasNeue, goodVibes, sfProBlack, sfProBold, sfProHeavy } from "./font-data";
 
 /**
  * Fonts are injected as plain CSS @font-face rules carrying inlined data URIs,
@@ -12,48 +12,50 @@ import { scriptCyrillic, scriptLatin, uiCyrillic, uiLatin } from "./font-data";
  * there is no request to lose. `font-display: block` keeps text from painting
  * in a fallback face.
  *
- * The reference edit uses SF Pro with a calligraphic script accent. Apple's
- * font CDN and the script-font hosts are both blocked by this environment's
- * proxy, so this uses the closest pair that is reachable: Inter, which was
- * drawn as an SF-style UI face and carries a full Cyrillic set, and Marck
- * Script for the handwritten accent.
+ * Three faces, one role each: SF Pro Display carries every bold/black headline
+ * and label, Good Vibes Pro is the handwritten accent, Bebas Neue is reserved
+ * for the punchy numeric displays (timers, counters, the score card) — the
+ * condensed all-caps cut is built for exactly that, not for running text.
+ *
+ * SF Pro ships as static per-weight files rather than a variable font, so each
+ * weight actually used in the project gets its own @font-face entry rather
+ * than a weight range.
  */
-const CYRILLIC = "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116";
-const LATIN =
-  "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
-
 const faces = `
 @font-face {
-  font-family: 'ReelUI';
-  src: url(${uiCyrillic}) format('woff2');
-  font-weight: 100 900;
+  font-family: 'SFProDisplay';
+  src: url(${sfProBold}) format('opentype');
+  font-weight: 700;
   font-style: normal;
   font-display: block;
-  unicode-range: ${CYRILLIC};
 }
 @font-face {
-  font-family: 'ReelUI';
-  src: url(${uiLatin}) format('woff2');
-  font-weight: 100 900;
+  font-family: 'SFProDisplay';
+  src: url(${sfProHeavy}) format('opentype');
+  font-weight: 800;
   font-style: normal;
   font-display: block;
-  unicode-range: ${LATIN};
 }
 @font-face {
-  font-family: 'ReelScript';
-  src: url(${scriptCyrillic}) format('woff2');
+  font-family: 'SFProDisplay';
+  src: url(${sfProBlack}) format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'GoodVibes';
+  src: url(${goodVibes}) format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: block;
-  unicode-range: ${CYRILLIC};
 }
 @font-face {
-  font-family: 'ReelScript';
-  src: url(${scriptLatin}) format('woff2');
+  font-family: 'BebasNeue';
+  src: url(${bebasNeue}) format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: block;
-  unicode-range: ${LATIN};
 }
 `;
 
@@ -64,8 +66,9 @@ if (typeof document !== "undefined" && !document.getElementById("reel-faces")) {
   document.head.appendChild(style);
 }
 
-export const displayFont = "ReelUI, -apple-system, sans-serif";
-export const scriptFont = "ReelScript, cursive";
+export const displayFont = "SFProDisplay, -apple-system, sans-serif";
+export const scriptFont = "GoodVibes, cursive";
+export const impactFont = "BebasNeue, sans-serif";
 
 export const YELLOW = "#FFE24A";
 export const INK = "#0A0A0F";
