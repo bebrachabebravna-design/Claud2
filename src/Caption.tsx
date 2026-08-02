@@ -1,5 +1,5 @@
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { displayFont, scriptFont, YELLOW } from "./fonts";
+import { CYAN, displayFont, scriptFont, WHITE } from "./fonts";
 
 /**
  * One caption chunk, styled after the reference edit: a tight centred block
@@ -45,12 +45,12 @@ export const Caption: React.FC<{
         fontSize: accent ? 132 : 96,
         lineHeight: accent ? 0.95 : 1.02,
         letterSpacing: accent ? 0 : -3,
-        color: accent ? YELLOW : "#FFFFFF",
+        color: accent ? CYAN : WHITE,
         textTransform: accent ? "none" : "uppercase",
         textShadow:
           "0 8px 30px rgba(0,0,0,0.8), 0 3px 8px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9)",
         paintOrder: "stroke fill",
-        WebkitTextStroke: accent ? "0" : "8px rgba(6,6,12,0.55)",
+        WebkitTextStroke: accent ? "0" : "8px rgba(5,11,22,0.6)",
       }}
     >
       {text}

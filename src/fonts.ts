@@ -70,5 +70,16 @@ export const displayFont = "SFProDisplay, -apple-system, sans-serif";
 export const scriptFont = "GoodVibes, cursive";
 export const impactFont = "BebasNeue, sans-serif";
 
-export const YELLOW = "#FFE24A";
-export const INK = "#0A0A0F";
+/**
+ * Neirodocs palette. Cyan is the highlight that used to be yellow, blue carries
+ * structure, and the two dark tones are the ground everything sits on.
+ *
+ * There is deliberately no alert red: the loss and penalty beats get their
+ * urgency from motion, scale and a darker ground rather than from a hue outside
+ * the brand.
+ */
+export const CYAN = "#45D0FF";
+export const BLUE = "#1E5FFF";
+export const NAVY = "#0A1428";
+export const INK = "#050B16";
+export const WHITE = "#FFFFFF";

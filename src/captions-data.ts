@@ -1,68 +1,72 @@
 /**
- * Caption chunks, timed against the real speech in the take.
+ * Caption chunks built from the supplied SRT.
  *
- * `silencedetect` gave the speaking intervals; the script was then walked
- * across them allocating each word time in proportion to its length, so the
- * chunks track the voice instead of being placed by eye. The take runs at
- * ~3.9 words/second, which is why an eyeballed pass drifted more than a second
- * by the end.
+ * The SRT gives sentence-level in/out points; each sentence is then split into
+ * display chunks with time allocated in proportion to character count, so the
+ * lines track the delivery instead of being placed by eye.
  *
- * `accent` marks the chunks that render in the handwritten face — they
- * alternate with the bold ones the way the reference edit does.
+ * A few obvious speech-to-text slips are corrected against the brand facts —
+ * "Нокументы"/"страф"/"и агент"/"тираешь" and the mangled site name — since a
+ * typo burned into a caption is worse than a missing one.
+ *
+ * `accent` marks the chunks that render in the handwritten face; they alternate
+ * with the bold ones so the frame never shows two of the same treatment in a row.
  */
 export type Chunk = {
   /** Seconds into the composition. */
   from: number;
   to: number;
   text: string;
-  /** Rendered in the yellow handwritten face. */
+  /** Rendered in the handwritten accent face. */
   accent?: boolean;
 };
 
 export const FPS = 30;
-export const DURATION_SECONDS = 39.79;
+export const DURATION_SECONDS = 54.83;
 
 export const CAPTIONS: Chunk[] = [
-  { from: 1.92, to: 2.49, text: "За 30 секунд" },
-  { from: 2.49, to: 2.9, text: "поймёте", accent: true },
-  { from: 2.9, to: 3.59, text: "нужен ли вам ИИ" },
-  { from: 3.59, to: 4.05, text: "в бизнесе" },
-  { from: 4.05, to: 4.62, text: "или сольёте", accent: true },
-  { from: 4.62, to: 4.96, text: "бюджет" },
-  { from: 4.96, to: 6.53, text: "Первый вопрос" },
-  { from: 6.53, to: 7.22, text: "Ваши люди ищут" },
-  { from: 7.22, to: 8.8, text: "документы по кругу", accent: true },
-  { from: 8.8, to: 9.2, text: "Договор" },
-  { from: 9.2, to: 9.72, text: "регламент" },
-  { from: 9.72, to: 10.01, text: "прайс" },
-  { from: 10.01, to: 10.53, text: "то в папках", accent: true },
-  { from: 10.53, to: 10.93, text: "то в чате", accent: true },
-  { from: 10.93, to: 11.39, text: "то в почте", accent: true },
-  { from: 11.39, to: 12.08, text: "Второй вопрос" },
-  { from: 12.08, to: 14.21, text: "Пока менеджер ищет" },
-  { from: 14.21, to: 14.78, text: "клиент ждёт", accent: true },
-  { from: 14.78, to: 15.7, text: "Вот прям на созвоне" },
-  { from: 15.7, to: 16.62, text: "секундочку", accent: true },
-  { from: 16.62, to: 17.31, text: "и полез в файлы" },
-  { from: 17.31, to: 17.71, text: "А клиент" },
-  { from: 17.71, to: 19.25, text: "тем временем остывает", accent: true },
-  { from: 19.25, to: 21.15, text: "Третий вопрос" },
-  { from: 21.15, to: 22.15, text: "Есть человек" },
-  { from: 22.15, to: 23.35, text: "без которого всё встанет", accent: true },
-  { from: 23.35, to: 25.29, text: "Уйдёт в отпуск" },
-  { from: 25.29, to: 25.87, text: "или по делам" },
-  { from: 25.87, to: 26.44, text: "и все встает", accent: true },
-  { from: 26.44, to: 28.14, text: "Если хотя бы" },
-  { from: 28.14, to: 28.83, text: "на два вопроса" },
-  { from: 28.83, to: 29.8, text: "ответили да", accent: true },
-  { from: 29.8, to: 30.49, text: "вы уже теряете" },
-  { from: 30.49, to: 31.18, text: "часы и прибыль" },
-  { from: 31.18, to: 31.75, text: "каждый день", accent: true },
-  { from: 31.75, to: 32.56, text: "Не когда-нибудь" },
-  { from: 32.56, to: 33.38, text: "а сегодня", accent: true },
-  { from: 33.38, to: 35.21, text: "Напишите в комментах" },
-  { from: 35.21, to: 35.96, text: "сколько у вас да" },
-  { from: 35.96, to: 36.3, text: "из трёх", accent: true },
-  { from: 36.3, to: 37.32, text: "разберу самые" },
-  { from: 37.32, to: 38.01, text: "частые случаи", accent: true },
+  { from: 3.02, to: 4.18, text: "КОМПАНИЯ ИЗ 30 ЧЕЛОВЕК" },
+  { from: 4.18, to: 5.13, text: "теряет 5 миллионов", accent: true },
+  { from: 5.13, to: 5.76, text: "РУБЛЕЙ В ГОД" },
+  { from: 5.76, to: 6.64, text: "и почти никто", accent: true },
+  { from: 6.64, to: 7.38, text: "НЕ ЗАМЕЧАЕТ" },
+  { from: 7.38, to: 8.06, text: "НЕ РЕКЛАМА" },
+  { from: 8.06, to: 8.67, text: "НЕ НАЛОГИ" },
+  { from: 8.67, to: 9.55, text: "а на том, что", accent: true },
+  { from: 9.55, to: 10.4, text: "СОТРУДНИКИ ПРОСТО" },
+  { from: 10.4, to: 11.11, text: "ИЩУТ ДОКУМЕНТЫ" },
+  { from: 11.84, to: 12.43, text: "42% ЛЮДЕЙ" },
+  { from: 12.43, to: 13.81, text: "тратят на поиск файла", accent: true },
+  { from: 13.81, to: 14.73, text: "БОЛЬШЕ ВРЕМЕНИ" },
+  { from: 14.73, to: 15.98, text: "ЧЕМ НА РАБОТУ С НИМ" },
+  { from: 15.98, to: 17.03, text: "1,5–2 ЧАСА В ДЕНЬ" },
+  { from: 17.03, to: 17.58, text: "у каждого", accent: true },
+  { from: 17.58, to: 19.12, text: "ЭТО ПОЧТИ 3 МЕСЯЦА В ГОДУ" },
+  { from: 19.35, to: 20.15, text: "ПРИЧИНА ОДНА" },
+  { from: 20.15, to: 21.42, text: "ДОКУМЕНТЫ РАСКИДАНЫ" },
+  { from: 21.42, to: 23.03, text: "по папкам, чатам и почте", accent: true },
+  { from: 23.03, to: 23.73, text: "А ПОИСК ИЩЕТ" },
+  { from: 23.73, to: 24.72, text: "ПО НАЗВАНИЮ ФАЙЛА" },
+  { from: 24.72, to: 25.53, text: "а не по смыслу", accent: true },
+  { from: 25.68, to: 26.34, text: "ПОЭТОМУ ДАЖЕ" },
+  { from: 26.34, to: 27.5, text: "САМЫЙ НУЖНЫЙ ДОКУМЕНТ" },
+  { from: 27.5, to: 28.6, text: "не находится вовремя", accent: true },
+  { from: 28.77, to: 30.14, text: "ЭТО СОРВАННАЯ СДЕЛКА" },
+  { from: 30.14, to: 31.57, text: "ИЛИ ШТРАФ ОТ 50 ТЫСЯЧ" },
+  { from: 32.0, to: 33.01, text: "РЕШАЕТ ЭТО ИИ-АГЕНТ" },
+  { from: 33.01, to: 33.86, text: "который прочитал", accent: true },
+  { from: 33.86, to: 34.82, text: "ВСЕ ВАШИ ДОКУМЕНТЫ" },
+  { from: 34.82, to: 36.26, text: "И ОТВЕЧАЕТ ОБЫЧНЫМИ СЛОВАМИ" },
+  { from: 36.26, to: 37.19, text: "ЗА 5 СЕКУНД" },
+  { from: 37.19, to: 38.8, text: "со ссылкой на пункт", accent: true },
+  { from: 39.04, to: 40.65, text: "ОТВЕТ КЛИЕНТУ УПАЛ" },
+  { from: 40.65, to: 41.54, text: "С 11 МИНУТ" },
+  { from: 41.54, to: 42.52, text: "ДО 9 СЕКУНД" },
+  { from: 42.52, to: 43.85, text: "ЭКОНОМИЯ 2,8 МЛН В ГОД" },
+  { from: 43.85, to: 44.94, text: "хочешь свою цифру?", accent: true },
+  { from: 45.24, to: 46.91, text: "ЗАЙДИ НА NEIRODOCS.RU" },
+  { from: 46.91, to: 48.19, text: "подвинь ползунки", accent: true },
+  { from: 48.19, to: 49.54, text: "ПОД СВОЮ КОМПАНИЮ" },
+  { from: 49.54, to: 51.04, text: "ПОЛУЧИ РАСЧЁТ ЗА 10 СЕКУНД" },
+  { from: 51.04, to: 52.48, text: "посмотри, сколько теряешь", accent: true },
 ];

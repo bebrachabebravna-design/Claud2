@@ -6,7 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { displayFont, YELLOW } from "./fonts";
+import { CYAN, displayFont, INK } from "./fonts";
 
 /** Springs in, holds, then drops away — used by every overlay below. */
 const useEnterExit = (durationInFrames: number, exitFrames = 6) => {
@@ -47,7 +47,7 @@ export const QuestionBadge: React.FC<{
           alignItems: "center",
           gap: 20,
           transform: `scale(${enter}) rotate(${interpolate(enter, [0, 1], [-6, -2])}deg)`,
-          background: YELLOW,
+          background: CYAN,
           borderRadius: 100,
           padding: "14px 40px 16px 24px",
           boxShadow: "0 14px 44px rgba(0,0,0,0.5)",
@@ -58,8 +58,8 @@ export const QuestionBadge: React.FC<{
             width: 74,
             height: 74,
             borderRadius: "50%",
-            background: "#0B0B0F",
-            color: YELLOW,
+            background: INK,
+            color: CYAN,
             fontFamily: displayFont,
             fontWeight: 900,
             fontSize: 46,
@@ -76,7 +76,7 @@ export const QuestionBadge: React.FC<{
             fontWeight: 900,
             fontSize: 40,
             letterSpacing: 1,
-            color: "#0B0B0F",
+            color: INK,
             textTransform: "uppercase",
           }}
         >

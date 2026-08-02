@@ -94,7 +94,7 @@ export const ReelShot: React.FC<{
       >
         <Video
           name="Source take"
-          src={staticFile("reel-source.mp4")}
+          src={staticFile("source-video.mp4")}
           trimBefore={trimBefore}
           muted
           style={{
