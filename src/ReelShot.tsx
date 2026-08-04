@@ -35,6 +35,8 @@ export const ReelShot: React.FC<{
   slideFrom?: number;
   /** Small rotation, used sparingly on the punchiest cuts. */
   tilt?: number;
+  /** Source file in public/. Defaults to the first project's take. */
+  src?: string;
 }> = ({
   trimBefore,
   originX,
@@ -45,6 +47,7 @@ export const ReelShot: React.FC<{
   fadeIn = 1,
   slideFrom = 0,
   tilt = 0,
+  src = "source-video.mp4",
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -94,7 +97,7 @@ export const ReelShot: React.FC<{
       >
         <Video
           name="Source take"
-          src={staticFile("source-video.mp4")}
+          src={staticFile(src)}
           trimBefore={trimBefore}
           muted
           style={{
