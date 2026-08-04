@@ -6,6 +6,7 @@ import { FlashCut } from "./Overlays";
 import { Headline, TipBadge } from "./Headline";
 import {
   SceneContract,
+  SceneIntro,
   SceneMeeting,
   SceneOutro,
   SceneTemplate,
@@ -21,6 +22,7 @@ const HOLD = 12;
 
 /** Full-screen scene windows, in SOURCE seconds. Captions hide under them. */
 const SCENES: { from: number; to: number; el: (d: number) => React.ReactNode }[] = [
+  { from: 0, to: 3.45, el: (d) => <SceneIntro durationInFrames={d} /> },
   { from: 12.09, to: 21.03, el: (d) => <SceneContract durationInFrames={d} /> },
   { from: 23.6, to: 33.09, el: (d) => <SceneMeeting durationInFrames={d} /> },
   { from: 36.5, to: 41.67, el: (d) => <SceneTemplate durationInFrames={d} /> },
@@ -68,7 +70,7 @@ const Sfx: React.FC<{ file: string; at: number; dur: number; volume?: number }> 
 export const ReelEdit2: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#050B16" }}>
-      <Audio name="Original voice" src={staticFile(SRC)} trimBefore={sec(TRIM_START)} />
+      <Audio name="Original voice" src={staticFile(SRC)} />
 
       {/* ---- Camera on the take ---- */}
       <AbsoluteFill>

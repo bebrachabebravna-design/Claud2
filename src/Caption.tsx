@@ -39,18 +39,20 @@ export const Caption: React.FC<{
         textAlign: "center",
         maxWidth: 940,
         fontFamily: accent ? scriptFont : displayFont,
-        fontWeight: accent ? 400 : 900,
-        // Good Vibes Pro has a far smaller x-height than SF Pro, so it needs a
-        // larger point size to carry the same visual weight on screen.
-        fontSize: accent ? 132 : 96,
-        lineHeight: accent ? 0.95 : 1.02,
-        letterSpacing: accent ? 0 : -3,
+        // SF Pro Display Heavy (800) reads as native iOS; the Black+thick-stroke
+        // combo before looked like a generic impact face, not the iPhone font.
+        fontWeight: accent ? 400 : 800,
+        fontSize: accent ? 132 : 92,
+        lineHeight: accent ? 0.95 : 1.05,
+        letterSpacing: accent ? 0 : -1,
         color: accent ? CYAN : WHITE,
         textTransform: accent ? "none" : "uppercase",
+        // Legibility over video comes from a soft shadow plus a thin crisp
+        // outline, not a heavy stroke that distorts the letterforms.
         textShadow:
-          "0 8px 30px rgba(0,0,0,0.8), 0 3px 8px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9)",
+          "0 6px 26px rgba(0,0,0,0.85), 0 2px 5px rgba(0,0,0,0.95)",
         paintOrder: "stroke fill",
-        WebkitTextStroke: accent ? "0" : "8px rgba(5,11,22,0.6)",
+        WebkitTextStroke: accent ? "0" : "3px rgba(5,11,22,0.5)",
       }}
     >
       {text}

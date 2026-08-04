@@ -15,8 +15,12 @@ export type Chunk = {
 };
 
 export const FPS = 30;
-export const TRIM_START = 3.2;
-export const CONTENT_END = 54.5;
+// No trim: the head stays in (the user asked for it) and, more importantly,
+// starting audio and picture both at frame 0 with no offset guarantees the
+// voice stays locked to the lips — the earlier lag came from a trim offset that
+// applied to the picture but not the audio element.
+export const TRIM_START = 0;
+export const CONTENT_END = 57.13;
 export const DURATION_SECONDS = CONTENT_END - TRIM_START;
 
 export const CAPTIONS: Chunk[] = [
