@@ -75,3 +75,14 @@ export const BLUE = "#1E5FFF";
 export const NAVY = "#0A1428";
 export const INK = "#050B16";
 export const WHITE = "#FFFFFF";
+
+/**
+ * Caption accent, set to yellow at the user's request. It is deliberately the
+ * iOS system yellow rather than a saturated print yellow: against the cyan the
+ * brand already owns, a warmer amber is the one hue that stays legible over
+ * both the dark room and the bright studio scenes without competing with the
+ * blues for "this is the product" duty.
+ */
+export const YELLOW = "#FFD60A";
+/** Near-black ground for the dark world — reads deeper than NAVY on phones. */
+export const GRAPHITE = "#0D1117";

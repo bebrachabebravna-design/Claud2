@@ -1,4 +1,5 @@
 import { Composition } from "remotion";
+import { DeepTest } from "./DeepTest";
 import { ReelEdit } from "./ReelEdit";
 import { ReelEdit2 } from "./ReelEdit2";
 import { DURATION_SECONDS, FPS } from "./captions-data";
@@ -10,6 +11,14 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="DeepTest"
+        component={DeepTest}
+        durationInFrames={300}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="ReelEdit2"
         component={ReelEdit2}
