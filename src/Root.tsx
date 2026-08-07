@@ -1,4 +1,6 @@
 import { Composition } from "remotion";
+import { ReelNeiro } from "./ReelNeiro";
+import { CONTENT_END as NEIRO_END, FPS as NEIRO_FPS } from "./captions-data3";
 import { DUR_FRAMES, Reel1, Reel2, Reel3 } from "./Reels20";
 import { DeepTest } from "./DeepTest";
 import { VariantA, VariantB, VariantC } from "./Variants";
@@ -13,6 +15,14 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="ReelNeiro"
+        component={ReelNeiro}
+        durationInFrames={Math.round(NEIRO_END * NEIRO_FPS)}
+        fps={NEIRO_FPS}
+        width={1080}
+        height={1920}
+      />
       {[
         { id: "Reel1", component: Reel1 },
         { id: "Reel2", component: Reel2 },
