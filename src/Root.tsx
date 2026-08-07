@@ -1,5 +1,6 @@
 import { Composition } from "remotion";
 import { DeepTest } from "./DeepTest";
+import { VariantA, VariantB, VariantC } from "./Variants";
 import { ReelEdit } from "./ReelEdit";
 import { ReelEdit2 } from "./ReelEdit2";
 import { DURATION_SECONDS, FPS } from "./captions-data";
@@ -11,6 +12,30 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="VariantA"
+        component={VariantA}
+        durationInFrames={300}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="VariantB"
+        component={VariantB}
+        durationInFrames={300}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="VariantC"
+        component={VariantC}
+        durationInFrames={300}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="DeepTest"
         component={DeepTest}
