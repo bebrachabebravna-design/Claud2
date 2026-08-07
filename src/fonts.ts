@@ -1,4 +1,12 @@
-import { goodVibes, sfProBlack, sfProBold, sfProHeavy } from "./font-data";
+import {
+  bebas,
+  goodVibes,
+  montsCyr,
+  montsLat,
+  sfProBlack,
+  sfProBold,
+  sfProHeavy,
+} from "./font-data";
 
 /**
  * Fonts are injected as plain CSS @font-face rules carrying inlined data URIs,
@@ -50,6 +58,27 @@ const faces = `
   font-style: normal;
   font-display: block;
 }
+@font-face {
+  font-family: 'BebasNeue';
+  src: url(${bebas}) format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+/* Montserrat ships as split subsets, so Cyrillic and Latin are separate faces
+   of the same family rather than one file. */
+@font-face {
+  font-family: 'Montserrat';
+  src: url(${montsCyr}) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url(${montsLat}) format('woff2');
+  unicode-range: U+0000-00FF, U+2000-206F, U+2190-21BB;
+  font-display: block;
+}
 `;
 
 if (typeof document !== "undefined" && !document.getElementById("reel-faces")) {
@@ -61,6 +90,10 @@ if (typeof document !== "undefined" && !document.getElementById("reel-faces")) {
 
 export const displayFont = "SFProDisplay, -apple-system, sans-serif";
 export const scriptFont = "GoodVibes, cursive";
+/** Condensed caps face — tall and narrow, so long Russian lines still fit. */
+export const bebasFont = "BebasNeue, Impact, sans-serif";
+/** Geometric grotesque, the default "clean" face in Russian social design. */
+export const montsFont = "Montserrat, sans-serif";
 
 /**
  * Neirodocs palette. Cyan is the highlight that used to be yellow, blue carries
