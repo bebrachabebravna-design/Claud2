@@ -1,4 +1,5 @@
 import { Composition } from "remotion";
+import { PILOT_FRAMES, ReelPilot } from "./ReelPilot";
 import { ReelCase } from "./ReelCase";
 import {
   CONTENT_END as CASE_END,
@@ -20,6 +21,14 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="ReelPilot"
+        component={ReelPilot}
+        durationInFrames={PILOT_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="ReelCase"
         component={ReelCase}
