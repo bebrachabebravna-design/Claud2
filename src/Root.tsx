@@ -1,4 +1,9 @@
 import { Composition } from "remotion";
+import { ReelCase } from "./ReelCase";
+import {
+  CONTENT_END as CASE_END,
+  FPS as CASE_FPS,
+} from "./captions-data4";
 import { ReelNeiro } from "./ReelNeiro";
 import { CONTENT_END as NEIRO_END, FPS as NEIRO_FPS } from "./captions-data3";
 import { DUR_FRAMES, Reel1, Reel2, Reel3 } from "./Reels20";
@@ -15,6 +20,14 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="ReelCase"
+        component={ReelCase}
+        durationInFrames={Math.round(CASE_END * CASE_FPS)}
+        fps={CASE_FPS}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="ReelNeiro"
         component={ReelNeiro}

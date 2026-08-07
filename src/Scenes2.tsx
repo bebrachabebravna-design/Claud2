@@ -19,7 +19,7 @@ import {
   IconSliders,
 } from "./Icons";
 
-const useOut = (durationInFrames: number, frames = 7) => {
+export const useOut = (durationInFrames: number, frames = 7) => {
   const frame = useCurrentFrame();
   return interpolate(frame, [durationInFrames - frames, durationInFrames], [1, 0], {
     extrapolateLeft: "clamp",
@@ -68,7 +68,7 @@ const FloatingField: React.FC<{ count?: number }> = ({ count = 16 }) => {
   );
 };
 
-const Backdrop: React.FC<{ withField?: boolean }> = ({ withField = true }) => {
+export const Backdrop: React.FC<{ withField?: boolean }> = ({ withField = true }) => {
   const frame = useCurrentFrame();
   const dx = Math.sin(frame / 42) * 6;
   const dy = Math.cos(frame / 57) * 7;
@@ -102,7 +102,7 @@ const Backdrop: React.FC<{ withField?: boolean }> = ({ withField = true }) => {
 };
 
 /** A short particle burst — cyan sparks flying outward from a point. */
-const Burst: React.FC<{ x: number; y: number; startAt: number; n?: number }> = ({
+export const Burst: React.FC<{ x: number; y: number; startAt: number; n?: number }> = ({
   x,
   y,
   startAt,
@@ -139,7 +139,7 @@ const Burst: React.FC<{ x: number; y: number; startAt: number; n?: number }> = (
   );
 };
 
-const Kicker: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+export const Kicker: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
     style={{
       fontFamily: displayFont,
