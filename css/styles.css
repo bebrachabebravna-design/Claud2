@@ -1064,11 +1064,11 @@ body {
 
 .tl-card {
   position: relative;
-  flex: 0 0 264px;
+  flex: 0 0 262px;
   scroll-snap-align: center;
   background: linear-gradient(180deg, var(--white), var(--pink-50));
   border-radius: 14px;
-  padding: 13px 13px 16px;
+  padding: 13px;
   box-shadow: var(--shadow-md);
   transform: scale(.86) rotate(var(--tilt, 0deg));
   opacity: .5;
@@ -1091,7 +1091,8 @@ body {
   display: grid;
   place-items: center;
 }
-.tl-photo img {
+.tl-photo img,
+.tl-photo video {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
@@ -1104,6 +1105,7 @@ body {
   inset: 0;
   background: linear-gradient(120deg, rgba(255, 255, 255, .3), transparent 40%);
   pointer-events: none;
+  z-index: 3;
 }
 /* заглушка лежит поверх картинки и исчезает, когда фото загрузилось */
 .ph-placeholder {
@@ -1130,33 +1132,27 @@ body {
 }
 .ph-placeholder .ph-txt { font-size: 12px; line-height: 1.4; letter-spacing: .04em; }
 
-/* бейдж живёт внутри фото снизу слева, чтобы не спорить со скотчем */
-.tl-badge {
+/* кнопка play на видео-карточке */
+.tl-vid-play {
   position: absolute;
-  bottom: 8px; left: 8px;
-  max-width: calc(100% - 16px);
-  background: linear-gradient(135deg, var(--rose-500), var(--red-700));
-  color: var(--white);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(153, 6, 42, .4);
+  top: 50%; left: 50%;
+  width: 54px; height: 54px;
+  transform: translate(-50%, -50%);
+  border: 0;
+  border-radius: 50%;
   z-index: 4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+  padding-left: 4px;
+  background: linear-gradient(140deg, var(--rose-500), var(--red-600));
+  box-shadow: 0 8px 20px rgba(193, 18, 47, .5);
+  display: grid;
+  place-items: center;
 }
-.tl-card.is-last .tl-badge { background: linear-gradient(135deg, var(--gold), var(--gold-dk)); color: var(--red-800); }
+.tl-vid-play:active { transform: translate(-50%, -50%) scale(.9); }
+.tl-card.is-video .tl-photo { background: #1a0009; }
 
-.tl-text {
-  font-family: 'Caveat', cursive;
-  font-size: 19.5px;
-  line-height: 1.32;
-  color: var(--ink);
-  margin: 12px 4px 0;
-  min-height: 3.6em;
-}
 .tl-tape {
   position: absolute;
   top: -9px; left: 50%;
@@ -1167,13 +1163,6 @@ body {
   border-right: 1px dashed rgba(224, 30, 70, .25);
   transform: rotate(-3deg);
   z-index: 3;
-}
-.tl-card .btn-next {
-  margin-top: 12px;
-  width: 100%;
-  justify-content: center;
-  font-size: 15px;
-  padding: 13px 20px;
 }
 
 .tl-controls {
@@ -1217,16 +1206,7 @@ body {
   background: linear-gradient(90deg, var(--pink-400), var(--red-600));
   transition: width .3s ease;
 }
-.tl-progress-year {
-  position: absolute;
-  top: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--red-600);
-  white-space: nowrap;
-}
+.tl-next-btn { display: flex; margin: 16px auto 4px; }
 
 .swipe-hint {
   text-align: center;

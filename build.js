@@ -67,6 +67,12 @@ for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
   }
 }
 
+// видео в ленте (последняя карточка)
+const memUri = fileToDataUri('media/mem.mp4', 'video/mp4');
+if (memUri) {
+  contentJs = contentJs.replace(/video:\s*'media\/mem\.mp4'/g, () => `video: '${memUri}'`);
+}
+
 const js = [contentJs, read('js/audio.js'), read('js/confetti.js'), read('js/app.js')].join('\n\n');
 
 /* ---------- собираем html ---------- */
@@ -98,4 +104,5 @@ console.log(embedded.length
   ? `фотографий вшито: ${embedded.length} (${embedded.sort((a, b) => a - b).join(', ')})`
   : 'фотографий пока нет, карточки покажут заглушки');
 console.log('голосовое: ' + (voiceUri ? 'вшито' : 'нет файла media/voice.mp3'));
-console.log('видео: ' + (jokeUri ? 'вшито' : 'нет файла media/joke.mp4'));
+console.log('видео-шутка: ' + (jokeUri ? 'вшито' : 'нет файла media/joke.mp4'));
+console.log('видео в ленте: ' + (memUri ? 'вшито' : 'нет файла media/mem.mp4'));

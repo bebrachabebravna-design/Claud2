@@ -44,26 +44,33 @@ const LETTER = [
   'Целую тебя, мой хороший, рассказывай дальше подарочек. Я тебя обожаю. Ты самый ахуеный щеночек мой.'
 ];
 
-/* ---------- ЛЕНТА ЖИЗНИ ---------- */
+/* ---------- ЛЕНТА: ФОТО И ОДНО ВИДЕО ----------
+   Просто фотки, без подписей.
+   Положи в папку photos файлы 1.jpg ... 19.jpg (всего 19 штук).
+   Плюс одно небольшое видео: положи его в media с именем mem.mp4,
+   оно встанет в ленту последней карточкой.
+   Порядок карточек = порядок в этом списке. */
 const MEMORIES = [
-  { year: 0,  photo: 'photos/0.jpg',  text: 'вот ты и вылупился, окакуля моя маленькая' },
-  { year: 1,  photo: 'photos/1.jpg',  text: 'годик. уже тогда был самый милый мальчик на свете' },
-  { year: 2,  photo: 'photos/2.jpg',  text: 'два. пупсик мой тупа, я щас растаю' },
-  { year: 3,  photo: 'photos/3.jpg',  text: 'три. мелкий бесёнок, но такой милашкинс' },
-  { year: 4,  photo: 'photos/4.jpg',  text: 'четыре. ну какой же ты тут хорошенький' },
-  { year: 5,  photo: 'photos/5.jpg',  text: 'пять. уже с характером, ну ты и жук' },
-  { year: 6,  photo: 'photos/6.jpg',  text: 'шесть. последнее лето перед школой, кайфовал по полной' },
-  { year: 7,  photo: 'photos/7.jpg',  text: 'семь. первоклашка, рюкзак больше тебя самого кекес' },
-  { year: 8,  photo: 'photos/8.jpg',  text: 'восемь. тут ты уже начал быть крутым пацаном' },
-  { year: 9,  photo: 'photos/9.jpg',  text: 'девять. мой смешной ребёнок, обожаю' },
-  { year: 10, photo: 'photos/10.jpg', text: 'десять. первый двузначный, взрослый капец' },
-  { year: 11, photo: 'photos/11.jpg', text: 'одиннадцать. ну ты и красавчик уже тут' },
-  { year: 12, photo: 'photos/12.jpg', text: 'двенадцать. тупа модель, я тябя люблю' },
-  { year: 13, photo: 'photos/13.jpg', text: 'тринадцать. подросточек мой, сердечко моё' },
-  { year: 14, photo: 'photos/14.jpg', text: 'четырнадцать. ну ты тут конч пидорас, но мой любимый' },
-  { year: 15, photo: 'photos/15.jpg', text: 'пятнадцать. взгляд взрослый, а внутри всё тот же щеночек' },
-  { year: 16, photo: 'photos/16.jpg', text: 'шестнадцать. этот год мы прожили вместе, мой самый любимый' },
-  { year: 17, photo: 'photos/17.jpg', text: 'семнадцать. бородач мой, окакуля моя, я тебя обожаю', last: true }
+  { photo: 'photos/1.jpg' },
+  { photo: 'photos/2.jpg' },
+  { photo: 'photos/3.jpg' },
+  { photo: 'photos/4.jpg' },
+  { photo: 'photos/5.jpg' },
+  { photo: 'photos/6.jpg' },
+  { photo: 'photos/7.jpg' },
+  { photo: 'photos/8.jpg' },
+  { photo: 'photos/9.jpg' },
+  { photo: 'photos/10.jpg' },
+  { photo: 'photos/11.jpg' },
+  { photo: 'photos/12.jpg' },
+  { photo: 'photos/13.jpg' },
+  { photo: 'photos/14.jpg' },
+  { photo: 'photos/15.jpg' },
+  { photo: 'photos/16.jpg' },
+  { photo: 'photos/17.jpg' },
+  { photo: 'photos/18.jpg' },
+  { photo: 'photos/19.jpg' },
+  { video: 'media/mem.mp4' }
 ];
 
 /* ---------- 17 ПРИЧИН ПОЧЕМУ ТЫ ЛУЧШИЙ ---------- */
@@ -86,12 +93,3 @@ const REASONS = [
   'ты выбираешь меня каждый день',
   'ну и просто потому что ты это ты, самый лучший ♥'
 ];
-
-/* ---------- ПОДПИСИ ВОЗРАСТА НА КАРТОЧКАХ ---------- */
-function yearLabel(n) {
-  const mod10 = n % 10, mod100 = n % 100;
-  if (n === 0) return 'самое начало';
-  if (mod10 === 1 && mod100 !== 11) return n + ' год';
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return n + ' года';
-  return n + ' лет';
-}

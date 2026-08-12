@@ -273,6 +273,7 @@
     if (id === 'l-voice') stopVoice();
     if (id === 'l-video') stopVideo();
     if (id === 'l-candles') leaveCandles();
+    if (id === 'l-timeline') $$('.tl-vid', $('#tlTrack')).forEach(v => v.pause());
   }
 
   /* ============================================================
@@ -941,7 +942,6 @@
   const tlViewport = $('#tlViewport');
   const tlTrack = $('#tlTrack');
   const tlBar = $('#tlBar');
-  const tlYear = $('#tlYear');
   const tlPrev = $('#tlPrev');
   const tlNext = $('#tlNext');
   const swipeHint = $('#swipeHint');
@@ -950,52 +950,78 @@
 
   function buildTimeline() {
     tlTrack.innerHTML = '';
+    const lastIdx = MEMORIES.length - 1;
+
     MEMORIES.forEach((m, i) => {
       const card = document.createElement('article');
-      card.className = 'tl-card' + (m.last ? ' is-last' : '');
+      card.className = 'tl-card' + (i === lastIdx ? ' is-last' : '') + (m.video ? ' is-video' : '');
       card.style.setProperty('--tilt', (i % 2 ? 1 : -1) * rnd(0.6, 1.8).toFixed(2) + 'deg');
 
       const tape = document.createElement('span');
       tape.className = 'tl-tape';
       card.appendChild(tape);
 
-      const photo = document.createElement('div');
-      photo.className = 'tl-photo';
+      const media = document.createElement('div');
+      media.className = 'tl-photo';
 
-      const badge = document.createElement('span');
-      badge.className = 'tl-badge';
-      badge.textContent = yearLabel(m.year);
-      photo.appendChild(badge);
+      if (m.video) {
+        // карточка-видео: заглушка, а как файл появится, встаёт плеер
+        const ph = document.createElement('div');
+        ph.className = 'ph-placeholder';
+        ph.innerHTML = '<span class="ph-ico">🎬</span><span class="ph-txt">сюда встанет<br>видео</span>';
+        media.appendChild(ph);
 
-      const ph = document.createElement('div');
-      ph.className = 'ph-placeholder';
-      ph.innerHTML = '<span class="ph-ico">🖼</span><span class="ph-txt">сюда встанет фото<br>' +
-        m.photo.replace('photos/', '') + '</span>';
-      photo.appendChild(ph);
+        const vid = document.createElement('video');
+        vid.className = 'tl-vid';
+        vid.playsInline = true;
+        vid.setAttribute('playsinline', '');
+        vid.preload = 'auto';   // чтобы сразу показывался первый кадр
+        vid.muted = false;
+        vid.style.display = 'none';
+        const playBtn = document.createElement('button');
+        playBtn.className = 'tl-vid-play';
+        playBtn.type = 'button';
+        playBtn.setAttribute('aria-label', 'играть видео');
+        playBtn.textContent = '►';
+        playBtn.style.display = 'none';
 
-      const img = new Image();
-      img.alt = 'фото, ' + yearLabel(m.year);
-      img.decoding = 'async';
-      if (i > 3) img.loading = 'lazy';
-      img.addEventListener('load', () => ph.remove());
-      img.addEventListener('error', () => img.remove());
-      img.src = m.photo;
-      photo.appendChild(img);
-      card.appendChild(photo);
+        vid.addEventListener('loadeddata', () => {
+          ph.remove();
+          vid.style.display = '';
+          playBtn.style.display = '';
+        });
+        vid.addEventListener('error', () => { /* нет файла, остаётся заглушка */ });
+        vid.addEventListener('play', () => { playBtn.style.display = 'none'; });
+        vid.addEventListener('pause', () => { if (!vid.ended) playBtn.style.display = ''; });
+        vid.addEventListener('ended', () => { playBtn.style.display = ''; });
 
-      const text = document.createElement('p');
-      text.className = 'tl-text';
-      text.textContent = m.text;
-      card.appendChild(text);
+        playBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          Sound.unlock();
+          // ставим на паузу все прочие видео в ленте
+          $$('.tl-vid', tlTrack).forEach(v => { if (v !== vid) v.pause(); });
+          vid.play().catch(() => {});
+        });
 
-      if (m.last) {
-        const btn = document.createElement('button');
-        btn.className = 'btn-next';
-        btn.type = 'button';
-        btn.setAttribute('data-go', 'next');
-        btn.innerHTML = 'дальше <span class="btn-arrow" aria-hidden="true">→</span>';
-        card.appendChild(btn);
+        vid.src = m.video;
+        media.appendChild(vid);
+        media.appendChild(playBtn);
+      } else {
+        const ph = document.createElement('div');
+        ph.className = 'ph-placeholder';
+        ph.innerHTML = '<span class="ph-ico">🖼</span><span class="ph-txt">сюда встанет<br>фото</span>';
+        media.appendChild(ph);
+
+        const img = new Image();
+        img.alt = 'фото';
+        img.decoding = 'async';
+        if (i > 3) img.loading = 'lazy';
+        img.addEventListener('load', () => ph.remove());
+        img.addEventListener('error', () => img.remove());
+        img.src = m.photo;
+        media.appendChild(img);
       }
+      card.appendChild(media);
       tlTrack.appendChild(card);
     });
     cards = $$('.tl-card', tlTrack);
@@ -1019,8 +1045,11 @@
     });
     if (best !== activeCard) {
       cards.forEach((c, i) => c.classList.toggle('is-active', i === best));
+      // уезжая с карточки-видео, ставим его на паузу
+      $$('.tl-vid', tlTrack).forEach(v => {
+        if (!v.closest('.tl-card').classList.contains('is-active')) v.pause();
+      });
       activeCard = best;
-      tlYear.textContent = yearLabel(MEMORIES[best].year);
       Sound.sfx.tick();
     }
     const pct = cards.length > 1 ? (best / (cards.length - 1)) : 1;
