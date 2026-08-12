@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffe3ee">
+<title>Яра, с днём рождения</title>
+<meta name="description" content="подарок, который открывается слой за слоем">
+
+<!-- Красивая карточка, когда кидаешь ссылку в телеграм.
+     После деплоя можно заменить preview.png на полный адрес
+     вида https://твой-сайт.netlify.app/preview.png -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Яра, с днём рождения">
+<meta property="og:description" content="подарок, который открывается слой за слоем">
+<meta property="og:image" content="preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="fonts/Onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Caveat-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Comfortaa-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+</head>
+<body>
+
+<!-- ============ общие градиенты для svg ============ -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="bowLoop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6fa"/>
+      <stop offset="55%" stop-color="#ffd0e0"/>
+      <stop offset="100%" stop-color="#ffa3c2"/>
+    </linearGradient>
+    <linearGradient id="bowKnot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ffc2d9"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ============ фон: лепестки и сердечки ============ -->
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="petals" id="petals" aria-hidden="true"></div>
+
+<!-- ============ канвас для конфетти ============ -->
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- ============ шторка перехода между слоями ============ -->
+<div class="curtain" id="curtain" aria-hidden="true">
+  <div class="curtain-half curtain-top"></div>
+  <div class="curtain-half curtain-bottom"></div>
+  <div class="curtain-heart">♥</div>
+</div>
+
+<!-- ============ верхняя панель ============ -->
+<header class="hud" id="hud">
+  <div class="hud-dots" id="hudDots" role="tablist" aria-label="слои подарка"></div>
+  <button class="hud-btn" id="musicBtn" type="button" aria-pressed="false" title="музыка">
+    <span class="ico-music" aria-hidden="true">
+      <i></i><i></i><i></i><i></i>
+    </span>
+    <span class="sr-only">включить или выключить музыку</span>
+  </button>
+</header>
+
+<main id="stage">
+
+  <!-- ================= СЛОЙ 1: КОРОБКА ================= -->
+  <section class="layer is-active" id="l-box" data-layer="0" aria-label="подарок">
+    <div class="layer-inner center">
+
+      <p class="intro-line reveal" style="--d:.2s">
+        не смогла сделать тебе бумажную открыточку,<br>поэтому держи такую
+      </p>
+
+      <div class="giftbox-wrap reveal" style="--d:1.1s">
+        <button class="giftbox" id="giftbox" type="button" aria-label="открыть подарок">
+          <span class="gb-shadow" aria-hidden="true"></span>
+          <span class="gb-lid" aria-hidden="true">
+            <span class="gb-lid-top"></span>
+            <span class="gb-lid-face"></span>
+            <span class="gb-lid-ribbon"></span>
+          </span>
+          <span class="gb-bow" aria-hidden="true">
+            <svg viewBox="0 0 140 62" class="bow-svg">
+              <path class="bow-tail" d="M64 36 C60 46 52 54 44 60 L57 60 C64 53 68 45 70 38 Z" fill="url(#bowLoop)"/>
+              <path class="bow-tail" d="M76 36 C80 46 88 54 96 60 L83 60 C76 53 72 45 70 38 Z" fill="url(#bowLoop)"/>
+              <path class="bow-loop" d="M70 31 C56 8 20 4 12 20 C4 36 30 48 70 31 Z" fill="url(#bowLoop)"/>
+              <path class="bow-loop" d="M70 31 C84 8 120 4 128 20 C136 36 110 48 70 31 Z" fill="url(#bowLoop)"/>
+              <ellipse cx="70" cy="32" rx="12" ry="11" fill="url(#bowKnot)"/>
+            </svg>
+          </span>
+          <span class="gb-body" aria-hidden="true">
+            <span class="gb-face"></span>
+            <span class="gb-ribbon-v"></span>
+            <span class="gb-shine"></span>
+          </span>
+          <span class="gb-burst" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <p class="tap-hint reveal" style="--d:1.8s">
+        <span class="tap-finger" aria-hidden="true">☝</span>
+        нажми на подарок
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 2: ПОЗДРАВЛЕНИЕ ================= -->
+  <section class="layer" id="l-hello" data-layer="1" aria-label="поздравление" hidden>
+    <div class="layer-inner center">
+
+      <div class="balloons" aria-hidden="true"></div>
+
+      <p class="eyebrow anim" style="--d:.1s">сегодня 13 августа</p>
+
+      <h1 class="name-title" aria-label="Яра">
+        <span class="anim-letter" style="--d:.25s">Я</span><span class="anim-letter" style="--d:.35s">р</span><span class="anim-letter" style="--d:.45s">а</span>
+      </h1>
+
+      <div class="age-wrap anim" style="--d:.8s">
+        <span class="age-label">тебе</span>
+        <span class="age-number" id="ageNumber">
+          <span class="age-digit">1</span><span class="age-digit">7</span>
+          <span class="age-shine" aria-hidden="true"></span>
+        </span>
+      </div>
+
+      <p class="hello-sub anim" style="--d:1.3s">
+        целых семнадцать, представляешь.<br>
+        я приготовила тебе подарок из нескольких слоёв,<br>
+        разворачивай по очереди
+      </p>
+
+      <button class="btn-next anim" style="--d:1.7s" data-go="2" type="button">
+        разворачивать дальше
+        <span class="btn-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 3: ОБЁРТКА ================= -->
+  <section class="layer" id="l-paper" data-layer="2" aria-label="обёрточная бумага" hidden>
+    <div class="layer-inner center">
+
+      <p class="paper-hint" id="paperHint">
+        под подарком ещё один слой.<br>
+        <b>потяни за уголок и порви бумагу</b>
+      </p>
+
+      <div class="tear-stage" id="tearStage">
+        <div class="tear-half tear-left" aria-hidden="true"></div>
+        <div class="tear-half tear-right" aria-hidden="true"></div>
+        <div class="tear-edge tear-edge-l" aria-hidden="true"></div>
+        <div class="tear-edge tear-edge-r" aria-hidden="true"></div>
+
+        <div class="tear-under" aria-hidden="true">
+          <div class="under-glow"></div>
+          <div class="under-envelope">✉</div>
+        </div>
+
+        <button class="tear-grip" id="tearGrip" type="button" aria-label="порвать бумагу">
+          <span class="grip-corner"></span>
+          <span class="grip-pulse"></span>
+        </button>
+      </div>
+
+      <p class="tear-progress-label" id="tearLabel">0%</p>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 4: ПИСЬМО ================= -->
+  <section class="layer" id="l-letter" data-layer="3" aria-label="письмо" hidden>
+    <div class="layer-inner">
+
+      <div class="envelope-stage" id="envelopeStage">
+        <div class="envelope" id="envelope">
+          <div class="env-back" aria-hidden="true"></div>
+          <div class="env-letter-peek" aria-hidden="true"></div>
+          <div class="env-front" aria-hidden="true"></div>
+          <div class="env-flap" aria-hidden="true"></div>
+          <button class="env-seal" id="envSeal" type="button" aria-label="сломать печать и открыть письмо">
+            <span class="seal-heart">♥</span>
+            <span class="seal-crack"></span>
+          </button>
+        </div>
+        <p class="env-hint" id="envHint">нажми на печать</p>
+      </div>
+
+      <article class="letter" id="letter" hidden>
+        <div class="letter-paper">
+          <h2 class="letter-title">письмо тебе</h2>
+          <div class="letter-body" id="letterBody"></div>
+          <p class="letter-sign">твоя, всегда ♥</p>
+        </div>
+        <div class="letter-fade" aria-hidden="true"></div>
+        <p class="scroll-hint" id="letterScrollHint">листай вниз</p>
+        <button class="btn-next" id="letterNext" data-go="4" type="button" hidden>
+          следующий слой
+          <span class="btn-arrow" aria-hidden="true">→</span>
+        </button>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 5: ЛЕНТА ЖИЗНИ ================= -->
+  <section class="layer" id="l-timeline" data-layer="4" aria-label="лента воспоминаний" hidden>
+    <div class="layer-inner timeline-inner">
+
+      <div class="tl-head">
+        <h2 class="tl-title">лента твоей жизни</h2>
+        <p class="tl-sub">семнадцать лет, листай вбок</p>
+      </div>
+
+      <div class="tl-viewport" id="tlViewport">
+        <div class="tl-track" id="tlTrack"></div>
+      </div>
+
+      <div class="tl-controls">
+        <button class="tl-arrow" id="tlPrev" type="button" aria-label="назад">‹</button>
+        <div class="tl-progress" aria-hidden="true">
+          <div class="tl-progress-bar" id="tlBar"></div>
+          <span class="tl-progress-year" id="tlYear">0</span>
+        </div>
+        <button class="tl-arrow" id="tlNext" type="button" aria-label="вперёд">›</button>
+      </div>
+
+      <div class="swipe-hint" id="swipeHint" aria-hidden="true">
+        <span class="swipe-finger">☜</span> свайпай
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 6: ФИНАЛ ================= -->
+  <section class="layer" id="l-final" data-layer="5" aria-label="финал" hidden>
+    <div class="layer-inner center">
+
+      <div class="final-stage" id="finalStage">
+        <p class="final-lead anim" style="--d:.2s">
+          и остался самый последний слой
+        </p>
+
+        <button class="minibox" id="minibox" type="button" aria-label="открыть последний подарок">
+          <span class="mb-lid"></span>
+          <span class="mb-body"></span>
+          <span class="mb-bow">
+            <svg viewBox="0 0 140 62" class="bow-svg" aria-hidden="true">
+              <path class="bow-tail" d="M64 36 C60 46 52 54 44 60 L57 60 C64 53 68 45 70 38 Z" fill="url(#bowLoop)"/>
+              <path class="bow-tail" d="M76 36 C80 46 88 54 96 60 L83 60 C76 53 72 45 70 38 Z" fill="url(#bowLoop)"/>
+              <path class="bow-loop" d="M70 31 C56 8 20 4 12 20 C4 36 30 48 70 31 Z" fill="url(#bowLoop)"/>
+              <path class="bow-loop" d="M70 31 C84 8 120 4 128 20 C136 36 110 48 70 31 Z" fill="url(#bowLoop)"/>
+              <ellipse cx="70" cy="32" rx="12" ry="11" fill="url(#bowKnot)"/>
+            </svg>
+          </span>
+          <span class="mb-glow"></span>
+        </button>
+
+        <p class="final-hint anim" style="--d:.9s">нажми, там настоящий подарок</p>
+      </div>
+
+      <div class="reveal-card" id="revealCard" hidden>
+        <h2 class="rc-title">настоящий подарок ждёт тебя в тг</h2>
+        <p class="rc-text">
+          напиши мне кодовое слово, и я сразу его скину.<br>
+          кнопка уже всё напишет за тебя
+        </p>
+
+        <div class="code-word">
+          <span class="cw-label">кодовое слово</span>
+          <code id="codeWord">дашулькинс, скинь подарочек кек)</code>
+          <button class="cw-copy" id="copyBtn" type="button">скопировать</button>
+        </div>
+
+        <a class="tg-btn" id="tgBtn" href="#" target="_blank" rel="noopener">
+          <span class="tg-ico" aria-hidden="true">✈</span>
+          написать мне в телеграм
+        </a>
+
+        <p class="rc-ps">
+          с днём рождения, Яра.<br>
+          спасибо, что ты есть ♥
+        </p>
+
+        <button class="again-btn" id="againBtn" type="button">открыть подарок заново</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="js/audio.js"></script>
+<script src="js/confetti.js"></script>
+<script src="js/content.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
