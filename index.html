@@ -128,7 +128,6 @@
         <span class="age-label">тебе</span>
         <span class="age-number" id="ageNumber">
           <span class="age-digit">1</span><span class="age-digit">7</span>
-          <span class="age-shine" aria-hidden="true"></span>
         </span>
       </div>
 
@@ -267,14 +266,15 @@
       <div class="reveal-card" id="revealCard" hidden>
         <h2 class="rc-title">настоящий подарок ждёт тебя в тг</h2>
         <p class="rc-text">
-          напиши мне кодовое слово, и я сразу его скину.<br>
-          кнопка уже всё напишет за тебя
+          жми на кнопку, сообщение напишется само,<br>
+          тебе останется только отправить
         </p>
 
-        <div class="code-word">
-          <span class="cw-label">кодовое слово</span>
-          <code id="codeWord">дашулькинс, скинь подарочек кек)</code>
-          <button class="cw-copy" id="copyBtn" type="button">скопировать</button>
+        <div class="chat-preview" aria-hidden="true">
+          <div class="chat-bubble">
+            <span id="codeWord">дашулькинс, скинь подарочек кек)</span>
+            <span class="chat-time">19:06</span>
+          </div>
         </div>
 
         <a class="tg-btn" id="tgBtn" href="#" target="_blank" rel="noopener">
@@ -282,9 +282,8 @@
           написать мне в телеграм
         </a>
 
-        <p class="rc-ps">
-          с днём рождения, Яра.<br>
-          спасибо, что ты есть ♥
+        <p class="rc-ps" id="rcPs">
+          с днём рождения ♥
         </p>
 
         <button class="again-btn" id="againBtn" type="button">открыть подарок заново</button>

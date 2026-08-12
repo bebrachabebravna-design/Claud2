@@ -79,7 +79,6 @@
     });
 
     const ageEl = $('#ageNumber');
-    const shine = $('.age-shine', ageEl);
     ageEl.innerHTML = '';
     Array.from(String(CONFIG.age)).forEach((d, i) => {
       const s = document.createElement('span');
@@ -88,8 +87,8 @@
       s.textContent = d;
       ageEl.appendChild(s);
     });
-    ageEl.appendChild(shine);
 
+    $('#rcPs').innerHTML = 'с днём рождения, ' + CONFIG.name + '.<br>спасибо, что ты есть ♥';
     $('#codeWord').textContent = CONFIG.codeWord;
     $('#tgBtn').href = 'https://t.me/' + CONFIG.telegram + '?text=' + encodeURIComponent(CONFIG.codeWord);
     document.title = CONFIG.name + ', с днём рождения';
@@ -126,7 +125,24 @@
     });
   }
 
+  // длинное имя не должно упираться в края экрана
+  function fitName() {
+    const t = $('.name-title');
+    if (!t || !t.parentElement) return;
+    const avail = t.parentElement.clientWidth - 24;
+    if (avail <= 0) return;
+
+    t.style.fontSize = '';
+    let size = parseFloat(getComputedStyle(t).fontSize);
+    let guard = 0;
+    while (t.scrollWidth > avail && size > 30 && guard++ < 60) {
+      size -= 2;
+      t.style.fontSize = size + 'px';
+    }
+  }
+
   function paintAllGradients() {
+    fitName();
     paintGradientText($('.name-title'), '.anim-letter');
     paintGradientText($('#ageNumber'), '.age-digit');
   }
@@ -611,7 +627,6 @@
   const minibox = $('#minibox');
   const finalStage = $('#finalStage');
   const revealCard = $('#revealCard');
-  const copyBtn = $('#copyBtn');
   let finalOpened = false;
 
   let finalSeen = false;
@@ -641,9 +656,6 @@
   });
 
   function resetFinal() {
-    copyBtn.classList.remove('is-copied');
-    copyBtn.textContent = 'скопировать';
-
     // финал уже открывали, сразу показываем кодовое слово
     if (finalSeen) {
       finalOpened = true;
@@ -658,32 +670,6 @@
     finalStage.hidden = false;
     revealCard.hidden = true;
   }
-
-  copyBtn.addEventListener('click', async () => {
-    const text = CONFIG.codeWord;
-    let ok = false;
-    try {
-      await navigator.clipboard.writeText(text);
-      ok = true;
-    } catch (err) {
-      // старые браузеры и http, копируем по старинке
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.cssText = 'position:fixed;top:-999px;opacity:0';
-      document.body.appendChild(ta);
-      ta.select();
-      try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
-      ta.remove();
-    }
-    Sound.sfx.click();
-    copyBtn.classList.toggle('is-copied', ok);
-    copyBtn.textContent = ok ? 'скопировано ♥' : 'выдели и скопируй';
-    setTimeout(() => {
-      copyBtn.classList.remove('is-copied');
-      copyBtn.textContent = 'скопировать';
-    }, 2200);
-  });
 
   $('#tgBtn').addEventListener('click', () => {
     Sound.sfx.sparkle(4);
