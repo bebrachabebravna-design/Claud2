@@ -47,6 +47,9 @@
 <div class="bg-glow" aria-hidden="true"></div>
 <div class="petals" id="petals" aria-hidden="true"></div>
 
+<!-- ============ приглушение света (для свечей) ============ -->
+<div class="dim" id="dim" aria-hidden="true"></div>
+
 <!-- ============ канвас для конфетти ============ -->
 <canvas id="confetti" aria-hidden="true"></canvas>
 
@@ -133,44 +136,39 @@
 
       <p class="hello-sub anim" style="--d:1.3s">
         целых семнадцать, представляешь.<br>
-        я приготовила тебе подарок из нескольких слоёв,<br>
-        разворачивай по очереди
+        я приготовила тебе подарок из кучи слоёв,<br>
+        разворачивай по очереди, их много
       </p>
 
-      <button class="btn-next anim" style="--d:1.7s" data-go="2" type="button">
+      <button class="btn-next anim" style="--d:1.7s" data-go="next" type="button">
         разворачивать дальше
         <span class="btn-arrow" aria-hidden="true">→</span>
       </button>
     </div>
   </section>
 
-  <!-- ================= СЛОЙ 3: ОБЁРТКА ================= -->
-  <section class="layer" id="l-paper" data-layer="2" aria-label="обёрточная бумага" hidden>
+  <!-- ================= СЛОЙ 3: ОБЁРТКА №1 ================= -->
+  <section class="layer layer-paper" id="l-paper" data-layer="2" aria-label="обёрточная бумага" hidden>
     <div class="layer-inner center">
-
-      <p class="paper-hint" id="paperHint">
-        под подарком ещё один слой.<br>
+      <p class="paper-hint">
+        под подарком ещё слой.<br>
         <b>потяни за уголок и порви бумагу</b>
       </p>
-
-      <div class="tear-stage" id="tearStage">
+      <div class="tear-stage tear-v1" data-under="✉" data-next="1">
         <div class="tear-half tear-left" aria-hidden="true"></div>
         <div class="tear-half tear-right" aria-hidden="true"></div>
         <div class="tear-edge tear-edge-l" aria-hidden="true"></div>
         <div class="tear-edge tear-edge-r" aria-hidden="true"></div>
-
         <div class="tear-under" aria-hidden="true">
           <div class="under-glow"></div>
-          <div class="under-envelope">✉</div>
+          <div class="under-icon">✉</div>
         </div>
-
-        <button class="tear-grip" id="tearGrip" type="button" aria-label="порвать бумагу">
+        <button class="tear-grip" type="button" aria-label="порвать бумагу">
           <span class="grip-corner"></span>
           <span class="grip-pulse"></span>
         </button>
       </div>
-
-      <p class="tear-progress-label" id="tearLabel">0%</p>
+      <p class="tear-progress-label">0%</p>
     </div>
   </section>
 
@@ -200,7 +198,7 @@
         </div>
         <div class="letter-fade" aria-hidden="true"></div>
         <p class="scroll-hint" id="letterScrollHint">листай вниз</p>
-        <button class="btn-next" id="letterNext" data-go="4" type="button" hidden>
+        <button class="btn-next" id="letterNext" data-go="next" type="button" hidden>
           следующий слой
           <span class="btn-arrow" aria-hidden="true">→</span>
         </button>
@@ -208,8 +206,186 @@
     </div>
   </section>
 
-  <!-- ================= СЛОЙ 5: ЛЕНТА ЖИЗНИ ================= -->
-  <section class="layer" id="l-timeline" data-layer="4" aria-label="лента воспоминаний" hidden>
+  <!-- ================= СЛОЙ 5: ГОЛОСОВОЕ ================= -->
+  <section class="layer" id="l-voice" data-layer="4" aria-label="голосовое сообщение" hidden>
+    <div class="layer-inner center">
+      <p class="voice-lead anim" style="--d:.15s">
+        а ещё я записала тебе голосовое,<br>включай и слушай ♥
+      </p>
+
+      <div class="voice-card anim" style="--d:.5s">
+        <button class="voice-play" id="voicePlay" type="button" aria-label="слушать голосовое">
+          <span class="vp-icon vp-play">►</span>
+          <span class="vp-icon vp-pause" hidden>❚❚</span>
+          <span class="vp-ring"></span>
+        </button>
+        <div class="voice-body">
+          <div class="voice-wave" id="voiceWave" aria-hidden="true"></div>
+          <div class="voice-meta">
+            <span class="voice-name">голосовое от меня</span>
+            <span class="voice-time" id="voiceTime">0:00</span>
+          </div>
+        </div>
+      </div>
+
+      <audio id="voiceAudio" preload="auto" src="media/voice.mp3"></audio>
+
+      <p class="voice-hint" id="voiceHint">нажми на кружок</p>
+
+      <button class="btn-next voice-next" id="voiceNext" data-go="next" type="button" hidden>
+        дальше
+        <span class="btn-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 6: ОБЁРТКА №2 ================= -->
+  <section class="layer layer-paper" id="l-paper2" data-layer="5" aria-label="ещё обёртка" hidden>
+    <div class="layer-inner center">
+      <p class="paper-hint">
+        не думал же ты что всё так просто)<br>
+        <b>рви ещё, тут снова бумага</b>
+      </p>
+      <div class="tear-stage tear-v2" data-under="🎬" data-next="1">
+        <div class="tear-half tear-left" aria-hidden="true"></div>
+        <div class="tear-half tear-right" aria-hidden="true"></div>
+        <div class="tear-edge tear-edge-l" aria-hidden="true"></div>
+        <div class="tear-edge tear-edge-r" aria-hidden="true"></div>
+        <div class="tear-under" aria-hidden="true">
+          <div class="under-glow"></div>
+          <div class="under-icon">🎬</div>
+        </div>
+        <button class="tear-grip" type="button" aria-label="порвать бумагу">
+          <span class="grip-corner"></span>
+          <span class="grip-pulse"></span>
+        </button>
+      </div>
+      <p class="tear-progress-label">0%</p>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 7: ВИДЕО-ШУТКА ================= -->
+  <section class="layer" id="l-video" data-layer="6" aria-label="видео" hidden>
+    <div class="layer-inner center">
+
+      <div class="video-stage" id="videoStage">
+        <p class="video-lead anim" style="--d:.15s">
+          ой, тут из подарка что-то выпало
+        </p>
+        <button class="minibox vbox" id="videoBox" type="button" aria-label="открыть">
+          <span class="mb-lid"></span>
+          <span class="mb-body"></span>
+          <span class="mb-bow">
+            <svg viewBox="0 0 140 62" class="bow-svg" aria-hidden="true">
+              <path class="bow-tail" d="M64 36 C60 46 52 54 44 60 L57 60 C64 53 68 45 70 38 Z" fill="url(#bowLoop)"/>
+              <path class="bow-tail" d="M76 36 C80 46 88 54 96 60 L83 60 C76 53 72 45 70 38 Z" fill="url(#bowLoop)"/>
+              <path class="bow-loop" d="M70 31 C56 8 20 4 12 20 C4 36 30 48 70 31 Z" fill="url(#bowLoop)"/>
+              <path class="bow-loop" d="M70 31 C84 8 120 4 128 20 C136 36 110 48 70 31 Z" fill="url(#bowLoop)"/>
+              <ellipse cx="70" cy="32" rx="12" ry="11" fill="url(#bowKnot)"/>
+            </svg>
+          </span>
+          <span class="mb-glow"></span>
+        </button>
+        <p class="video-hint anim" style="--d:.9s">нажми, посмотрим вместе</p>
+      </div>
+
+      <div class="video-wrap" id="videoWrap" hidden>
+        <div class="video-frame">
+          <video id="jokeVideo" playsinline preload="auto" src="media/joke.mp4"></video>
+          <button class="video-replay" id="videoReplay" type="button" hidden aria-label="ещё раз">↻</button>
+        </div>
+        <p class="video-after" id="videoAfter" hidden>ну лан, расслабься 😄</p>
+        <button class="btn-next" id="videoNext" data-go="next" type="button" hidden>
+          следующий слой
+          <span class="btn-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 8: СВЕЧИ ================= -->
+  <section class="layer" id="l-candles" data-layer="7" aria-label="задуй свечи" hidden>
+    <div class="layer-inner center">
+      <p class="candle-lead" id="candleLead">
+        загадай желание<br>и задуй свечи
+      </p>
+
+      <div class="cake" id="cake">
+        <div class="cake-candles" id="cakeCandles"></div>
+        <div class="cake-top"></div>
+        <div class="cake-mid"></div>
+        <div class="cake-drip" aria-hidden="true"></div>
+        <div class="cake-base"></div>
+        <div class="cake-plate"></div>
+      </div>
+
+      <p class="candle-hint" id="candleHint">нажми и дунь в микрофон, либо проведи пальцем по свечам</p>
+
+      <button class="candle-mic-btn" id="candleMic" type="button">🎤 дунуть по-настоящему</button>
+
+      <div class="candle-done" id="candleDone" hidden>
+        <p class="candle-wish">загадала? тогда до встречи, желание ♥</p>
+        <button class="btn-next" data-go="next" type="button">
+          дальше
+          <span class="btn-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 9: ОБЁРТКА №3 ================= -->
+  <section class="layer layer-paper" id="l-paper3" data-layer="8" aria-label="ещё обёртка" hidden>
+    <div class="layer-inner center">
+      <p class="paper-hint">
+        последняя бумажка, честно честно)<br>
+        <b>ну ты понял, рви</b>
+      </p>
+      <div class="tear-stage tear-v3" data-under="✨" data-next="1">
+        <div class="tear-half tear-left" aria-hidden="true"></div>
+        <div class="tear-half tear-right" aria-hidden="true"></div>
+        <div class="tear-edge tear-edge-l" aria-hidden="true"></div>
+        <div class="tear-edge tear-edge-r" aria-hidden="true"></div>
+        <div class="tear-under" aria-hidden="true">
+          <div class="under-glow"></div>
+          <div class="under-icon">✨</div>
+        </div>
+        <button class="tear-grip" type="button" aria-label="порвать бумагу">
+          <span class="grip-corner"></span>
+          <span class="grip-pulse"></span>
+        </button>
+      </div>
+      <p class="tear-progress-label">0%</p>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 10: СКРЕТЧ ================= -->
+  <section class="layer" id="l-scratch" data-layer="9" aria-label="сотри и увидь" hidden>
+    <div class="layer-inner center">
+      <p class="scratch-lead anim" style="--d:.15s">
+        тут спрятана картинка,<br><b>сотри пальцем плёнку</b>
+      </p>
+
+      <div class="scratch-stage" id="scratchStage">
+        <div class="scratch-under" id="scratchUnder">
+          <div class="scratch-fallback">
+            <span class="sf-heart">♥</span>
+            <span class="sf-text">я тебя<br>люблю</span>
+          </div>
+        </div>
+        <canvas class="scratch-canvas" id="scratchCanvas"></canvas>
+      </div>
+
+      <p class="scratch-progress" id="scratchProgress">стёрто 0%</p>
+
+      <button class="btn-next scratch-next" id="scratchNext" data-go="next" type="button" hidden>
+        дальше
+        <span class="btn-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 11: ЛЕНТА ЖИЗНИ ================= -->
+  <section class="layer" id="l-timeline" data-layer="10" aria-label="лента воспоминаний" hidden>
     <div class="layer-inner timeline-inner">
 
       <div class="tl-head">
@@ -233,11 +409,31 @@
       <div class="swipe-hint" id="swipeHint" aria-hidden="true">
         <span class="swipe-finger">☜</span> свайпай
       </div>
+
+      <button class="btn-next tl-next-btn" data-go="next" type="button">
+        дальше
+        <span class="btn-arrow" aria-hidden="true">→</span>
+      </button>
     </div>
   </section>
 
-  <!-- ================= СЛОЙ 6: ФИНАЛ ================= -->
-  <section class="layer" id="l-final" data-layer="5" aria-label="финал" hidden>
+  <!-- ================= СЛОЙ 12: 17 ПРИЧИН ================= -->
+  <section class="layer" id="l-reasons" data-layer="11" aria-label="причины" hidden>
+    <div class="layer-inner">
+      <div class="reasons-head">
+        <h2 class="reasons-title" id="reasonsTitle">17 причин</h2>
+        <p class="reasons-sub">почему ты лучший, листай вниз</p>
+      </div>
+      <ol class="reasons-list" id="reasonsList"></ol>
+      <button class="btn-next reasons-next" id="reasonsNext" data-go="next" type="button" hidden>
+        и последнее ♥
+        <span class="btn-arrow" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= СЛОЙ 13: ФИНАЛ ================= -->
+  <section class="layer" id="l-final" data-layer="12" aria-label="финал" hidden>
     <div class="layer-inner center">
 
       <div class="final-stage" id="finalStage">
@@ -266,20 +462,15 @@
       <div class="reveal-card" id="revealCard" hidden>
         <h2 class="rc-title">настоящий подарок ждёт тебя в тг</h2>
         <p class="rc-text">
-          жми на кнопку, сообщение напишется само,<br>
-          тебе останется только отправить
+          тут прячется последний сюрприз.<br>
+          просто тыкни ♥
         </p>
 
-        <div class="chat-preview" aria-hidden="true">
-          <div class="chat-bubble">
-            <span id="codeWord">дашулькинс, скинь подарочек кек)</span>
-            <span class="chat-time">19:06</span>
-          </div>
-        </div>
+        <span id="codeWord" hidden>дашулькинс, скинь подарочек кек)</span>
 
-        <a class="tg-btn" id="tgBtn" href="#" target="_blank" rel="noopener">
+        <a class="tg-btn tg-btn-big" id="tgBtn" href="#" target="_blank" rel="noopener">
           <span class="tg-ico" aria-hidden="true">✈</span>
-          написать мне в телеграм
+          тыкни
         </a>
 
         <p class="rc-ps" id="rcPs">

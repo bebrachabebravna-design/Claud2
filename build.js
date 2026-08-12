@@ -52,6 +52,21 @@ if (embedded.length) {
     photoMap[year] ? `photo: '${photoMap[year]}'` : m);
 }
 
+// секретное фото под плёнкой (слой «сотри»)
+function fileToDataUri(rel, mime) {
+  const abs = path.join(ROOT, rel);
+  if (!fs.existsSync(abs)) return null;
+  return `data:${mime};base64,${b64(rel)}`;
+}
+for (const ext of ['jpg', 'jpeg', 'png', 'webp']) {
+  const uri = fileToDataUri('photos/secret.' + ext,
+    ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg');
+  if (uri) {
+    contentJs = contentJs.replace(/const SCRATCH_PHOTO = '[^']*';/, () => `const SCRATCH_PHOTO = '${uri}';`);
+    break;
+  }
+}
+
 const js = [contentJs, read('js/audio.js'), read('js/confetti.js'), read('js/app.js')].join('\n\n');
 
 /* ---------- собираем html ---------- */
@@ -60,6 +75,10 @@ let html = read('index.html');
 // ВАЖНО: замену передаём функцией, а не строкой.
 // В строке замены последовательности вида $$ и $& имеют особый смысл,
 // и код с $$ (сокращение для querySelectorAll) молча ломается.
+// медиа: голосовое и видео внутрь файла
+const voiceUri = fileToDataUri('media/voice.mp3', 'audio/mpeg');
+const jokeUri = fileToDataUri('media/joke.mp4', 'video/mp4');
+
 html = html
   .replace(/\n?\s*<link rel="preload"[^>]*>/g, '')
   .replace('<link rel="stylesheet" href="css/fonts.css">', () => `<style>\n${fontsCss}\n</style>`)
@@ -67,11 +86,16 @@ html = html
   .replace(/\s*<script src="js\/(audio|confetti|content)\.js"><\/script>/g, '')
   .replace('<script src="js/app.js"></script>', () => `<script>\n${js}\n</script>`);
 
+if (voiceUri) html = html.replace('src="media/voice.mp3"', () => `src="${voiceUri}"`);
+if (jokeUri) html = html.replace('src="media/joke.mp4"', () => `src="${jokeUri}"`);
+
 fs.mkdirSync(DIST, { recursive: true });
 fs.writeFileSync(path.join(DIST, 'index.html'), html);
 
-const kb = (Buffer.byteLength(html) / 1024).toFixed(0);
-console.log(`dist/index.html готов, ${kb} КБ`);
+const kb = (Buffer.byteLength(html) / 1024 / 1024).toFixed(2);
+console.log(`dist/index.html готов, ${kb} МБ`);
 console.log(embedded.length
   ? `фотографий вшито: ${embedded.length} (${embedded.sort((a, b) => a - b).join(', ')})`
   : 'фотографий пока нет, карточки покажут заглушки');
+console.log('голосовое: ' + (voiceUri ? 'вшито' : 'нет файла media/voice.mp3'));
+console.log('видео: ' + (jokeUri ? 'вшито' : 'нет файла media/joke.mp4'));
