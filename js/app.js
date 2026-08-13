@@ -955,7 +955,8 @@
     MEMORIES.forEach((m, i) => {
       const card = document.createElement('article');
       card.className = 'tl-card' + (i === lastIdx ? ' is-last' : '') + (m.video ? ' is-video' : '');
-      card.style.setProperty('--tilt', (i % 2 ? 1 : -1) * rnd(0.6, 1.8).toFixed(2) + 'deg');
+      // фото стоят ровно, без наклона, чтобы не выглядели криво
+      card.style.setProperty('--tilt', '0deg');
 
       const tape = document.createElement('span');
       tape.className = 'tl-tape';
@@ -1022,6 +1023,15 @@
         media.appendChild(img);
       }
       card.appendChild(media);
+
+      // подпись под фото, по смыслу
+      if (m.cap) {
+        const cap = document.createElement('p');
+        cap.className = 'tl-cap';
+        cap.textContent = m.cap;
+        card.appendChild(cap);
+      }
+
       tlTrack.appendChild(card);
     });
     cards = $$('.tl-card', tlTrack);

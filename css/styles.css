@@ -1164,6 +1164,17 @@ body {
   transform: rotate(-3deg);
   z-index: 3;
 }
+/* подпись под фото */
+.tl-cap {
+  font-family: 'Caveat', cursive;
+  font-size: 19.5px;
+  line-height: 1.28;
+  color: var(--ink);
+  text-align: center;
+  margin: 11px 4px 2px;
+  min-height: 3.2em;
+}
+.tl-card.is-last .tl-cap { color: var(--red-700); }
 
 .tl-controls {
   display: flex;
