@@ -3422,6 +3422,15 @@ document.addEventListener('DOMContentLoaded', function () {
 // Никаких сторонних сервисов и передачи данных за границу — так чище по 152-ФЗ.
 (function(){
   var ENDPOINT='/api/lead.php';
+  // СТАБИЛЬНЫЙ канал: заявка мгновенно приходит вам в Telegram прямо из браузера
+  // и НЕ зависит от того, включён ли сервер. Заполните один раз — и заявки не
+  // потеряются, даже когда сервер выключен.
+  //   1) в Telegram напишите @BotFather → /newbot → скопируйте токен в TG_TOKEN;
+  //   2) напишите своему новому боту любое сообщение (иначе он не сможет вам писать);
+  //   3) откройте в браузере https://api.telegram.org/bot<ВАШ_ТОКЕН>/getUpdates
+  //      и найдите "chat":{"id":ЧИСЛО} — впишите это ЧИСЛО в TG_CHAT.
+  var TG_TOKEN='';   // например '7712345678:AAH...'
+  var TG_CHAT='';    // например '123456789'
 
   // Черновик формы живёт в localStorage: случайная перезагрузка или закрытие
   // страницы не стирает введённое.
@@ -3503,16 +3512,34 @@ document.addEventListener('DOMContentLoaded', function () {
         clearDraft(form);
         if(typeof onSuccess==='function'){ try{ onSuccess(data); }catch(err){} }
       }
-      // Свой обработчик на российском хостинге (/api/lead.php): данные не уходят
-      // третьим лицам и за границу. Отправляем обычной формой (form-urlencoded).
+      // Заявку шлём в ДВА канала сразу — что-то одно точно сработает:
+      //  1) свой обработчик на хостинге (/api/lead.php) — сохраняет заявку в файл;
+      //  2) напрямую в Telegram — работает всегда, даже если сервер выключен.
+      // Успех показываем, если доставил хотя бы один канал.
       var enc=Object.keys(data).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(data[k]); }).join('&');
-      fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc})
-        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-        .then(function(j){ if(j&&j.ok){ success(); } else { throw 0; } })
-        .catch(function(){
+      function sendServer(){
+        return fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc})
+          .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+          .then(function(j){ if(!(j&&j.ok)) throw 0; return true; });
+      }
+      function sendTelegram(){
+        if(!TG_TOKEN||!TG_CHAT) return Promise.reject();
+        var lines=Object.keys(data).filter(function(k){ return k!=='form'; })
+          .map(function(k){ return k+': '+data[k]; }).join('\n');
+        var text='🔔 Заявка с сайта\n'+subject+'\n\n'+lines;
+        return fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
+          method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:'chat_id='+encodeURIComponent(TG_CHAT)+'&text='+encodeURIComponent(text)
+        }).then(function(r){ if(!r.ok) throw 0; return true; });
+      }
+      function safe(pr){ return pr.then(function(){ return true; }, function(){ return false; }); }
+      Promise.all([safe(sendServer()), safe(sendTelegram())]).then(function(res){
+        if(res.indexOf(true)!==-1){ success(); }
+        else {
           if(btn){ btn.disabled=false; btn.innerHTML=btnHtml; btn.style.opacity=''; }
           showError(form,'Не получилось отправить. Попробуйте ещё раз или напишите нам напрямую в Telegram.');
-        });
+        }
+      });
     });
   }
 
