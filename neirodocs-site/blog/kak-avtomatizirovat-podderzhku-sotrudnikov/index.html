@@ -52,7 +52,11 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif;font-weight:700;line-height:1.15;le
 .b-footer ul{list-style:none;padding:0;margin:0}
 .b-footer li{margin-bottom:12px;font-size:.95rem}
 .b-footer li a{color:#A0AAC2}.b-footer li a:hover{color:#fff;text-decoration:none}
-.b-footer-bottom{display:flex;justify-content:space-between;padding-top:28px;font-size:.85rem;color:#6B7896;flex-wrap:wrap;gap:16px}
+.b-footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;font-size:.85rem;color:#6B7896;flex-wrap:wrap;gap:14px 22px}
+.b-legal-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+.b-legal-links a{color:#8894b0;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.14)}
+.b-legal-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.5);text-decoration:none}
+@media(max-width:720px){.b-footer-bottom{flex-direction:column;align-items:flex-start}.b-legal-links{flex-direction:column;gap:10px}}
 .b-burger{display:none;flex-direction:column;gap:5px;width:46px;height:46px;border:none;border-radius:50%;background:#0A1428;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .b-burger span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;transition:.25s}
 body.bnav-open .b-burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -94,12 +98,76 @@ body.bnav-open .b-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 .art-faq h2{font-size:1.6rem;margin-bottom:22px}
 .art-faq-item{background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-md);padding:20px 24px;margin-bottom:14px;box-shadow:var(--sh-md)}
 .art-faq-item h3{font-size:1.1rem;margin-bottom:8px;color:var(--t-h)}
-.art-faq-item p{margin:0;color:var(--t-mute)}
+.art-faq-item p{margin:0;color:var(--t-body)}
 .art-cta{margin-top:56px;background:var(--grad-dark);color:#fff;border-radius:var(--r-lg);padding:44px 40px;text-align:center;box-shadow:var(--sh-md)}
 .art-cta h2{color:#fff;font-size:1.7rem;margin-bottom:12px}
 .art-cta p{color:#C3D0EA;max-width:520px;margin:0 auto 24px}
 .art-cta a{display:inline-block;background:var(--grad-accent);color:#fff!important;padding:14px 30px;border-radius:99px;font-weight:600;text-decoration:none;box-shadow:0 14px 34px -12px rgba(29,93,227,.7)}
-.back-link{display:inline-block;margin-top:40px;color:var(--t-mute);font-weight:500}</style>
+.back-link{display:inline-block;margin-top:40px;color:var(--t-mute);font-weight:500}
+
+/* --- полоса прогресса чтения --- */
+.read-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;background:transparent;pointer-events:none}
+.read-progress i{display:block;height:100%;width:0;background:var(--grad-accent);transition:width .08s linear}
+
+/* --- оглавление --- */
+.art-toc{background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-md);padding:22px 26px;margin:0 0 36px;box-shadow:var(--sh-md)}
+.art-toc b{display:block;font-family:'Manrope',sans-serif;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t-faint);margin-bottom:14px}
+.art-toc ol{margin:0;padding:0;list-style:none;counter-reset:toc}
+.art-toc li{margin:0 0 9px;font-size:.98rem;line-height:1.45}
+.art-toc li:last-child{margin-bottom:0}
+.art-toc li a{color:var(--t-body);text-decoration:none;border-bottom:1px solid transparent}
+.art-toc li a:hover{color:var(--acc);border-bottom-color:var(--acc-soft);text-decoration:none}
+.art-toc li.sub{padding-left:20px;font-size:.92rem}
+.art-toc li.sub a{color:var(--t-mute)}
+
+/* --- якоря у заголовков --- */
+.art-body h2,.art-body h3{scroll-margin-top:84px;position:relative}
+.art-body .anchor{position:absolute;left:-1.1em;top:0;color:var(--t-faint);opacity:0;text-decoration:none;font-weight:400;transition:opacity .2s}
+.art-body h2:hover .anchor,.art-body h3:hover .anchor{opacity:.55}
+.art-body .anchor:hover{opacity:1!important;color:var(--acc);text-decoration:none}
+@media(max-width:900px){.art-body .anchor{display:none}}
+
+/* --- первый абзац крупнее: задаёт тон статье --- */
+.art-body>p:first-of-type{font-size:1.2rem;line-height:1.66;color:var(--t-h)}
+
+/* --- таблицы, код, разделители, подписи --- */
+.art-body .t-scroll{overflow-x:auto;margin:0 0 24px;-webkit-overflow-scrolling:touch}
+.art-body table{border-collapse:collapse;width:100%;min-width:460px;font-size:.98rem;background:var(--paper);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-md)}
+.art-body th,.art-body td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+.art-body th{font-family:'Manrope',sans-serif;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--t-mute);background:var(--paper-mute)}
+.art-body tr:last-child td{border-bottom:none}
+.art-body code{background:var(--paper-mute);border:1px solid var(--rule);border-radius:6px;padding:2px 7px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;color:#0D3CB8}
+.art-body pre{background:#0A1428;color:#DDE6FA;border-radius:var(--r-md);padding:20px 22px;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9rem;line-height:1.6;margin:0 0 24px}
+.art-body pre code{background:none;border:none;color:inherit;padding:0}
+.art-body hr{border:none;border-top:1px solid var(--rule);margin:40px 0}
+.art-body figure{margin:26px 0}
+.art-body figcaption{text-align:center;color:var(--t-faint);font-size:.9rem;margin-top:10px}
+.art-body ul{list-style:none;padding-left:4px}
+.art-body ul li{position:relative;padding-left:24px}
+.art-body ul li::before{content:"";position:absolute;left:4px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.art-body ol{padding-left:24px}
+.art-body ol li::marker{color:var(--acc);font-weight:600}
+
+/* --- поделиться --- */
+.art-share{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:44px 0 0;padding-top:26px;border-top:1px solid var(--rule)}
+.as-label{font-size:.86rem;color:var(--t-faint);margin-right:4px}
+.as-btn{display:inline-flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--rule);border-radius:99px;padding:9px 17px;font:600 .88rem/1 'Manrope',system-ui,sans-serif;color:var(--t-mute);cursor:pointer;text-decoration:none;transition:border-color .2s,color .2s,transform .2s}
+.as-btn:hover{border-color:var(--acc);color:var(--acc);text-decoration:none;transform:translateY(-1px)}
+.as-btn.is-done{border-color:#1F9D55;color:#1F9D55}
+
+/* --- похожие статьи --- */
+.art-rel{margin-top:56px;border-top:1px solid var(--rule);padding-top:36px}
+.art-rel h2{font-size:1.5rem;margin-bottom:22px}
+.art-rel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:760px){.art-rel-grid{grid-template-columns:1fr}}
+.art-rel-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-md);text-decoration:none;transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s}
+.art-rel-card:hover{transform:translateY(-3px);border-color:var(--acc);text-decoration:none}
+.arc-cover{display:block;aspect-ratio:16/9;background:var(--paper-mute);overflow:hidden}
+.arc-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.arc-cover-ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0D3CB8,#5B8AFF);color:rgba(255,255,255,.92);font:800 2rem/1 'Manrope',sans-serif}
+.arc-body{display:block;padding:16px 18px 18px}
+.arc-title{display:block;font:700 1.02rem/1.3 'Manrope',sans-serif;color:var(--t-h);margin-bottom:7px}
+.arc-ex{display:block;font-size:.9rem;color:var(--t-mute);line-height:1.5}</style>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
     (function(m,e,t,r,i,k,a){
@@ -115,6 +183,7 @@ body.bnav-open .b-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
 <!-- /Yandex.Metrika counter -->
 </head>
 <body>
+<div class="read-progress" aria-hidden="true"><i id="readBar"></i></div>
 <header class="b-header"><div class="in">
   <a class="b-brand" href="/"><span class="n1">НЕЙРО</span><span>ДОКС</span></a>
   <nav class="b-nav" id="bNav">
@@ -139,12 +208,15 @@ body.bnav-open .b-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
     <div class="breadcrumb"><a href="/">Главная</a> → <a href="/blog/">Блог</a> → Как автоматизировать поддержку сотрудников?</div>
     <span class="art-q">Отвечаем на вопрос</span>
     <h1 class="art-title">Как автоматизировать поддержку сотрудников с помощью ИИ-агента</h1>
-    <div class="art-meta"><span>Нейродокс</span><span class="dot"></span><time datetime="2026-07-10T10:00:00+03:00">10.07.2026</time><span class="dot"></span><span>1 мин чтения</span></div>
+    <div class="art-meta"><span>Нейродокс</span><span class="dot"></span><time datetime="2026-07-10T10:00:00+03:00">10.07.2026</time><span class="dot"></span><span>1 мин чтения</span><span class="dot" hidden></span><span data-views-slug="kak-avtomatizirovat-podderzhku-sotrudnikov" hidden></span></div>
   </div></div>
   
   <div class="wrap">
-    <div class="art-body"><p>Каждый день сотрудники задают одни и те же вопросы: где лежит регламент, какой лимit на командировку, как оформить заявку. Ответы есть в документах — но их долго искать. <strong>ИИ-агент решает это за секунды.</strong></p><h2>Что делает ИИ-агент</h2><p>Агент читает все внутренние документы компании — регламенты, инструкции, политики — и отвечает сотрудникам обычными словами, со ссылкой на конкретный пункт. Никаких выдумок: если ответа в документах нет, агент честно об этом скажет.</p><h2>Сколько это экономит</h2><p>Средний сотрудник тратит 30–40 минут в день на поиск информации. Для компании из 30 человек это сотни часов в месяц. Агент возвращает большую часть этого времени.</p><blockquote>Раньше новый менеджер входил в курс дела месяц. С агентом — за несколько дней.</blockquote><h2>Куда встраивается</h2><p>ИИ-агента можно подключить в Telegram, WhatsApp, вашу CRM или 1С — туда, где сотрудники уже работают. Отдельную платформу учить не нужно.</p></div>
-    <section class="art-faq"><h2>Частые вопросы</h2><div class="art-faq-item"><h3>Агент может выдумать ответ?</h3><p>Нет. Агент отвечает только по вашим документам и всегда показывает источник. Если ответа нет — он так и скажет.</p></div><div class="art-faq-item"><h3>Сколько занимает внедрение?</h3><p>Зависит от объёма документов. Точные сроки и стоимость считаем на бесплатном аудите.</p></div></section>
+    <nav class="art-toc"><b>В этой статье</b><ol><li><a href="#h1">Что делает ИИ-агент</a></li><li><a href="#h2">Сколько это экономит</a></li><li><a href="#h3">Куда встраивается</a></li></ol></nav>
+    <div class="art-body"><p>Каждый день сотрудники задают одни и&nbsp;те&nbsp;же&nbsp;вопросы: где лежит регламент, какой лимit на&nbsp;командировку, как оформить заявку. Ответы есть в&nbsp;документах&nbsp;— но&nbsp;их&nbsp;долго искать. <strong>ИИ-агент решает это за&nbsp;секунды.</strong></p><h2 id="h1">Что делает ИИ-агент<a class="anchor" href="#h1" aria-label="Ссылка на этот раздел">#</a></h2><p>Агент читает все внутренние документы компании&nbsp;— регламенты, инструкции, политики&nbsp;— и&nbsp;отвечает сотрудникам обычными словами, со&nbsp;ссылкой на&nbsp;конкретный пункт. Никаких выдумок: если ответа в&nbsp;документах нет, агент честно об&nbsp;этом скажет.</p><h2 id="h2">Сколько это экономит<a class="anchor" href="#h2" aria-label="Ссылка на этот раздел">#</a></h2><p>Средний сотрудник тратит 30–40&nbsp;минут в&nbsp;день на&nbsp;поиск информации. Для компании из&nbsp;30&nbsp;человек это сотни часов в&nbsp;месяц. Агент возвращает большую часть этого времени.</p><blockquote>Раньше новый менеджер входил в&nbsp;курс дела месяц. С&nbsp;агентом&nbsp;— за&nbsp;несколько дней.</blockquote><h2 id="h3">Куда встраивается<a class="anchor" href="#h3" aria-label="Ссылка на этот раздел">#</a></h2><p>ИИ-агента можно подключить в&nbsp;Telegram, WhatsApp, вашу CRM или 1С&nbsp;— туда, где сотрудники уже работают. Отдельную платформу учить не&nbsp;нужно.</p></div>
+    <div class="art-share"><span class="as-label">Поделиться</span><a class="as-btn" href="https://t.me/share/url?url=https%3A%2F%2Fneirodocs.ru%2Fblog%2Fkak-avtomatizirovat-podderzhku-sotrudnikov%2F&text=%D0%9A%D0%B0%D0%BA%20%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D1%81%D0%BE%D1%82%D1%80%D1%83%D0%B4%D0%BD%D0%B8%D0%BA%D0%BE%D0%B2%20%D1%81%20%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%D1%8E%20%D0%98%D0%98-%D0%B0%D0%B3%D0%B5%D0%BD%D1%82%D0%B0" target="_blank" rel="noopener nofollow" aria-label="Отправить в Telegram"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.51l-.38 5.34c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.65.25 1.91-.9l3.46-16.2c.31-1.43-.52-1.99-1.46-1.64L1.13 10.87c-1.39.54-1.37 1.31-.24 1.66l5.2 1.62L18.16 6.5c.57-.37 1.09-.17.66.2L9.04 15.51z"/></svg>Telegram</a><a class="as-btn" href="https://vk.com/share.php?url=https%3A%2F%2Fneirodocs.ru%2Fblog%2Fkak-avtomatizirovat-podderzhku-sotrudnikov%2F&title=%D0%9A%D0%B0%D0%BA%20%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C%20%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D1%83%20%D1%81%D0%BE%D1%82%D1%80%D1%83%D0%B4%D0%BD%D0%B8%D0%BA%D0%BE%D0%B2%20%D1%81%20%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%D1%8E%20%D0%98%D0%98-%D0%B0%D0%B3%D0%B5%D0%BD%D1%82%D0%B0" target="_blank" rel="noopener nofollow" aria-label="Поделиться во ВКонтакте">VK</a><button class="as-btn as-copy" type="button" data-url="https://neirodocs.ru/blog/kak-avtomatizirovat-podderzhku-sotrudnikov/">Скопировать ссылку</button></div>
+    <section class="art-faq"><h2>Частые вопросы</h2><div class="art-faq-item"><h3>Агент может выдумать ответ?</h3><p>Нет. Агент отвечает только по&nbsp;вашим документам и&nbsp;всегда показывает источник. Если ответа нет&nbsp;— он&nbsp;так и&nbsp;скажет.</p></div><div class="art-faq-item"><h3>Сколько занимает внедрение?</h3><p>Зависит от&nbsp;объёма документов. Точные сроки и&nbsp;стоимость считаем на&nbsp;бесплатном аудите.</p></div></section>
+    <section class="art-rel"><h2>Читать дальше</h2><div class="art-rel-grid"><a class="art-rel-card" href="/blog/skolko-stoit-vnedrenie-ii-agenta/"><span class="arc-cover arc-cover-ph">С</span><span class="arc-body"><span class="arc-title">Сколько стоит внедрение ИИ-агента в компанию и когда он окупается</span><span class="arc-ex">Из чего складывается стоимость ИИ-агента, от чего она зависит и за какой срок вложения возвращаются.</span></span></a></div></section>
     <div class="art-cta">
       <h2>Хотите такой же ИИ-агент для своей компании?</h2>
       <p>На бесплатном аудите разберём ваши процессы, покажем кейсы конкурентов и дадим чек-лист по нейросетям для бизнеса.</p>
@@ -193,8 +265,89 @@ body.bnav-open .b-burger span:nth-child(3){transform:translateY(-7px) rotate(-45
   </div>
   <div class="b-footer-bottom">
     <div>© 2026 Нейродокс. Все права защищены.</div>
+    <div class="b-legal-links">
+      <a href="/privacy/">Политика конфиденциальности</a>
+      <a href="/consent/">Согласие на обработку ПД</a>
+      <a href="/terms/">Пользовательское соглашение</a>
+    </div>
     <div>ИНН 920002551441</div>
   </div>
 </div></footer>
+<script src="/assets/legal.js" defer></script>
+<script>
+(function(){
+  function word(n){
+    var a=n%10, b=n%100;
+    if(a===1&&b!==11) return 'просмотр';
+    if(a>=2&&a<=4&&(b<10||b>=20)) return 'просмотра';
+    return 'просмотров';
+  }
+  function paint(el,n){
+    el.textContent = n + ' ' + word(n);
+    el.hidden = false;
+    var d = el.previousElementSibling;           // точка-разделитель показывается вместе с числом
+    if(d && d.className.indexOf('dot')>-1) d.hidden = false;
+  }
+  window.nrdViews = { word: word, paint: paint };
+
+  var one=document.querySelector('[data-views-slug]');
+  if(one){
+    var slug=one.getAttribute('data-views-slug');
+    var key='nrd_seen_'+slug, today=new Date().toISOString().slice(0,10), fresh=true;
+    try{ fresh = localStorage.getItem(key)!==today; }catch(e){}
+    var body='slug='+encodeURIComponent(slug);
+    if(fresh){
+      fetch('/blog/views.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body})
+        .then(function(r){return r.json();})
+        .then(function(j){ if(j&&j.ok){ paint(one,j.count); try{localStorage.setItem(key,today);}catch(e){} } })
+        .catch(function(){});
+    } else {
+      fetch('/blog/views.php').then(function(r){return r.json();}).then(function(j){
+        if(j&&j.ok&&j.views&&j.views[slug]) paint(one,j.views[slug]);
+      }).catch(function(){});
+    }
+  }
+
+  var many=[].slice.call(document.querySelectorAll('[data-views-card]'));
+  if(many.length){
+    fetch('/blog/views.php').then(function(r){return r.json();}).then(function(j){
+      if(!j||!j.ok||!j.views) return;
+      many.forEach(function(el){
+        var n=j.views[el.getAttribute('data-views-card')];
+        if(n) paint(el,n);
+      });
+    }).catch(function(){});
+  }
+})();
+</script>
+<script>
+(function(){
+  // полоса прогресса чтения
+  var bar=document.getElementById('readBar'), art=document.querySelector('.art-body');
+  if(bar&&art){
+    var tick=function(){
+      var top=art.getBoundingClientRect().top+window.pageYOffset;
+      var total=art.offsetHeight-window.innerHeight*0.5;
+      var done=(window.pageYOffset-top+window.innerHeight*0.5)/(total>0?total:1);
+      bar.style.width=Math.max(0,Math.min(1,done))*100+'%';
+    };
+    tick();
+    window.addEventListener('scroll',tick,{passive:true});
+    window.addEventListener('resize',tick);
+  }
+  // копирование ссылки на статью
+  var copy=document.querySelector('.as-copy');
+  if(copy){
+    copy.addEventListener('click',function(){
+      var url=copy.getAttribute('data-url'), old=copy.textContent;
+      var done=function(){ copy.textContent='Ссылка скопирована'; copy.classList.add('is-done');
+        setTimeout(function(){ copy.textContent=old; copy.classList.remove('is-done'); },2200); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,function(){}); }
+      else { var t=document.createElement('textarea'); t.value=url; document.body.appendChild(t); t.select();
+        try{ document.execCommand('copy'); done(); }catch(e){} document.body.removeChild(t); }
+    });
+  }
+})();
+</script>
 </body>
 </html>

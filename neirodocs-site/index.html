@@ -3062,6 +3062,10 @@ h1, h2, h3{ text-wrap: balance; }
             <input type="text" name="Контакт" placeholder="Телефон, @telegram или email" required>
             <input type="hidden" name="Расчёт" id="calcData" value="">
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+            <label class="nrd-consent" style="flex:1 1 100%;">
+              <input type="checkbox" name="Согласие" value="Дано — пользователь отметил галочку" data-consent required>
+              <span>Я&nbsp;даю <a href="/consent/" target="_blank" rel="noopener">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="/privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+            </label>
             <button type="submit" class="btn btn-primary">Получить бесплатно</button>
           </form>
           <p class="lc-capture-note">Готовится за&nbsp;пару секунд под&nbsp;вашу сферу&nbsp;— можно сохранить в&nbsp;PDF. Это не&nbsp;созвон: пользу получаете сразу, а&nbsp;мы&nbsp;свяжемся, только чтобы разобрать ваш случай, если захотите.</p>
@@ -3103,6 +3107,10 @@ h1, h2, h3{ text-wrap: balance; }
             <input type="text" name="Компания" placeholder="Компания и размер команды" autocomplete="organization">
             <input type="text" name="Контакт" placeholder="Телефон или Telegram" required autocomplete="tel">
             <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+            <label class="nrd-consent">
+              <input type="checkbox" name="Согласие" value="Дано — пользователь отметил галочку" data-consent required>
+              <span>Я&nbsp;даю <a href="/consent/" target="_blank" rel="noopener">согласие на&nbsp;обработку персональных данных</a> и&nbsp;принимаю <a href="/privacy/" target="_blank" rel="noopener">политику конфиденциальности</a></span>
+            </label>
             <button type="submit" class="btn btn-white">Записаться на&nbsp;аудит <span class="arr"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12m0 0L8 2m5 5L8 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
             <p class="cta-form-ok" hidden>Заявка отправлена! Свяжусь с&nbsp;вами в&nbsp;течение рабочего дня.</p>
           </form>
@@ -3296,10 +3304,17 @@ h1, h2, h3{ text-wrap: balance; }
     </div>
     <div class="footer-bottom">
       <div>© 2026 Нейродокс. Все права защищены.</div>
+      <div class="nrd-legal-links">
+        <a href="/privacy/">Политика конфиденциальности</a>
+        <a href="/consent/">Согласие на обработку ПД</a>
+        <a href="/terms/">Пользовательское соглашение</a>
+      </div>
       <div>ИНН 920002551441</div>
     </div>
   </div>
 </footer>
+<script src="/assets/legal.js" defer></script>
+
 <script>
 document.documentElement.classList.add('js');
 document.addEventListener('DOMContentLoaded', function () {
@@ -3444,10 +3459,14 @@ document.addEventListener('DOMContentLoaded', function () {
       hideError(form);
       var data={_subject:subject, _template:'table', 'Страница':location.href};
       [].slice.call(form.querySelectorAll('input')).forEach(function(i){
-        if(i.name) data[i.name]=i.value;
+        if(!i.name) return;
+        // галочки уходят в письмо только когда отмечены
+        if(i.type==='checkbox'){ if(i.checked) data[i.name]=i.value||'Да'; return; }
+        data[i.name]=i.value;
       });
       if(data['_honey']) return; // бот
-      var required=[].slice.call(form.querySelectorAll('input[required]'));
+      var required=[].slice.call(form.querySelectorAll('input[required]'))
+        .filter(function(i){ return i.type!=='checkbox'; });
       var empty=required.filter(function(i){ return !i.value.trim(); });
       if(empty.length){
         empty.forEach(function(i){ i.style.borderColor='#FF8A8D'; });
@@ -3455,6 +3474,18 @@ document.addEventListener('DOMContentLoaded', function () {
         showError(form,'Заполните, пожалуйста, подсвеченные поля');
         return;
       }
+      // 152-ФЗ: без явно отмеченного согласия заявку не отправляем
+      var consent=form.querySelector('input[data-consent]');
+      if(consent && !consent.checked){
+        var wrap=consent.closest('.nrd-consent');
+        if(wrap) wrap.classList.add('is-bad');
+        consent.focus();
+        showError(form,'Отметьте согласие на обработку персональных данных');
+        return;
+      }
+      var cw=form.querySelector('.nrd-consent'); if(cw) cw.classList.remove('is-bad');
+      // фиксируем факт и время согласия — это доказательство при проверке
+      if(consent && consent.checked) data['Согласие дано'] = new Date().toISOString();
       var btn=form.querySelector('button[type=submit]');
       var btnHtml=btn?btn.innerHTML:'';
       if(btn){ btn.disabled=true; btn.innerHTML='Отправляем…'; btn.style.opacity='.75'; }

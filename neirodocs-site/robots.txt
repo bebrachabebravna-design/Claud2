@@ -6,5 +6,7 @@ Disallow: /blog/config.php
 Disallow: /blog/lib.php
 Disallow: /api/
 Disallow: /blog/data/
+Disallow: /blog/views.php
+Disallow: /legal/
 
 Sitemap: https://neirodocs.ru/sitemap.xml

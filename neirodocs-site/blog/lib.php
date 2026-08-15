@@ -29,8 +29,129 @@ function reading_time(string $html): int {
     return max(1, (int)round($words / 150));
 }
 
+// ---------- Типографика: приводит текст статьи к «книжному» виду ----------
+// Правит только текст, содержимое тегов и кода не трогает.
+function typo(string $html): string {
+    $parts = preg_split('/(<[^>]*>)/u', $html, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+    if (!$parts) return $html;
+    $skip = 0; $out = '';
+    foreach ($parts as $chunk) {
+        if ($chunk[0] === '<') {
+            if (preg_match('#^</?\s*(pre|code|script|style|kbd|textarea)\b#i', $chunk)) {
+                $skip += (isset($chunk[1]) && $chunk[1] === '/') ? -1 : 1;
+                if ($skip < 0) $skip = 0;
+            }
+            $out .= $chunk; continue;
+        }
+        if ($skip > 0) { $out .= $chunk; continue; }
+        $t = $chunk;
+        // дефис между пробелами → длинное тире
+        $t = preg_replace('/(\s)-(\s)/u', '$1—$2', $t);
+        // тире не должно начинать строку
+        $t = preg_replace('/[ \t]+—/u', '&nbsp;—', $t);
+        // короткие слова (в, на, из, и, у…) не отрываем от следующего
+        for ($i = 0; $i < 2; $i++) {
+            $t = preg_replace('/(^|[\s(«"]|&nbsp;)([А-Яа-яЁёA-Za-z]{1,2})[ \t]+/u', '$1$2&nbsp;', $t);
+        }
+        // число не отрывается от единицы измерения
+        $t = preg_replace('/(\d)[ \t]+(₽|%|руб|тыс|млн|млрд|мин|час|сек|дн|шт|раз|чел)/u', '$1&nbsp;$2', $t);
+        $out .= $t;
+    }
+    return $out;
+}
+
+// ---------- Заголовки статьи: якоря + оглавление ----------
+function article_toc(string $html): array {
+    $n = 0; $items = [];
+    $html = preg_replace_callback('#<h([23])\b[^>]*>(.*?)</h\1>#is', function ($m) use (&$n, &$items) {
+        // типографика уже вставила &nbsp; — в оглавлении их надо вернуть в обычный вид
+        $txt = trim(html_entity_decode(strip_tags($m[2]), ENT_QUOTES, 'UTF-8'));
+        if ($txt === '') return $m[0];
+        $n++; $id = 'h' . $n;
+        $items[] = ['id' => $id, 'lvl' => (int)$m[1], 't' => $txt];
+        return '<h' . $m[1] . ' id="' . $id . '">' . $m[2]
+             . '<a class="anchor" href="#' . $id . '" aria-label="Ссылка на этот раздел">#</a></h' . $m[1] . '>';
+    }, $html);
+
+    $tops = array_filter($items, fn($i) => $i['lvl'] === 2);
+    if (count($tops) < 2) return [$html, ''];
+
+    $li = '';
+    foreach ($items as $i) {
+        $cls = $i['lvl'] === 3 ? ' class="sub"' : '';
+        $li .= '<li' . $cls . '><a href="#' . $i['id'] . '">' . e($i['t']) . '</a></li>';
+    }
+    $toc = '<nav class="art-toc"><b>В этой статье</b><ol>' . $li . '</ol></nav>';
+    return [$html, $toc];
+}
+
+// ---------- Похожие статьи (внутренняя перелинковка — плюс к ранжированию) ----------
+function related_posts(array $p, array $all, int $limit = 3): array {
+    $kw = array_filter(array_map('trim', explode(',', mb_strtolower($p['keywords'] ?? ''))));
+    $scored = [];
+    foreach ($all as $o) {
+        if (($o['slug'] ?? '') === ($p['slug'] ?? '')) continue;
+        $okw = array_filter(array_map('trim', explode(',', mb_strtolower($o['keywords'] ?? ''))));
+        $scored[] = ['p' => $o, 's' => count(array_intersect($kw, $okw))];
+    }
+    usort($scored, fn($a, $b) => ($b['s'] <=> $a['s']) ?: strcmp($b['p']['date'] ?? '', $a['p']['date'] ?? ''));
+    return array_slice(array_column($scored, 'p'), 0, $limit);
+}
+
+// ---------- Скрипт счётчика просмотров ----------
+function views_script(): string {
+    return <<<'JS'
+<script>
+(function(){
+  function word(n){
+    var a=n%10, b=n%100;
+    if(a===1&&b!==11) return 'просмотр';
+    if(a>=2&&a<=4&&(b<10||b>=20)) return 'просмотра';
+    return 'просмотров';
+  }
+  function paint(el,n){
+    el.textContent = n + ' ' + word(n);
+    el.hidden = false;
+    var d = el.previousElementSibling;           // точка-разделитель показывается вместе с числом
+    if(d && d.className.indexOf('dot')>-1) d.hidden = false;
+  }
+  window.nrdViews = { word: word, paint: paint };
+
+  var one=document.querySelector('[data-views-slug]');
+  if(one){
+    var slug=one.getAttribute('data-views-slug');
+    var key='nrd_seen_'+slug, today=new Date().toISOString().slice(0,10), fresh=true;
+    try{ fresh = localStorage.getItem(key)!==today; }catch(e){}
+    var body='slug='+encodeURIComponent(slug);
+    if(fresh){
+      fetch('/blog/views.php',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body})
+        .then(function(r){return r.json();})
+        .then(function(j){ if(j&&j.ok){ paint(one,j.count); try{localStorage.setItem(key,today);}catch(e){} } })
+        .catch(function(){});
+    } else {
+      fetch('/blog/views.php').then(function(r){return r.json();}).then(function(j){
+        if(j&&j.ok&&j.views&&j.views[slug]) paint(one,j.views[slug]);
+      }).catch(function(){});
+    }
+  }
+
+  var many=[].slice.call(document.querySelectorAll('[data-views-card]'));
+  if(many.length){
+    fetch('/blog/views.php').then(function(r){return r.json();}).then(function(j){
+      if(!j||!j.ok||!j.views) return;
+      many.forEach(function(el){
+        var n=j.views[el.getAttribute('data-views-card')];
+        if(n) paint(el,n);
+      });
+    }).catch(function(){});
+  }
+})();
+</script>
+JS;
+}
+
 // ---------- Общая обёртка страницы (шапка/подвал в стиле сайта) ----------
-function page_head(string $title, string $desc, string $canonical, string $extra = ''): string {
+function page_head(string $title, string $desc, string $canonical, string $extra = '', string $ogType = 'article'): string {
     $t = e($title); $d = e($desc);
     return <<<HTML
 <!DOCTYPE html>
@@ -48,7 +169,7 @@ function page_head(string $title, string $desc, string $canonical, string $extra
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="$canonical">
 <meta name="theme-color" content="#0A1428">
-<meta property="og:type" content="article">
+<meta property="og:type" content="$ogType">
 <meta property="og:site_name" content="Нейродокс">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:title" content="$t">
@@ -87,7 +208,11 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif;font-weight:700;line-height:1.15;le
 .b-footer ul{list-style:none;padding:0;margin:0}
 .b-footer li{margin-bottom:12px;font-size:.95rem}
 .b-footer li a{color:#A0AAC2}.b-footer li a:hover{color:#fff;text-decoration:none}
-.b-footer-bottom{display:flex;justify-content:space-between;padding-top:28px;font-size:.85rem;color:#6B7896;flex-wrap:wrap;gap:16px}
+.b-footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;font-size:.85rem;color:#6B7896;flex-wrap:wrap;gap:14px 22px}
+.b-legal-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+.b-legal-links a{color:#8894b0;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.14)}
+.b-legal-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.5);text-decoration:none}
+@media(max-width:720px){.b-footer-bottom{flex-direction:column;align-items:flex-start}.b-legal-links{flex-direction:column;gap:10px}}
 .b-burger{display:none;flex-direction:column;gap:5px;width:46px;height:46px;border:none;border-radius:50%;background:#0A1428;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .b-burger span{display:block;width:20px;height:2px;background:#fff;border-radius:2px;transition:.25s}
 body.bnav-open .b-burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
@@ -163,14 +288,20 @@ function chrome_footer(): string {
   </div>
   <div class="b-footer-bottom">
     <div>© $y Нейродокс. Все права защищены.</div>
+    <div class="b-legal-links">
+      <a href="/privacy/">Политика конфиденциальности</a>
+      <a href="/consent/">Согласие на обработку ПД</a>
+      <a href="/terms/">Пользовательское соглашение</a>
+    </div>
     <div>ИНН 920002551441</div>
   </div>
 </div></footer>
+<script src="/assets/legal.js" defer></script>
 HTML;
 }
 
 // ---------- Рендер статьи в статический SEO-файл ----------
-function render_article(array $p): string {
+function render_article(array $p, array $all = []): string {
     $canonical = DOMAIN . '/blog/' . $p['slug'] . '/';
     // обложка как og:image статьи (должно быть до page_head)
     if (!empty($p['cover'])) {
@@ -207,15 +338,42 @@ function render_article(array $p): string {
         . '<script type="application/ld+json">'.json_encode($breadcrumb, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).'</script>'
         . $faqJson;
     $head = page_head($p['title'].' — Блог Нейродокс', $p['excerpt'], $canonical, $extra);
-    $body = $p['body'];
+    // Текст статьи: типографика → якоря у заголовков → оглавление
+    [$body, $tocHtml] = article_toc(typo($p['body']));
+    // широкие таблицы прокручиваются внутри себя, а не ломают страницу на телефоне
+    $body = preg_replace('#<table(\b[^>]*)?>(.*?)</table>#is', '<div class="t-scroll"><table$1>$2</table></div>', $body);
     $faqHtml = '';
     if (!empty($p['faq'])) {
         $faqHtml = '<section class="art-faq"><h2>Частые вопросы</h2>';
         foreach ($p['faq'] as $f) {
-            $faqHtml .= '<div class="art-faq-item"><h3>'.e($f['q']).'</h3><p>'.e($f['a']).'</p></div>';
+            $faqHtml .= '<div class="art-faq-item"><h3>'.e($f['q']).'</h3><p>'.typo(e($f['a'])).'</p></div>';
         }
         $faqHtml .= '</section>';
     }
+    // Похожие статьи — внутренние ссылки помогают и читателю, и поиску
+    $relHtml = '';
+    $rel = related_posts($p, $all);
+    if ($rel) {
+        $relHtml = '<section class="art-rel"><h2>Читать дальше</h2><div class="art-rel-grid">';
+        foreach ($rel as $r) {
+            $rcov = !empty($r['cover'])
+                ? '<span class="arc-cover"><img src="'.e($r['cover']).'" alt="" loading="lazy"></span>'
+                : '<span class="arc-cover arc-cover-ph">'.e(mb_strtoupper(mb_substr(trim($r['title']), 0, 1, 'UTF-8'), 'UTF-8')).'</span>';
+            $relHtml .= '<a class="art-rel-card" href="/blog/'.e($r['slug']).'/">'.$rcov
+                . '<span class="arc-body"><span class="arc-title">'.e($r['title']).'</span>'
+                . '<span class="arc-ex">'.e(mb_substr($r['excerpt'] ?? '', 0, 110, 'UTF-8')).'</span></span></a>';
+        }
+        $relHtml .= '</div></section>';
+    }
+    // Поделиться
+    $shareUrl = rawurlencode($canonical);
+    $shareTxt = rawurlencode($p['title']);
+    $shareHtml = '<div class="art-share"><span class="as-label">Поделиться</span>'
+        . '<a class="as-btn" href="https://t.me/share/url?url='.$shareUrl.'&text='.$shareTxt.'" target="_blank" rel="noopener nofollow" aria-label="Отправить в Telegram">'
+        . '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M9.04 15.51l-.38 5.34c.54 0 .78-.23 1.06-.51l2.55-2.44 5.28 3.87c.97.53 1.65.25 1.91-.9l3.46-16.2c.31-1.43-.52-1.99-1.46-1.64L1.13 10.87c-1.39.54-1.37 1.31-.24 1.66l5.2 1.62L18.16 6.5c.57-.37 1.09-.17.66.2L9.04 15.51z"/></svg>Telegram</a>'
+        . '<a class="as-btn" href="https://vk.com/share.php?url='.$shareUrl.'&title='.$shareTxt.'" target="_blank" rel="noopener nofollow" aria-label="Поделиться во ВКонтакте">VK</a>'
+        . '<button class="as-btn as-copy" type="button" data-url="'.e($canonical).'">Скопировать ссылку</button>'
+        . '</div>';
     $q = e($p['question'] ?? $p['title']);
     $coverHtml = '';
     if (!empty($p['cover'])) {
@@ -246,12 +404,76 @@ function render_article(array $p): string {
 .art-faq h2{font-size:1.6rem;margin-bottom:22px}
 .art-faq-item{background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-md);padding:20px 24px;margin-bottom:14px;box-shadow:var(--sh-md)}
 .art-faq-item h3{font-size:1.1rem;margin-bottom:8px;color:var(--t-h)}
-.art-faq-item p{margin:0;color:var(--t-mute)}
+.art-faq-item p{margin:0;color:var(--t-body)}
 .art-cta{margin-top:56px;background:var(--grad-dark);color:#fff;border-radius:var(--r-lg);padding:44px 40px;text-align:center;box-shadow:var(--sh-md)}
 .art-cta h2{color:#fff;font-size:1.7rem;margin-bottom:12px}
 .art-cta p{color:#C3D0EA;max-width:520px;margin:0 auto 24px}
 .art-cta a{display:inline-block;background:var(--grad-accent);color:#fff!important;padding:14px 30px;border-radius:99px;font-weight:600;text-decoration:none;box-shadow:0 14px 34px -12px rgba(29,93,227,.7)}
 .back-link{display:inline-block;margin-top:40px;color:var(--t-mute);font-weight:500}
+
+/* --- полоса прогресса чтения --- */
+.read-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;background:transparent;pointer-events:none}
+.read-progress i{display:block;height:100%;width:0;background:var(--grad-accent);transition:width .08s linear}
+
+/* --- оглавление --- */
+.art-toc{background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-md);padding:22px 26px;margin:0 0 36px;box-shadow:var(--sh-md)}
+.art-toc b{display:block;font-family:'Manrope',sans-serif;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t-faint);margin-bottom:14px}
+.art-toc ol{margin:0;padding:0;list-style:none;counter-reset:toc}
+.art-toc li{margin:0 0 9px;font-size:.98rem;line-height:1.45}
+.art-toc li:last-child{margin-bottom:0}
+.art-toc li a{color:var(--t-body);text-decoration:none;border-bottom:1px solid transparent}
+.art-toc li a:hover{color:var(--acc);border-bottom-color:var(--acc-soft);text-decoration:none}
+.art-toc li.sub{padding-left:20px;font-size:.92rem}
+.art-toc li.sub a{color:var(--t-mute)}
+
+/* --- якоря у заголовков --- */
+.art-body h2,.art-body h3{scroll-margin-top:84px;position:relative}
+.art-body .anchor{position:absolute;left:-1.1em;top:0;color:var(--t-faint);opacity:0;text-decoration:none;font-weight:400;transition:opacity .2s}
+.art-body h2:hover .anchor,.art-body h3:hover .anchor{opacity:.55}
+.art-body .anchor:hover{opacity:1!important;color:var(--acc);text-decoration:none}
+@media(max-width:900px){.art-body .anchor{display:none}}
+
+/* --- первый абзац крупнее: задаёт тон статье --- */
+.art-body>p:first-of-type{font-size:1.2rem;line-height:1.66;color:var(--t-h)}
+
+/* --- таблицы, код, разделители, подписи --- */
+.art-body .t-scroll{overflow-x:auto;margin:0 0 24px;-webkit-overflow-scrolling:touch}
+.art-body table{border-collapse:collapse;width:100%;min-width:460px;font-size:.98rem;background:var(--paper);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-md)}
+.art-body th,.art-body td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+.art-body th{font-family:'Manrope',sans-serif;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;color:var(--t-mute);background:var(--paper-mute)}
+.art-body tr:last-child td{border-bottom:none}
+.art-body code{background:var(--paper-mute);border:1px solid var(--rule);border-radius:6px;padding:2px 7px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;color:#0D3CB8}
+.art-body pre{background:#0A1428;color:#DDE6FA;border-radius:var(--r-md);padding:20px 22px;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9rem;line-height:1.6;margin:0 0 24px}
+.art-body pre code{background:none;border:none;color:inherit;padding:0}
+.art-body hr{border:none;border-top:1px solid var(--rule);margin:40px 0}
+.art-body figure{margin:26px 0}
+.art-body figcaption{text-align:center;color:var(--t-faint);font-size:.9rem;margin-top:10px}
+.art-body ul{list-style:none;padding-left:4px}
+.art-body ul li{position:relative;padding-left:24px}
+.art-body ul li::before{content:"";position:absolute;left:4px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--acc)}
+.art-body ol{padding-left:24px}
+.art-body ol li::marker{color:var(--acc);font-weight:600}
+
+/* --- поделиться --- */
+.art-share{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:44px 0 0;padding-top:26px;border-top:1px solid var(--rule)}
+.as-label{font-size:.86rem;color:var(--t-faint);margin-right:4px}
+.as-btn{display:inline-flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--rule);border-radius:99px;padding:9px 17px;font:600 .88rem/1 'Manrope',system-ui,sans-serif;color:var(--t-mute);cursor:pointer;text-decoration:none;transition:border-color .2s,color .2s,transform .2s}
+.as-btn:hover{border-color:var(--acc);color:var(--acc);text-decoration:none;transform:translateY(-1px)}
+.as-btn.is-done{border-color:#1F9D55;color:#1F9D55}
+
+/* --- похожие статьи --- */
+.art-rel{margin-top:56px;border-top:1px solid var(--rule);padding-top:36px}
+.art-rel h2{font-size:1.5rem;margin-bottom:22px}
+.art-rel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:760px){.art-rel-grid{grid-template-columns:1fr}}
+.art-rel-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--rule);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-md);text-decoration:none;transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s}
+.art-rel-card:hover{transform:translateY(-3px);border-color:var(--acc);text-decoration:none}
+.arc-cover{display:block;aspect-ratio:16/9;background:var(--paper-mute);overflow:hidden}
+.arc-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.arc-cover-ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0D3CB8,#5B8AFF);color:rgba(255,255,255,.92);font:800 2rem/1 'Manrope',sans-serif}
+.arc-body{display:block;padding:16px 18px 18px}
+.arc-title{display:block;font:700 1.02rem/1.3 'Manrope',sans-serif;color:var(--t-h);margin-bottom:7px}
+.arc-ex{display:block;font-size:.9rem;color:var(--t-mute);line-height:1.5}
 CSS;
     $header = chrome_header(); $footer = chrome_footer();
     return $head."\n<style>$css</style>\n<!-- Yandex.Metrika counter -->
@@ -267,18 +489,21 @@ CSS;
 </script>
 <noscript><div><img src=\"https://mc.yandex.ru/watch/110861876\" style=\"position:absolute; left:-9999px;\" alt=\"\" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
-</head>\n<body>\n$header
+</head>\n<body>\n<div class=\"read-progress\" aria-hidden=\"true\"><i id=\"readBar\"></i></div>\n$header
 <article class=\"art-css\">
   <div class=\"art-hero\"><div class=\"wrap\">
     <div class=\"breadcrumb\"><a href=\"/\">Главная</a> → <a href=\"/blog/\">Блог</a> → {$q}</div>
     <span class=\"art-q\">Отвечаем на вопрос</span>
     <h1 class=\"art-title\">".e($p['title'])."</h1>
-    <div class=\"art-meta\"><span>Нейродокс</span><span class=\"dot\"></span><time datetime=\"$date\">$dfmt</time><span class=\"dot\"></span><span>$rt мин чтения</span></div>
+    <div class=\"art-meta\"><span>Нейродокс</span><span class=\"dot\"></span><time datetime=\"$date\">$dfmt</time><span class=\"dot\"></span><span>$rt мин чтения</span><span class=\"dot\" hidden></span><span data-views-slug=\"".e($p['slug'])."\" hidden></span></div>
   </div></div>
   $coverHtml
   <div class=\"wrap\">
+    $tocHtml
     <div class=\"art-body\">$body</div>
+    $shareHtml
     $faqHtml
+    $relHtml
     <div class=\"art-cta\">
       <h2>Хотите такой же ИИ-агент для своей компании?</h2>
       <p>На бесплатном аудите разберём ваши процессы, покажем кейсы конкурентов и дадим чек-лист по нейросетям для бизнеса.</p>
@@ -300,6 +525,36 @@ CSS;
 </div>
 
 $footer
+".views_script()."
+<script>
+(function(){
+  // полоса прогресса чтения
+  var bar=document.getElementById('readBar'), art=document.querySelector('.art-body');
+  if(bar&&art){
+    var tick=function(){
+      var top=art.getBoundingClientRect().top+window.pageYOffset;
+      var total=art.offsetHeight-window.innerHeight*0.5;
+      var done=(window.pageYOffset-top+window.innerHeight*0.5)/(total>0?total:1);
+      bar.style.width=Math.max(0,Math.min(1,done))*100+'%';
+    };
+    tick();
+    window.addEventListener('scroll',tick,{passive:true});
+    window.addEventListener('resize',tick);
+  }
+  // копирование ссылки на статью
+  var copy=document.querySelector('.as-copy');
+  if(copy){
+    copy.addEventListener('click',function(){
+      var url=copy.getAttribute('data-url'), old=copy.textContent;
+      var done=function(){ copy.textContent='Ссылка скопирована'; copy.classList.add('is-done');
+        setTimeout(function(){ copy.textContent=old; copy.classList.remove('is-done'); },2200); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,function(){}); }
+      else { var t=document.createElement('textarea'); t.value=url; document.body.appendChild(t); t.select();
+        try{ document.execCommand('copy'); done(); }catch(e){} document.body.removeChild(t); }
+    });
+  }
+})();
+</script>
 </body>
 </html>";
 }
@@ -314,7 +569,7 @@ function render_index(array $posts): string {
     $extra .= '<script type="application/ld+json">'.json_encode($blogData, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).'</script>';
     $head = page_head('Блог о внедрении ИИ в бизнес — Нейродокс',
         'Разборы, гайды и кейсы по внедрению ИИ-агентов в бизнес: как автоматизировать поддержку, базу знаний и работу с документами.',
-        $canonical, $extra);
+        $canonical, $extra, 'website');
     $cards = '';
     $searchData = [];
     foreach ($posts as $i => $p) {
@@ -334,7 +589,8 @@ function render_index(array $posts): string {
             . '<div class="pc-q">'.e($p['question'] ?? 'Статья').'</div>'
             . '<h2 class="pc-title">'.e($p['title']).'</h2>'
             . '<p class="pc-ex">'.e($p['excerpt']).'</p>'
-            . '<div class="pc-meta"><time>'.$dfmt.'</time><span class="dot"></span><span>'.$rt.' мин</span></div>'
+            . '<div class="pc-meta"><time>'.$dfmt.'</time><span class="dot"></span><span>'.$rt.' мин</span>'
+            . '<span class="dot" hidden></span><span data-views-card="'.e($p['slug']).'" hidden></span></div>'
             . '</div>'
             . '</a>';
     }
@@ -361,7 +617,7 @@ function render_index(array $posts): string {
 .pc-q{font-size:.78rem;font-weight:600;color:var(--acc);background:var(--acc-soft);align-self:flex-start;padding:5px 12px;border-radius:99px;margin-bottom:14px}
 .pc-title{font-size:1.3rem;line-height:1.22;margin-bottom:10px;color:var(--t-h)}
 .pc-ex{color:var(--t-mute);font-size:1rem;margin:0 0 18px;flex:1}
-.pc-meta{display:flex;align-items:center;gap:10px;color:var(--t-faint);font-size:.85rem}
+.pc-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;color:var(--t-faint);font-size:.85rem}
 .pc-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--t-faint)}
 .no-res{grid-column:1/-1;color:var(--t-mute);padding:20px 0}
 CSS;
@@ -394,6 +650,7 @@ $footer
   });
 })();
 </script>
+".views_script()."
 </body>
 </html>";
 }
@@ -404,7 +661,7 @@ function rebuild_all(): void {
     foreach ($posts as $p) {
         $dir = BLOG_DIR . '/' . $p['slug'];
         if (!is_dir($dir)) mkdir($dir, 0755, true);
-        file_put_contents($dir . '/index.html', render_article($p));
+        file_put_contents($dir . '/index.html', render_article($p, $posts));
     }
     file_put_contents(BLOG_DIR . '/index.html', render_index($posts));
     rebuild_sitemap($posts);
@@ -418,6 +675,11 @@ function rebuild_sitemap(array $posts): void {
         ['loc'=>DOMAIN.'/about/', 'pri'=>'0.6'],
         ['loc'=>DOMAIN.'/partner/', 'pri'=>'0.6'],
         ['loc'=>DOMAIN.'/blog/', 'pri'=>'0.8'],
+        // Юридические страницы: должны быть в индексе — это сигнал доверия
+        // для поиска и требование ст. 18.1 152-ФЗ (свободный доступ к политике).
+        ['loc'=>DOMAIN.'/privacy/', 'pri'=>'0.3'],
+        ['loc'=>DOMAIN.'/consent/', 'pri'=>'0.3'],
+        ['loc'=>DOMAIN.'/terms/', 'pri'=>'0.3'],
     ];
     foreach ($posts as $p) $urls[] = ['loc'=>DOMAIN.'/blog/'.$p['slug'].'/', 'pri'=>'0.7', 'lastmod'=>substr($p['updated'] ?? $p['date'],0,10)];
     // Дедупликация на всякий случай: одинаковых <loc> в sitemap быть не должно —
