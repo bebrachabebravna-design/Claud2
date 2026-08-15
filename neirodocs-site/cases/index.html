@@ -1897,6 +1897,57 @@ section { padding: clamp(72px, 10vw, 128px) 0; position: relative; }
   line-height: 1.35;
 }
 
+/* Таблица «В цифрах» — несколько метрик до/после в одном кейсе */
+.case-figs {
+  margin-bottom: 32px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--paper);
+}
+.cf-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 18px;
+  padding: 15px 26px;
+  align-items: center;
+  border-bottom: 1px solid var(--rule);
+}
+.cf-row:last-child { border-bottom: none; }
+.cf-head {
+  background: linear-gradient(135deg, #F4F7FD 0%, #E8EFFB 100%);
+}
+.cf-head span {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t-mute);
+  font-weight: 600;
+}
+.cf-head span:last-child { color: var(--acc); }
+.cf-metric { font-weight: 600; color: var(--t-h); font-size: 0.98rem; line-height: 1.35; }
+.cf-was {
+  color: var(--t-mute);
+  text-decoration: line-through;
+  text-decoration-color: rgba(107, 120, 150, 0.45);
+  font-size: 0.98rem;
+}
+.cf-now {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 1.08rem;
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, #0D3CB8 0%, #1D5DE3 55%, #5B8AFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@media (max-width: 640px) {
+  .cf-row { grid-template-columns: 1fr 1fr; gap: 4px 16px; padding: 14px 18px; }
+  .cf-metric { grid-column: 1 / -1; margin-bottom: 4px; }
+  .cf-head .cf-metric { display: none; }
+}
+
 .case-v-body {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
@@ -1977,8 +2028,8 @@ section { padding: clamp(72px, 10vw, 128px) 0; position: relative; }
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  white-space: nowrap;
 }
+.case-v-calc .cr-main.cr-money { white-space: nowrap; }
 .case-v-calc .cr-lab {
   font-size: 0.95rem;
   color: var(--t-body);
@@ -2578,19 +2629,12 @@ h1, h2, h3{ text-wrap: balance; }
         <h2>Менеджер продаёт, а не ищет условия в прайсах</h2>
       </div>
 
-      <div class="case-v-metric">
-        <div class="cvm-from">
-          <div class="cvm-label">Было</div>
-          <div class="cvm-val">11 минут</div>
-        </div>
-        <div class="cvm-arrow">
-          <svg width="40" height="16" viewBox="0 0 40 16" fill="none"><path d="M1 8h36m0 0l-8-7m8 7l-8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="cvm-to">
-          <div class="cvm-label">Стало</div>
-          <div class="cvm-val">9 секунд</div>
-        </div>
-        <div class="cvm-caption">Время ответа клиенту</div>
+      <div class="case-figs">
+        <div class="cf-row cf-head"><span class="cf-metric">Метрика</span><span>Было</span><span>Стало</span></div>
+        <div class="cf-row"><span class="cf-metric">Ответ клиенту по условиям</span><span class="cf-was">11 мин</span><span class="cf-now">9 сек</span></div>
+        <div class="cf-row"><span class="cf-metric">Сделок в работе одновременно</span><span class="cf-was">5–7</span><span class="cf-now">10–12</span></div>
+        <div class="cf-row"><span class="cf-metric">Онбординг нового менеджера</span><span class="cf-was">3–4 недели</span><span class="cf-now">1–2 недели</span></div>
+        <div class="cf-row"><span class="cf-metric">Знания по продукту при увольнении</span><span class="cf-was">уходили</span><span class="cf-now">в базе</span></div>
       </div>
 
       <div class="case-v-body">
@@ -2599,23 +2643,20 @@ h1, h2, h3{ text-wrap: balance; }
         </div>
         <div class="cvb-story">
           <p>Раньше во время звонка менеджер ставил клиента на удержание и уходил искать нужный пункт, а пока искал, часть клиентов теряла интерес и срывалась. Теперь он, не прекращая разговор, вбивает вопрос в агента обычными словами, например про условия рассрочки для опта, и за пару секунд читает готовый ответ со ссылкой на пункт. Клиент даже не успевает заметить паузу.</p>
-          <p class="cvb-extra">Через месяц отчёт по частым вопросам показал, что про рассрочку спрашивали 38 раз. Стало ясно, что менеджеры плохо знают этот блок, и руководитель закрыл пробел короткой памяткой.</p>
+          <p class="cvb-extra">Отчёт по частым вопросам показал, что про рассрочку спрашивали 38 раз — менеджеры плохо знали этот блок. Руководитель закрыл пробел короткой памяткой, а не разбором с каждым.</p>
         </div>
       </div>
 
       <div class="case-v-calc">
-        <div class="calc-title">Что изменилось</div>
-        <div class="calc-grid">
-          <div class="calc-item"><div class="ci-num">Секунды</div><div class="ci-lab">ответ по условиям вместо ~11 мин</div></div><div class="calc-item"><div class="ci-num">Больше</div><div class="ci-lab">сделок в параллельной работе</div></div><div class="calc-item"><div class="ci-num">Быстрее</div><div class="ci-lab">новичок выходит на продажи</div></div><div class="calc-item"><div class="ci-num">Без найма</div><div class="ci-lab">возросший поток тянут те же люди</div></div>
-        </div>
+        <div class="calc-title">Экономия на ФОТ</div>
         <div class="calc-result">
-          <div class="cr-main">Рост нагрузки без расширения штата</div>
-          <div class="cr-lab">Отдел закрывает больше заявок теми же силами — второй менеджер под возросший поток не понадобился, а это ставка ФОТ, которую не пришлось добавлять. Руководитель меньше отвечает на вопросы по продукту и занимается стратегией.</div>
+          <div class="cr-main cr-money">≈ 1,4 млн ₽ / год</div>
+          <div class="cr-lab">Возросший поток заявок отдел закрыл без расширения штата — не пришлось нанимать 2 дополнительных менеджеров (~60к ₽/мес каждый = ~1,4 млн ₽ в год). Новички быстрее выходят на продажи, а руководитель занят стратегией, а не ответами на вопросы по продукту.</div>
         </div>
       </div>
 
       <div class="case-v-payback">
-        Экономия на ФОТ <span>не нанимали второго менеджера</span>
+        Экономия ФОТ <span>≈ 1,4 млн ₽ / год</span>
       </div>
     </article>
     
@@ -2625,19 +2666,12 @@ h1, h2, h3{ text-wrap: balance; }
         <h2>Условия договора — за минуту и без ошибок по памяти</h2>
       </div>
 
-      <div class="case-v-metric">
-        <div class="cvm-from">
-          <div class="cvm-label">Было</div>
-          <div class="cvm-val">18 минут</div>
-        </div>
-        <div class="cvm-arrow">
-          <svg width="40" height="16" viewBox="0 0 40 16" fill="none"><path d="M1 8h36m0 0l-8-7m8 7l-8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="cvm-to">
-          <div class="cvm-label">Стало</div>
-          <div class="cvm-val">1 минута</div>
-        </div>
-        <div class="cvm-caption">Поиск условий по договору</div>
+      <div class="case-figs">
+        <div class="cf-row cf-head"><span class="cf-metric">Метрика</span><span>Было</span><span>Стало</span></div>
+        <div class="cf-row"><span class="cf-metric">Поиск условий по договору</span><span class="cf-was">18 мин</span><span class="cf-now">1 мин</span></div>
+        <div class="cf-row"><span class="cf-metric">Ответ контрагенту</span><span class="cf-was">с задержкой</span><span class="cf-now">сразу, со ссылкой</span></div>
+        <div class="cf-row"><span class="cf-metric">Ответы «по памяти» наугад</span><span class="cf-was">случались</span><span class="cf-now">0</span></div>
+        <div class="cf-row"><span class="cf-metric">Спорные ситуации с перевозчиками</span><span class="cf-was">регулярно</span><span class="cf-now">реже</span></div>
       </div>
 
       <div class="case-v-body">
@@ -2651,12 +2685,9 @@ h1, h2, h3{ text-wrap: balance; }
       </div>
 
       <div class="case-v-calc">
-        <div class="calc-title">Результат</div>
-        <div class="calc-grid">
-          <div class="calc-item"><div class="ci-num">Со ссылкой</div><div class="ci-lab">каждый ответ — на пункт договора</div></div><div class="calc-item"><div class="ci-num">Меньше</div><div class="ci-lab">спорных ситуаций с перевозчиками</div></div><div class="calc-item"><div class="ci-num">1 минута</div><div class="ci-lab">вместо 18 на поиск условий</div></div><div class="calc-item"><div class="ci-num">Ноль</div><div class="ci-lab">ответов «по памяти» наугад</div></div>
-        </div>
+        <div class="calc-title">Главный эффект</div>
         <div class="calc-result">
-          <div class="cr-main">Меньше ошибок и споров с контрагентами</div>
+          <div class="cr-main">Меньше ошибок, штрафов и споров с контрагентами</div>
           <div class="cr-lab">Сотрудники перестали отвечать по памяти — агент отдаёт точный пункт со ссылкой на договор. Цена одной ошибки в логистике — это претензия, штраф или сорванная поставка, и таких ситуаций стало заметно меньше.</div>
         </div>
       </div>
@@ -2669,40 +2700,37 @@ h1, h2, h3{ text-wrap: balance; }
     <article class="case-v reveal">
       <div class="case-v-head">
         <span class="case-tag">Стройка и девелопмент</span>
-        <h2>К проверке готовы за минуты, а не за неделю</h2>
+        <h2>КП за 3 минуты, договор за 2, и к проверке готовы без авралов</h2>
       </div>
 
-      <div class="case-v-metric" style="grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 32px;">
-        <div class="cvm-to">
-          <div class="cvm-label">Результат за первый год</div>
-          <div class="cvm-val">−65%</div>
-          <div style="font-size: 0.9rem; color: var(--t-mute); margin-top: 12px; line-height: 1.4;">Штрафы по документам снизились на 65%</div>
-        </div>
+      <div class="case-figs">
+        <div class="cf-row cf-head"><span class="cf-metric">Метрика</span><span>Было</span><span>Стало</span></div>
+        <div class="cf-row"><span class="cf-metric">Подготовка коммерческого предложения</span><span class="cf-was">30–60 мин</span><span class="cf-now">3 мин</span></div>
+        <div class="cf-row"><span class="cf-metric">Подготовка договора</span><span class="cf-was">20–40 мин</span><span class="cf-now">2 мин</span></div>
+        <div class="cf-row"><span class="cf-metric">Подготовка к проверке</span><span class="cf-was">неделя</span><span class="cf-now">минуты</span></div>
+        <div class="cf-row"><span class="cf-metric">Штрафы по документам за год</span><span class="cf-was">регулярные</span><span class="cf-now">−65%</span></div>
       </div>
 
       <div class="case-v-body">
         <div class="cvb-context">
-          <p>Застройщик, 90 человек.</p><p>Проектная документация, разрешения, журналы по охране труда и предписания разбросаны по объектам.</p>
+          <p>Застройщик, 90 человек.</p><p>Проектная документация, шаблоны КП и договоров, разрешения и предписания разбросаны по объектам и папкам.</p>
         </div>
         <div class="cvb-story">
-          <p>Перед визитом инспекции сотрудники неделю поднимают бумаги, но часть штрафов всё равно прилетает за документ, который не нашли вовремя или вели в устаревшей версии. Теперь профильный сотрудник перед проверкой спрашивает, какие документы нужны, и агент показывает, что есть, где лежит и какая версия актуальна.</p>
-          <p class="cvb-extra">За первый год штрафы по документарным нарушениям снизились примерно на 65%, остались только те, что с поиском бумаг не связаны.</p>
+          <p>Менеджер раньше собирал КП и договор вручную из старых файлов — по 30–60 минут на документ, с риском вписать не ту цену или устаревший пункт. Теперь агент собирает КП и договор по шаблону за пару минут, подставляя актуальные условия. А перед проверкой профильный сотрудник спрашивает, какие документы нужны, и агент показывает, что есть, где лежит и какая версия актуальна.</p>
+          <p class="cvb-extra">За первый год штрафы по документарным нарушениям снизились примерно на 65% — остались только те, что с поиском и оформлением бумаг не связаны.</p>
         </div>
       </div>
 
       <div class="case-v-calc">
-        <div class="calc-title">Расчёт</div>
-        <div class="calc-grid">
-          <div class="calc-item"><div class="ci-num">100–500 тыс ₽</div><div class="ci-lab">типовой штраф</div></div><div class="calc-item"><div class="ci-num">Несколько</div><div class="ci-lab">штрафов в год</div></div><div class="calc-item"><div class="ci-num">80 ч</div><div class="ci-lab">в квартал на подготовку</div></div><div class="calc-item"><div class="ci-num">Сотни тыс ₽</div><div class="ci-lab">набегало в год</div></div>
-        </div>
+        <div class="calc-title">Главный эффект</div>
         <div class="calc-result">
-          <div class="cr-main">−65% штрафов</div>
-          <div class="cr-lab">по документарным нарушениям, плюс профильные сотрудники экономят около 80 часов в квартал на подготовке к проверкам</div>
+          <div class="cr-main">−65% штрафов и документы без ошибок</div>
+          <div class="cr-lab">Менеджер перестал быть «оформителем бумаг»: КП и договоры собираются за минуты и без ошибок в цене и пунктах. Подготовка к проверке — вместо недели авралов, а штрафы по документам за первый год упали на 65%.</div>
         </div>
       </div>
 
       <div class="case-v-payback">
-        Окупаемость <span>3–4 месяца</span>
+        Главный эффект <span>документы и проверки без потерь</span>
       </div>
     </article>
     
@@ -2712,19 +2740,12 @@ h1, h2, h3{ text-wrap: balance; }
         <h2>Любой регламент — с телефона за секунды. Знания остаются в компании</h2>
       </div>
 
-      <div class="case-v-metric">
-        <div class="cvm-from">
-          <div class="cvm-label">Было</div>
-          <div class="cvm-val">22 минуты</div>
-        </div>
-        <div class="cvm-arrow">
-          <svg width="40" height="16" viewBox="0 0 40 16" fill="none"><path d="M1 8h36m0 0l-8-7m8 7l-8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="cvm-to">
-          <div class="cvm-label">Стало</div>
-          <div class="cvm-val">40 секунд</div>
-        </div>
-        <div class="cvm-caption">Поиск регламента в цеху</div>
+      <div class="case-figs">
+        <div class="cf-row cf-head"><span class="cf-metric">Метрика</span><span>Было</span><span>Стало</span></div>
+        <div class="cf-row"><span class="cf-metric">Поиск регламента / СОПа в цеху</span><span class="cf-was">22 мин</span><span class="cf-now">40 сек</span></div>
+        <div class="cf-row"><span class="cf-metric">Онбординг новичка в смене</span><span class="cf-was">база</span><span class="cf-now">−40%</span></div>
+        <div class="cf-row"><span class="cf-metric">Простои из-за поиска инструкции</span><span class="cf-was">случались</span><span class="cf-now">реже</span></div>
+        <div class="cf-row"><span class="cf-metric">Потеря знаний при увольнении</span><span class="cf-was">критичная</span><span class="cf-now">знания в системе</span></div>
       </div>
 
       <div class="case-v-body">
@@ -2738,10 +2759,7 @@ h1, h2, h3{ text-wrap: balance; }
       </div>
 
       <div class="case-v-calc">
-        <div class="calc-title">Результат</div>
-        <div class="calc-grid">
-          <div class="calc-item"><div class="ci-num">40 секунд</div><div class="ci-lab">поиск СОПа вместо 22 минут</div></div><div class="calc-item"><div class="ci-num">Единая база</div><div class="ci-lab">вместо папок и памяти сотрудников</div></div><div class="calc-item"><div class="ci-num">Быстрее</div><div class="ci-lab">новичок входит в смену</div></div><div class="calc-item"><div class="ci-num">Меньше</div><div class="ci-lab">простоев и обращений к инженерам</div></div>
-        </div>
+        <div class="calc-title">Главный эффект</div>
         <div class="calc-result">
           <div class="cr-main">Знания остаются в компании, а не уходят с людьми</div>
           <div class="cr-lab">Инструкции по оборудованию и охране труда собраны в одной базе. Когда опытный сотрудник увольняется, его знания остаются в системе. Новичок в смене находит нужный пункт сам, не дёргая инженеров, и линия не простаивает из-за поиска бумаг.</div>
@@ -2759,12 +2777,12 @@ h1, h2, h3{ text-wrap: balance; }
         <h2>Один специалист ведёт на 30% больше клиентов — без найма</h2>
       </div>
 
-      <div class="case-v-metric" style="grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 32px;">
-        <div class="cvm-to">
-          <div class="cvm-label">Результат</div>
-          <div class="cvm-val">+30%</div>
-          <div style="font-size: 0.9rem; color: var(--t-mute); margin-top: 12px; line-height: 1.4;">Один специалист ведёт на 30% больше клиентов</div>
-        </div>
+      <div class="case-figs">
+        <div class="cf-row cf-head"><span class="cf-metric">Метрика</span><span>Было</span><span>Стало</span></div>
+        <div class="cf-row"><span class="cf-metric">Поиск документов по клиенту</span><span class="cf-was">1,5 ч / день</span><span class="cf-now">минуты</span></div>
+        <div class="cf-row"><span class="cf-metric">Клиентов на 1 специалиста</span><span class="cf-was">база</span><span class="cf-now">+30%</span></div>
+        <div class="cf-row"><span class="cf-metric">Онбординг нового специалиста</span><span class="cf-was">дольше</span><span class="cf-now">быстрее</span></div>
+        <div class="cf-row"><span class="cf-metric">Данные клиентов</span><span class="cf-was">вперемешку</span><span class="cf-now">изолированы</span></div>
       </div>
 
       <div class="case-v-body">
@@ -2778,18 +2796,15 @@ h1, h2, h3{ text-wrap: balance; }
       </div>
 
       <div class="case-v-calc">
-        <div class="calc-title">Экономия ФОТ</div>
-        <div class="calc-grid">
-          <div class="calc-item"><div class="ci-num">+30%</div><div class="ci-lab">клиентов на том же штате</div></div><div class="calc-item"><div class="ci-num">Без найма</div><div class="ci-lab">рост нагрузки тянут те же люди</div></div><div class="calc-item"><div class="ci-num">Своя база</div><div class="ci-lab">у каждого клиента — изолированно</div></div><div class="calc-item"><div class="ci-num">Со ссылкой</div><div class="ci-lab">ответ строго по нужному клиенту</div></div>
-        </div>
+        <div class="calc-title">Экономия на ФОТ</div>
         <div class="calc-result">
-          <div class="cr-main">+30% клиентов без расширения штата</div>
-          <div class="cr-lab">Тот же отдел обслуживает больше клиентов — выручка растёт быстрее, чем расходы на людей. Это прямая экономия ФОТ: чтобы взять на 30% больше клиентов старым способом, пришлось бы нанимать людей.</div>
+          <div class="cr-main cr-money">≈ 2,9 млн ₽ / год</div>
+          <div class="cr-lab">Отдел стал обслуживать на 30% больше клиентов на том же штате. Чтобы вырасти так же старым способом, пришлось бы нанять ~3 специалистов (~80к ₽/мес каждый = ~2,9 млн ₽ в год). Выручка выросла, а расходы на людей — нет.</div>
         </div>
       </div>
 
       <div class="case-v-payback">
-        Экономия на ФОТ <span>рост без пропорционального найма</span>
+        Экономия ФОТ <span>≈ 2,9 млн ₽ / год</span>
       </div>
     </article>
     
