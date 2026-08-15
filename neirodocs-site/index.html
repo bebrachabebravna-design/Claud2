@@ -3417,11 +3417,11 @@ document.addEventListener('DOMContentLoaded', function () {
   })();
 });
 
-// Формы заявок → FormSubmit → письмо на neirodocs.support@gmail.com.
-// ВАЖНО: после выкладки сайта отправьте одну тестовую заявку — FormSubmit пришлёт
-// на почту письмо со ссылкой активации, после подтверждения заявки начнут доходить.
+// Формы заявок → собственный обработчик /api/lead.php на российском хостинге.
+// Заявка сохраняется в файл (видно на /api/leads.php) и уходит на почту владельца.
+// Никаких сторонних сервисов и передачи данных за границу — так чище по 152-ФЗ.
 (function(){
-  var ENDPOINT='https://formsubmit.co/ajax/neirodocs.support@gmail.com';
+  var ENDPOINT='/api/lead.php';
 
   // Черновик формы живёт в localStorage: случайная перезагрузка или закрытие
   // страницы не стирает введённое.
@@ -3457,7 +3457,7 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function(e){
       e.preventDefault();
       hideError(form);
-      var data={_subject:subject, _template:'table', 'Страница':location.href};
+      var data={form:subject, 'Страница':location.href};
       [].slice.call(form.querySelectorAll('input')).forEach(function(i){
         if(!i.name) return;
         // галочки уходят в письмо только когда отмечены
@@ -3485,7 +3485,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       var cw=form.querySelector('.nrd-consent'); if(cw) cw.classList.remove('is-bad');
       // фиксируем факт и время согласия — это доказательство при проверке
-      if(consent && consent.checked) data['Согласие дано'] = new Date().toISOString();
+      if(consent && consent.checked) data['Время_согласия'] = new Date().toISOString();
       var btn=form.querySelector('button[type=submit]');
       var btnHtml=btn?btn.innerHTML:'';
       if(btn){ btn.disabled=true; btn.innerHTML='Отправляем…'; btn.style.opacity='.75'; }
@@ -3503,9 +3503,12 @@ document.addEventListener('DOMContentLoaded', function () {
         clearDraft(form);
         if(typeof onSuccess==='function'){ try{ onSuccess(data); }catch(err){} }
       }
-      fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
+      // Свой обработчик на российском хостинге (/api/lead.php): данные не уходят
+      // третьим лицам и за границу. Отправляем обычной формой (form-urlencoded).
+      var enc=Object.keys(data).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(data[k]); }).join('&');
+      fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc})
         .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-        .then(success)
+        .then(function(j){ if(j&&j.ok){ success(); } else { throw 0; } })
         .catch(function(){
           if(btn){ btn.disabled=false; btn.innerHTML=btnHtml; btn.style.opacity=''; }
           showError(form,'Не получилось отправить. Попробуйте ещё раз или напишите нам напрямую в Telegram.');

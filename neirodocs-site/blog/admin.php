@@ -130,9 +130,11 @@ textarea{resize:vertical}
 .hint{font-size:12px;color:#8492AE;margin-top:4px}
 .btn{background:linear-gradient(135deg,#1D5DE3,#5B8AFF);color:#fff;border:none;padding:13px 22px;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;margin-top:20px}
 .btn:disabled{opacity:.6;cursor:default}
-.toolbar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;padding:8px;background:#F4F7FD;border:1px solid #D8DEEA;border-bottom:none;border-radius:10px 10px 0 0}
-.toolbar button{background:#fff;border:1px solid #D8DEEA;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:600;color:#1F2A47}
+.toolbar{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:6px 0 0;padding:8px;background:#F4F7FD;border:1px solid #D8DEEA;border-bottom:none;border-radius:10px 10px 0 0;position:sticky;top:56px;z-index:10}
+.toolbar button{background:#fff;border:1px solid #D8DEEA;border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer;font-weight:600;color:#1F2A47;line-height:1;min-height:32px}
 .toolbar button:hover{background:#E0EAFF;border-color:var(--acc);color:var(--acc)}
+.toolbar button.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.tb-sep{width:1px;align-self:stretch;background:#D8DEEA;margin:2px 3px}
 .editor{min-height:340px;max-height:70vh;overflow-y:auto;border:1px solid #D8DEEA;border-radius:0 0 10px 10px;padding:18px 20px;font-size:16px;line-height:1.65;color:#1F2A47;background:#fff}
 .editor:empty::before{content:attr(data-ph);color:#9AA6C4}
 .editor h2{font-size:1.5rem;margin:22px 0 10px;font-weight:700;line-height:1.2}
@@ -200,18 +202,26 @@ h2.page{font-size:18px;margin:0 0 18px}
 
       <label>Текст статьи</label>
       <div class="toolbar">
-        <button type="button" data-cmd="formatBlock" data-val="h2">Заголовок</button>
-        <button type="button" data-cmd="formatBlock" data-val="h3">Подзаголовок</button>
-        <button type="button" data-cmd="formatBlock" data-val="p">Обычный текст</button>
-        <button type="button" data-cmd="bold">Жирный</button>
-        <button type="button" data-cmd="insertUnorderedList">Список</button>
-        <button type="button" data-cmd="formatBlock" data-val="blockquote">Цитата</button>
-        <button type="button" id="linkBtn">Ссылка</button>
-        <button type="button" id="imgBtn">🖼 Картинка</button>
+        <button type="button" data-block="h2" title="Заголовок раздела">Заголовок</button>
+        <button type="button" data-block="h3" title="Подзаголовок">Подзаголовок</button>
+        <button type="button" data-block="p" title="Обычный абзац">Абзац</button>
+        <span class="tb-sep"></span>
+        <button type="button" data-cmd="bold" title="Жирный (Ctrl+B)"><b>Ж</b></button>
+        <button type="button" data-cmd="italic" title="Курсив (Ctrl+I)"><i>К</i></button>
+        <span class="tb-sep"></span>
+        <button type="button" data-cmd="insertUnorderedList" title="Маркированный список">• Список</button>
+        <button type="button" data-cmd="insertOrderedList" title="Нумерованный список">1. Список</button>
+        <button type="button" data-block="blockquote" title="Цитата">❝ Цитата</button>
+        <span class="tb-sep"></span>
+        <button type="button" id="linkBtn" title="Вставить ссылку">🔗 Ссылка</button>
+        <button type="button" id="unlinkBtn" title="Убрать ссылку">✕ Ссылка</button>
+        <button type="button" id="imgBtn" title="Вставить картинку">🖼 Картинка</button>
+        <span class="tb-sep"></span>
+        <button type="button" data-cmd="removeFormat" title="Убрать оформление">⌫ Очистить</button>
         <span class="uploading" id="imgUp"></span>
       </div>
-      <div class="editor" id="editor" contenteditable="true" data-ph="Просто вставьте сюда текст статьи (Ctrl+V) — он сам разобьётся на абзацы. Выделяйте текст и жмите кнопки сверху, чтобы сделать заголовок, список или вставить картинку."><?= $editing['body'] ?? '' ?></div>
-      <div class="hint">Вставляйте текст как есть — оформление можно навести кнопками. Картинки грузятся кнопкой «🖼 Картинка».</div>
+      <div class="editor" id="editor" contenteditable="true" data-ph="Пишите или вставляйте текст (Ctrl+V). Форматирование из Word, Google Документов и с сайтов сохранится — заголовки, жирный, списки и ссылки. Оформить вручную можно кнопками сверху."><?= $editing['body'] ?? '' ?></div>
+      <div class="hint">Можно вставлять уже оформленный текст — заголовки, списки, жирный и ссылки сохранятся. Картинки — кнопкой «🖼 Картинка» или перетащите файл прямо в поле.</div>
 
       <label>Частые вопросы (FAQ) — по одному в строке, формат «Вопрос :: Ответ»</label>
       <textarea name="faq" rows="4" placeholder="Сколько стоит внедрение? :: Зависит от объёма документов, считаем на аудите."><?= e($faqText) ?></textarea>
@@ -242,32 +252,163 @@ h2.page{font-size:18px;margin:0 0 18px}
 </div>
 <script>
 var editor=document.getElementById('editor');
+try{ document.execCommand('defaultParagraphSeparator', false, 'p'); }catch(e){}
 
-// формат-кнопки
+// ---- Разрешённые теги. Всё остальное при вставке/сохранении вычищается ----
+var ALLOWED={ 'P':[], 'BR':[], 'H2':[], 'H3':[], 'STRONG':[], 'EM':[],
+  'UL':[], 'OL':[], 'LI':[], 'BLOCKQUOTE':[], 'A':['href'], 'IMG':['src','alt'] };
+// во что превращаем «синонимы» тегов
+var MAP={ 'B':'STRONG','I':'EM','H1':'H2','H4':'H3','H5':'H3','H6':'H3','DIV':'P' };
+
+// Жирный/курсив могут быть заданы стилем (Google Документы: font-weight:700),
+// а не тегом. Распознаём и то, и другое.
+function emphasisOf(el){
+  var b=false,i=false, st=((el.getAttribute&&el.getAttribute('style'))||'').toLowerCase();
+  if(/font-weight\s*:\s*(bold|[6-9]00)/.test(st)) b=true;
+  if(/font-style\s*:\s*italic/.test(st)) i=true;
+  var t=el.nodeName.toUpperCase();
+  if(t==='B'||t==='STRONG') b=true;
+  if(t==='I'||t==='EM') i=true;
+  return {b:b,i:i};
+}
+
+// Рекурсивно чистим узел, оставляя только разрешённые теги и атрибуты.
+function cleanNode(node, out){
+  node.childNodes.forEach(function(ch){
+    if(ch.nodeType===3){ // текст
+      out.appendChild(document.createTextNode(ch.nodeValue));
+      return;
+    }
+    if(ch.nodeType!==1) return;
+    var tag=ch.nodeName.toUpperCase();
+    if(MAP[tag]) tag=MAP[tag];
+    if(tag==='SCRIPT'||tag==='STYLE') return;
+    if(ALLOWED[tag] && tag!=='STRONG' && tag!=='EM'){
+      var el=document.createElement(tag);
+      (ALLOWED[tag]||[]).forEach(function(attr){
+        var v=ch.getAttribute&&ch.getAttribute(attr);
+        if(v){
+          if(attr==='href'&&/^\s*javascript:/i.test(v)) return;
+          el.setAttribute(attr, v);
+        }
+      });
+      if(tag==='A'){ el.setAttribute('target','_blank'); el.setAttribute('rel','noopener'); }
+      cleanNode(ch, el);
+      // пустые ссылки/заголовки/абзацы без текста и без картинок выкидываем
+      if(tag!=='BR'&&tag!=='IMG'&&!el.textContent.trim()&&!el.querySelector('img')) return;
+      out.appendChild(el);
+    } else {
+      // span/font/strong/em/b/i — переносим только жирность и курсив, тег отбрасываем
+      var emp=emphasisOf(ch), target=out;
+      if(emp.b){ var s=document.createElement('strong'); out.appendChild(s); target=s; }
+      if(emp.i){ var em=document.createElement('em'); target.appendChild(em); target=em; }
+      cleanNode(ch, target);
+    }
+  });
+}
+
+// Из грязного HTML делаем чистый. blockLevel=true — оборачиваем «голый» текст в <p>.
+function sanitize(dirtyHtml){
+  var tmp=document.createElement('div'); tmp.innerHTML=dirtyHtml;
+  var clean=document.createElement('div');
+  cleanNode(tmp, clean);
+  // строчные куски верхнего уровня (текст, ссылки, жирный без абзаца) собираем в <p>
+  var wrap=document.createElement('div'), buf=null;
+  var BLOCK={P:1,H2:1,H3:1,UL:1,OL:1,BLOCKQUOTE:1,IMG:1};
+  [].slice.call(clean.childNodes).forEach(function(n){
+    var isBlock=n.nodeType===1&&BLOCK[n.nodeName];
+    if(isBlock){ if(buf){wrap.appendChild(buf);buf=null;} wrap.appendChild(n); }
+    else {
+      if(n.nodeType===3&&!n.nodeValue.trim()) return;
+      if(!buf) buf=document.createElement('p');
+      buf.appendChild(n);
+    }
+  });
+  if(buf) wrap.appendChild(buf);
+  return wrap.innerHTML;
+}
+
+// ---- Панель форматирования ----
+function applyBlock(tag){
+  editor.focus();
+  // formatBlock ждёт <h2>/<p>/<blockquote>
+  document.execCommand('formatBlock', false, '<'+tag+'>');
+  refreshToolbar();
+}
+document.querySelectorAll('.toolbar button[data-block]').forEach(function(b){
+  b.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  b.addEventListener('click', function(){ applyBlock(b.getAttribute('data-block')); });
+});
 document.querySelectorAll('.toolbar button[data-cmd]').forEach(function(b){
+  b.addEventListener('mousedown', function(e){ e.preventDefault(); });
   b.addEventListener('click', function(){
     editor.focus();
-    var cmd=b.getAttribute('data-cmd'), val=b.getAttribute('data-val');
-    if(cmd==='formatBlock'){ document.execCommand('formatBlock', false, val); }
-    else { document.execCommand(cmd, false, null); }
+    document.execCommand(b.getAttribute('data-cmd'), false, null);
+    refreshToolbar();
   });
 });
 
-// ссылка
-document.getElementById('linkBtn').addEventListener('click', function(){
-  editor.focus();
-  var url=prompt('Вставьте адрес ссылки (например, https://neirodocs.ru/product/):','https://');
-  if(url && url!=='https://'){ document.execCommand('createLink', false, url); }
+// подсветка активных кнопок
+function currentBlock(){
+  var n=window.getSelection().anchorNode; if(!n) return '';
+  if(n.nodeType===3) n=n.parentNode;
+  while(n&&n!==editor){ var t=n.nodeName; if(/^(H2|H3|P|BLOCKQUOTE|LI)$/.test(t)) return t; n=n.parentNode; }
+  return '';
+}
+function refreshToolbar(){
+  var blk=currentBlock();
+  document.querySelectorAll('.toolbar button[data-block]').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-block').toUpperCase()===blk);
+  });
+  try{
+    document.querySelector('[data-cmd=bold]').classList.toggle('active', document.queryCommandState('bold'));
+    document.querySelector('[data-cmd=italic]').classList.toggle('active', document.queryCommandState('italic'));
+  }catch(e){}
+}
+document.addEventListener('selectionchange', function(){
+  if(document.activeElement===editor) refreshToolbar();
 });
 
-// вставка plain-текста -> чистые абзацы (чтобы из Word не тянуло мусор)
+// ссылка: если выделен текст — оборачиваем; если нет — спрашиваем и текст, и адрес
+document.getElementById('linkBtn').addEventListener('mousedown', function(e){ e.preventDefault(); });
+document.getElementById('linkBtn').addEventListener('click', function(){
+  editor.focus();
+  var sel=window.getSelection();
+  var picked=sel && sel.toString().trim();
+  var url=prompt('Адрес ссылки (например, https://neirodocs.ru/product/):','https://');
+  if(!url||url==='https://') return;
+  if(!/^(https?:|mailto:|tel:|\/)/i.test(url)) url='https://'+url;
+  if(picked){
+    document.execCommand('createLink', false, url);
+  } else {
+    var text=prompt('Текст ссылки:', url)||url;
+    document.execCommand('insertHTML', false,
+      '<a href="'+url.replace(/"/g,'%22')+'" target="_blank" rel="noopener">'+
+      text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</a>&nbsp;');
+  }
+});
+document.getElementById('unlinkBtn').addEventListener('mousedown', function(e){ e.preventDefault(); });
+document.getElementById('unlinkBtn').addEventListener('click', function(){
+  editor.focus(); document.execCommand('unlink', false, null);
+});
+
+// ---- Умная вставка: СОХРАНЯЕМ форматирование, но чистим мусор ----
 editor.addEventListener('paste', function(e){
   e.preventDefault();
-  var text=(e.clipboardData||window.clipboardData).getData('text/plain');
-  if(!text) return;
-  var blocks=text.split(/\n\s*\n/).map(function(s){ return s.replace(/\n/g,' ').trim(); }).filter(Boolean);
-  var html=blocks.map(function(b){ return '<p>'+b.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</p>'; }).join('');
-  document.execCommand('insertHTML', false, html);
+  var cb=e.clipboardData||window.clipboardData;
+  var html=cb.getData('text/html');
+  var out;
+  if(html && html.replace(/<[^>]+>/g,'').trim()){
+    out=sanitize(html);
+  } else {
+    // простой текст: пустые строки = новые абзацы, одиночные переносы = <br>
+    var text=cb.getData('text/plain')||'';
+    var esc=function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    out=text.split(/\n\s*\n/).map(function(b){
+      return '<p>'+esc(b.trim()).replace(/\n/g,'<br>')+'</p>';
+    }).filter(function(x){ return x!=='<p></p>'; }).join('');
+  }
+  document.execCommand('insertHTML', false, out);
 });
 
 // Сжимаем фото в браузере ДО отправки: телефонные снимки по 3–6 МБ превращаются
@@ -322,8 +463,22 @@ imgInput.addEventListener('change', function(){
   var f=imgInput.files[0]; imgInput.value='';
   uploadImage(f, function(url){
     editor.focus();
-    document.execCommand('insertHTML', false, '<img src="'+url+'" alt="">');
+    document.execCommand('insertHTML', false, '<img src="'+url+'" alt=""><p></p>');
   }, document.getElementById('imgUp'));
+});
+
+// перетаскивание картинки прямо в поле
+editor.addEventListener('dragover', function(e){ e.preventDefault(); editor.style.borderColor='#1D5DE3'; });
+editor.addEventListener('dragleave', function(){ editor.style.borderColor=''; });
+editor.addEventListener('drop', function(e){
+  e.preventDefault(); editor.style.borderColor='';
+  var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+  if(f&&/^image\//.test(f.type)){
+    uploadImage(f, function(url){
+      editor.focus();
+      document.execCommand('insertHTML', false, '<img src="'+url+'" alt=""><p></p>');
+    }, document.getElementById('imgUp'));
+  }
 });
 
 // обложка
@@ -341,14 +496,13 @@ coverClear.addEventListener('click', function(){
   coverField.value=''; coverPreview.src=''; coverPreview.classList.remove('show'); coverClear.style.display='none';
 });
 
-// перед отправкой — переносим HTML редактора в скрытое поле, чистим div-обёртки
+// перед отправкой — прогоняем содержимое через тот же санитайзер (чистый HTML)
 document.getElementById('postForm').addEventListener('submit', function(e){
-  var html=editor.innerHTML
-    .replace(/<div>/gi,'<p>').replace(/<\/div>/gi,'</p>')
-    .replace(/<p>\s*(<br\s*\/?>)?\s*<\/p>/gi,'')
-    .replace(/ style="[^"]*"/gi,'')
-    .replace(/&nbsp;/g,' ');
-  if(!html.trim() || !editor.textContent.trim()){
+  var html=sanitize(editor.innerHTML)
+    .replace(/<p>\s*(<br\s*\/?>)?\s*<\/p>/gi,'')  // пустые абзацы
+    .replace(/&nbsp;/g,' ')
+    .trim();
+  if(!html || !editor.textContent.trim()){
     e.preventDefault(); alert('Напишите текст статьи.'); editor.focus(); return;
   }
   document.getElementById('bodyField').value=html;

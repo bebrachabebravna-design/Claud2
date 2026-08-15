@@ -1,5 +1,6 @@
 neirodocs-site/api/config.php
-neirodocs-site/api/data/
+neirodocs-site/api/data/*
+!neirodocs-site/api/data/.htaccess
 neirodocs-site/blog/uploads/*
 !neirodocs-site/blog/uploads/.htaccess
 neirodocs-site/blog/data/views.json
