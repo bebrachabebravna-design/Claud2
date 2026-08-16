@@ -17,22 +17,22 @@
     + '.nrd-legal-links a:hover{color:#fff;border-bottom-color:rgba(255,255,255,.5)}'
     + '@media(max-width:760px){.nrd-legal-links{flex-direction:column;align-items:flex-start;gap:10px}}'
 
-    + '.nrd-cookie{position:fixed;left:20px;right:20px;bottom:20px;z-index:9999;max-width:560px;'
-    +   'background:#0F1732;color:#D6DFF3;border:1px solid rgba(255,255,255,.14);border-radius:18px;'
-    +   'padding:20px 22px;box-shadow:0 28px 60px -20px rgba(0,0,0,.65);'
-    +   'font:400 .92rem/1.6 Inter,-apple-system,system-ui,sans-serif;'
-    +   'opacity:0;transform:translateY(16px);transition:opacity .35s ease,transform .35s cubic-bezier(.16,1,.3,1)}'
+    + '.nrd-cookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:400px;'
+    +   'background:#0F1732;color:#C4CFE6;border:1px solid rgba(255,255,255,.12);border-radius:14px;'
+    +   'padding:14px 16px;box-shadow:0 20px 44px -18px rgba(0,0,0,.6);'
+    +   'font:400 .78rem/1.5 Inter,-apple-system,system-ui,sans-serif;'
+    +   'opacity:0;transform:translateY(14px);transition:opacity .3s ease,transform .3s cubic-bezier(.16,1,.3,1)}'
     + '.nrd-cookie.is-in{opacity:1;transform:none}'
-    + '.nrd-cookie b{display:block;color:#fff;font:700 1rem/1.3 Manrope,system-ui,sans-serif;margin-bottom:7px}'
-    + '.nrd-cookie p{margin:0 0 16px}'
+    + '.nrd-cookie b{display:block;color:#fff;font:700 .86rem/1.3 Manrope,system-ui,sans-serif;margin-bottom:5px}'
+    + '.nrd-cookie p{margin:0 0 12px}'
     + '.nrd-cookie a{color:#7FA8FF;text-decoration:underline}'
-    + '.nrd-cookie-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}'
-    + '.nrd-cookie button{border:none;cursor:pointer;font:600 .92rem/1 Manrope,system-ui,sans-serif;'
-    +   'padding:12px 22px;border-radius:99px;transition:transform .2s,filter .2s}'
+    + '.nrd-cookie-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}'
+    + '.nrd-cookie button{border:none;cursor:pointer;font:600 .8rem/1 Manrope,system-ui,sans-serif;'
+    +   'padding:9px 16px;border-radius:99px;transition:transform .2s,filter .2s}'
     + '.nrd-cookie button:hover{transform:translateY(-1px);filter:brightness(1.08)}'
     + '.nrd-cookie .ok{background:linear-gradient(135deg,#1D5DE3,#5B8AFF);color:#fff}'
     + '.nrd-cookie .no{background:transparent;color:#9AA6C4;border:1px solid rgba(255,255,255,.2)}'
-    + '@media(max-width:560px){.nrd-cookie{left:12px;right:12px;bottom:12px;padding:18px}'
+    + '@media(max-width:480px){.nrd-cookie{left:10px;right:10px;bottom:10px;padding:13px 15px}'
     +   '.nrd-cookie button{flex:1 1 auto}}'
 
     + '.nrd-consent{display:flex;align-items:flex-start;gap:10px;margin:2px 0 0;'
@@ -75,13 +75,12 @@
     bar.setAttribute('role', 'dialog');
     bar.setAttribute('aria-label', 'Уведомление об использовании cookie');
     bar.innerHTML =
-      '<b>Мы используем файлы cookie</b>' +
-      '<p>Сайт использует cookie и сервис Яндекс Метрика, чтобы страницы работали корректно, ' +
-      'а мы понимали, что улучшить. Эти данные обезличены и не позволяют вас идентифицировать. ' +
-      'Подробнее — в <a href="/privacy/">Политике конфиденциальности</a>.</p>' +
+      '<b>Файлы cookie</b>' +
+      '<p>Сайт использует cookie и Яндекс Метрику, чтобы работать лучше. Данные обезличены. ' +
+      'Подробнее — в <a href="/privacy/">политике</a>.</p>' +
       '<div class="nrd-cookie-row">' +
         '<button type="button" class="ok">Принять</button>' +
-        '<button type="button" class="no">Только необходимые</button>' +
+        '<button type="button" class="no">Только нужные</button>' +
       '</div>';
     document.body.appendChild(bar);
     requestAnimationFrame(function () { bar.classList.add('is-in'); });
