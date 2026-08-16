@@ -3313,6 +3313,7 @@ h1, h2, h3{ text-wrap: balance; }
     </div>
   </div>
 </footer>
+<script src="/assets/tg-config.js"></script>
 <script src="/assets/legal.js" defer></script>
 
 <script>
@@ -3422,15 +3423,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // Никаких сторонних сервисов и передачи данных за границу — так чище по 152-ФЗ.
 (function(){
   var ENDPOINT='/api/lead.php';
-  // СТАБИЛЬНЫЙ канал: заявка мгновенно приходит вам в Telegram прямо из браузера
-  // и НЕ зависит от того, включён ли сервер. Заполните один раз — и заявки не
-  // потеряются, даже когда сервер выключен.
-  //   1) в Telegram напишите @BotFather → /newbot → скопируйте токен в TG_TOKEN;
-  //   2) напишите своему новому боту любое сообщение (иначе он не сможет вам писать);
-  //   3) откройте в браузере https://api.telegram.org/bot<ВАШ_ТОКЕН>/getUpdates
-  //      и найдите "chat":{"id":ЧИСЛО} — впишите это ЧИСЛО в TG_CHAT.
-  var TG_TOKEN='';   // например '7712345678:AAH...'
-  var TG_CHAT='';    // например '123456789'
+  // Токен бота для отправки из браузера берём из assets/tg-config.js (он в
+  // .gitignore, чтобы токен не попал в репозиторий). Если файла нет — браузерный
+  // канал просто не используется, а заявка всё равно уходит через сервер.
+  var TG = (window.NRD_TG||{});
+  var TG_TOKEN = TG.token || '';
+  var TG_CHAT  = TG.chat  || '';
 
   // Черновик формы живёт в localStorage: случайная перезагрузка или закрытие
   // страницы не стирает введённое.
@@ -3512,17 +3510,27 @@ document.addEventListener('DOMContentLoaded', function () {
         clearDraft(form);
         if(typeof onSuccess==='function'){ try{ onSuccess(data); }catch(err){} }
       }
-      // Заявку шлём в ДВА канала сразу — что-то одно точно сработает:
-      //  1) свой обработчик на хостинге (/api/lead.php) — сохраняет заявку в файл;
-      //  2) напрямую в Telegram — работает всегда, даже если сервер выключен.
-      // Успех показываем, если доставил хотя бы один канал.
+      // Надёжная доставка в три независимых места, чтобы заявка не потерялась
+      // НИКОГДА:
+      //  1) сервер /api/lead.php сохраняет заявку в файл (виден на /api/leads.php)
+      //     и шлёт на почту — это надёжный архив, он не зависит от Telegram;
+      //  2) сервер сам шлёт в Telegram (если хостинг пускает наружу);
+      //  3) если сервер не смог отправить в Telegram (или сам недоступен) —
+      //     в Telegram отправляет браузер посетителя. Так дубля не будет, а
+      //     сообщение придёт при любом раскладе.
       var enc=Object.keys(data).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(data[k]); }).join('&');
+
+      // Сервер: сохранить заявку в файл + почта + попытка Telegram. Возвращает
+      // {ok, tg}. Ставим таймаут, чтобы при недоступном сервере не ждать долго.
       function sendServer(){
-        return fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc})
-          .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-          .then(function(j){ if(!(j&&j.ok)) throw 0; return true; });
+        var ctl = ('AbortController' in window) ? new AbortController() : null;
+        var to = ctl ? setTimeout(function(){ ctl.abort(); }, 12000) : 0;
+        return fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc,signal:ctl?ctl.signal:undefined})
+          .then(function(r){ if(to) clearTimeout(to); if(!r.ok) throw 0; return r.json(); })
+          .then(function(j){ if(!(j&&j.ok)) throw 0; return j; });
       }
-      function sendTelegram(){
+      // Telegram из браузера, до 3 попыток с нарастающей паузой.
+      function tgOnce(){
         if(!TG_TOKEN||!TG_CHAT) return Promise.reject();
         var lines=Object.keys(data).filter(function(k){ return k!=='form'; })
           .map(function(k){ return k+': '+data[k]; }).join('\n');
@@ -3532,8 +3540,26 @@ document.addEventListener('DOMContentLoaded', function () {
           body:'chat_id='+encodeURIComponent(TG_CHAT)+'&text='+encodeURIComponent(text)
         }).then(function(r){ if(!r.ok) throw 0; return true; });
       }
+      function tgRetry(n){
+        n=n||1;
+        return tgOnce().catch(function(){
+          if(n>=3) throw 0;
+          return new Promise(function(res){ setTimeout(res, n*700); }).then(function(){ return tgRetry(n+1); });
+        });
+      }
+
+      var serverP = sendServer();
+      // Telegram шлём РОВНО один раз: сервером, если он смог; иначе — из браузера.
+      var tgP = serverP.then(function(j){
+        return (j && j.tg) ? true : tgRetry();   // сервер уже отправил -> не дублируем
+      }, function(){
+        return tgRetry();                         // сервер недоступен -> шлёт браузер
+      });
+
+      // «Отправлено» показываем, как только сработал любой канал: заявка либо
+      // сохранена на сервере, либо доставлена в Telegram.
       function safe(pr){ return pr.then(function(){ return true; }, function(){ return false; }); }
-      Promise.all([safe(sendServer()), safe(sendTelegram())]).then(function(res){
+      Promise.all([safe(serverP), safe(tgP)]).then(function(res){
         if(res.indexOf(true)!==-1){ success(); }
         else {
           if(btn){ btn.disabled=false; btn.innerHTML=btnHtml; btn.style.opacity=''; }

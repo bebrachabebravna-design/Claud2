@@ -108,21 +108,30 @@ $headers = [
 ];
 $mailOk = @mail(LEAD_EMAIL, $subject, $body, implode("\r\n", $headers));
 
-// ── 3. Telegram (если настроен) ──────────────────────────────────────
+// ── 3. Telegram с сервера (если настроен и хостинг пускает наружу) ────
+// Пробуем 2 раза. Если хостинг блокирует исходящие (частая ситуация на
+// шаред-хостинге), браузер отправит в Telegram сам — см. index.html.
+$tgSent = false;
 if (LEAD_TG_TOKEN !== '' && LEAD_TG_CHAT !== '' && function_exists('curl_init')) {
-    $tg = "🔔 <b>Заявка с сайта</b>\n<b>{$formName}</b>\n\n";
-    foreach ($fields as $k => $v) $tg .= htmlspecialchars($k) . ': ' . htmlspecialchars($v) . "\n";
-    if ($page) $tg .= "\n" . htmlspecialchars($page);
-    $ch = curl_init('https://api.telegram.org/bot' . LEAD_TG_TOKEN . '/sendMessage');
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => http_build_query(['chat_id' => LEAD_TG_CHAT, 'text' => $tg, 'parse_mode' => 'HTML']),
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 8,
-    ]);
-    @curl_exec($ch);
-    @curl_close($ch);
+    $tg = "🔔 Заявка с сайта\n{$formName}\n\n";
+    foreach ($fields as $k => $v) $tg .= $k . ': ' . $v . "\n";
+    if ($page) $tg .= "\n" . $page;
+    for ($try = 0; $try < 2 && !$tgSent; $try++) {
+        $ch = curl_init('https://api.telegram.org/bot' . LEAD_TG_TOKEN . '/sendMessage');
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query(['chat_id' => LEAD_TG_CHAT, 'text' => $tg]),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 8,
+            CURLOPT_CONNECTTIMEOUT => 5,
+        ]);
+        $resp = @curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        @curl_close($ch);
+        if ($resp !== false && $code >= 200 && $code < 300) $tgSent = true;
+    }
 }
 
-// Заявка сохранена в файле в любом случае — считаем успехом.
-out(['ok' => true, 'mail' => $mailOk]);
+// Заявка сохранена в файл в любом случае — это надёжный источник.
+// tg=true → сервер уже уведомил в Telegram, браузеру дублировать не нужно.
+out(['ok' => true, 'mail' => $mailOk, 'tg' => $tgSent]);

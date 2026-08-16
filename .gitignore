@@ -7,3 +7,4 @@ neirodocs-site/blog/data/views.json
 neirodocs-site/blog/data/views_seen.json
 neirodocs-site/blog/data/*.lock
 neirodocs-site/blog/data/*.tmp
+neirodocs-site/assets/tg-config.js
