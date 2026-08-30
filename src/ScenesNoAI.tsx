@@ -257,6 +257,9 @@ export const SCENE_EL: Record<string, (d: number) => React.ReactNode> = {
   n1: (d) => (
     <SceneNumber durationInFrames={d} n="01" label="сначала цифра" tint={CYAN} Icon={IconSearch} />
   ),
+  n2: (d) => (
+    <SceneNumber durationInFrames={d} n="02" label="не в chatgpt" tint="#FF4D63" Icon={IconAlert} />
+  ),
   leak: (d) => <SceneLeak durationInFrames={d} />,
   n3: (d) => (
     <SceneNumber durationInFrames={d} n="03" label="не замена, а время" tint="#B06BFF" Icon={IconClock} />

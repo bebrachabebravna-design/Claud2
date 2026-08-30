@@ -10,35 +10,43 @@ import {
 } from "remotion";
 import { Audio } from "@remotion/media";
 import { SCENE_EL } from "./ScenesNoAI";
+import { POP_EL, PointBadge } from "./OverlayFx";
 import { FlashCut } from "./Overlays";
-import { BEHIND, CONTENT_END, FPS, SCENES, SHOTS, TRIM_START } from "./captions-data5";
-import { bebasFont, CYAN } from "./fonts";
+import {
+  BADGES,
+  BEHIND,
+  CAPTIONS,
+  Chunk,
+  CONTENT_END,
+  FPS,
+  POPS,
+  SCENES,
+  SHOTS,
+  TRIM_START,
+} from "./captions-data5";
+import { bebasFont, CYAN, WHITE, YELLOW } from "./fonts";
 import { Grain } from "./fx";
 
 /**
- * «Куда НЕ надо внедрять ИИ» — the take is a flat delivery, so the edit has to
- * carry the energy on its own.
+ * «Куда НЕ надо внедрять ИИ».
  *
- * Three devices do that work:
- *  - The frame never rests. Every short pause in the audio becomes a re-frame,
- *    so the picture changes every 2–4 seconds even mid-sentence.
- *  - The long pauses become full-screen inserts, each in a different colour —
- *    the eye has to re-adapt on every one, which reads as pace.
- *  - The hook runs the matted speaker over depth type, so the opening three
- *    seconds — where most viewers are lost — have real dimension.
+ * The delivery is flat, so density does the work. Four layers stack up:
+ * re-framings of the take on every pause; graphics popping over him on the
+ * exact word they illustrate; kinetic captions changing every ~0.8s; and four
+ * short full-screen hits on «Первое / Второе / Третье» and the CTA.
  *
- * No burned captions: those are added natively in Instagram.
+ * The room is left alone — an earlier pass washed a blue gradient over him,
+ * which the brief rejected. The only thing laid over the picture now is a
+ * vignette to keep the eye centred and a caption scrim at the bottom.
  */
 const SRC = "src5.mp4";
 const CUT = "cut5-hook.webm";
 const sec = (s: number) => Math.round(s * FPS);
-/** Source time → timeline frame. */
 const tl = (s: number) => sec(s - TRIM_START);
 const HOLD = 10;
 
 export const DURATION_FRAMES = sec(CONTENT_END - TRIM_START);
 
-/** One re-framing of the take. Scale drifts within the shot so it never sits still. */
 const Shot: React.FC<{
   from: number;
   to: number;
@@ -48,9 +56,9 @@ const Shot: React.FC<{
 }> = ({ from, to, scale, ox, oy }) => {
   const frame = useCurrentFrame();
   const dur = sec(to - from) + HOLD;
-  const s = interpolate(frame, [0, dur], [scale, scale + 0.045]);
-  const settle = interpolate(frame, [0, 7], [1.02, 1], { extrapolateRight: "clamp" });
-  const fade = interpolate(frame, [0, 5], [0, 1], { extrapolateRight: "clamp" });
+  const s = interpolate(frame, [0, dur], [scale, scale + 0.05]);
+  const settle = interpolate(frame, [0, 6], [1.025, 1], { extrapolateRight: "clamp" });
+  const fade = interpolate(frame, [0, 4], [0, 1], { extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ overflow: "hidden", opacity: fade }}>
       <OffthreadVideo
@@ -69,7 +77,42 @@ const Shot: React.FC<{
   );
 };
 
-/** Depth word, rendered between the room and the matted speaker. */
+/** Caption chunk. No plate — a scrim below carries legibility. */
+const Cap: React.FC<{ chunk: Chunk; durationInFrames: number }> = ({ chunk, durationInFrames }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const e = spring({ frame, fps, config: { damping: 14, stiffness: 240, mass: 0.5 } });
+  const out = interpolate(frame, [durationInFrames - 3, durationInFrames], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <div
+      style={{
+        opacity: out,
+        transform: `translateY(${(1 - e) * 26}px) scale(${interpolate(e, [0, 1], [0.88, 1])})`,
+        // Accents are Bebas in yellow, not the script face: these chunks are
+        // upper-case, and a calligraphic face set in caps is both unreadable
+        // and explicitly off-limits here. The script face stays for the
+        // lower-case asides in the full-screen cards.
+        fontFamily: bebasFont,
+        fontWeight: 400,
+        fontSize: chunk.accent ? 146 : 132,
+        lineHeight: 0.9,
+        letterSpacing: 2,
+        color: chunk.accent ? YELLOW : WHITE,
+        textAlign: "center",
+        whiteSpace: "pre-line",
+        textShadow: chunk.accent
+          ? `0 0 30px ${YELLOW}55, 0 6px 24px rgba(0,0,0,0.8)`
+          : "0 6px 26px rgba(0,0,0,0.92), 0 2px 5px rgba(0,0,0,0.95)",
+      }}
+    >
+      {chunk.text}
+    </div>
+  );
+};
+
 const Behind: React.FC<{
   text: string;
   color: string;
@@ -83,7 +126,7 @@ const Behind: React.FC<{
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const drift = interpolate(frame, [0, durationInFrames], [26, -26]);
+  const drift = interpolate(frame, [0, durationInFrames], [24, -24]);
   return (
     <AbsoluteFill
       style={{
@@ -96,13 +139,13 @@ const Behind: React.FC<{
       <div
         style={{
           fontFamily: bebasFont,
-          fontSize: 176,
+          fontSize: 168,
           lineHeight: 0.84,
           letterSpacing: 3,
           color,
           textAlign: "center",
           whiteSpace: "pre-line",
-          transform: `translateY(${drift}px) scale(${interpolate(e, [0, 1], [0.78, 1])})`,
+          transform: `translateY(${drift}px) scale(${interpolate(e, [0, 1], [0.8, 1])})`,
           opacity: interpolate(e, [0, 1], [0, 0.95]),
           textShadow: `0 0 70px ${color}66`,
         }}
@@ -113,16 +156,18 @@ const Behind: React.FC<{
   );
 };
 
-/** The hook: room, depth type, then the cut-out speaker over the top. */
+/**
+ * Hook: the matted speaker over depth type. The room behind him is only dimmed
+ * and blurred — no colour is laid onto it.
+ */
 const Hook: React.FC = () => {
   const frame = useCurrentFrame();
-  const dur = tl(6.42);
-  // Room and matte share one transform, otherwise the cut-out slides off him.
-  const push = interpolate(frame, [0, dur], [1.0, 1.07]);
-  const tx = Math.sin(frame / 46) * 10;
+  const dur = tl(4.85);
+  const push = interpolate(frame, [0, dur], [1.0, 1.06]);
+  const tx = Math.sin(frame / 44) * 9;
   const cam = `scale(${push}) translateX(${tx}px)`;
   return (
-    <AbsoluteFill style={{ backgroundColor: "#080D18", overflow: "hidden" }}>
+    <AbsoluteFill style={{ backgroundColor: "#0A0A0C", overflow: "hidden" }}>
       <AbsoluteFill style={{ transform: cam }}>
         <OffthreadVideo
           src={staticFile(SRC)}
@@ -132,16 +177,10 @@ const Hook: React.FC = () => {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "brightness(0.52) saturate(0.8) blur(3px)",
+            filter: "brightness(0.42) blur(4px)",
           }}
         />
       </AbsoluteFill>
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(circle at 72% 26%, rgba(30,95,255,0.4), transparent 58%), radial-gradient(circle at 22% 82%, rgba(69,208,255,0.26), transparent 54%)",
-        }}
-      />
       {BEHIND.map((b) => {
         const d = sec(b.to - b.from);
         return (
@@ -171,7 +210,7 @@ const Sfx: React.FC<{ file: string; at: number; dur: number; volume?: number }> 
   file,
   at,
   dur,
-  volume = 0.42,
+  volume = 0.4,
 }) => {
   const from = tl(at);
   if (from < 0) return null;
@@ -187,7 +226,7 @@ export const ReelNoAI: React.FC = () => {
     <AbsoluteFill style={{ backgroundColor: "#050B16" }}>
       <Audio name="Голос" src={staticFile(SRC)} trimBefore={sec(TRIM_START)} />
 
-      {/* Re-framed talking head */}
+      {/* 1. Re-framed take */}
       <AbsoluteFill>
         {SHOTS.map((s) => (
           <Sequence
@@ -201,21 +240,78 @@ export const ReelNoAI: React.FC = () => {
         ))}
       </AbsoluteFill>
 
-      {/* Hook with depth type, over the first shot */}
-      <Sequence from={0} durationInFrames={tl(6.42)}>
+      {/* 2. Hook with depth type */}
+      <Sequence from={0} durationInFrames={tl(4.85)}>
         <Hook />
       </Sequence>
 
-      {/* Vignette — pulls the eye off the edges and hides the flat room light */}
+      {/* 3. Vignette + caption scrim. No colour over the room. */}
       <AbsoluteFill
         style={{
           background:
-            "radial-gradient(ellipse 84% 64% at 50% 40%, rgba(0,0,0,0) 54%, rgba(5,11,22,0.55) 100%)",
+            "radial-gradient(ellipse 88% 66% at 50% 38%, rgba(0,0,0,0) 58%, rgba(0,0,0,0.5) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background:
+            "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.34) 22%, rgba(0,0,0,0) 42%)",
           pointerEvents: "none",
         }}
       />
 
-      {/* Full-screen inserts, each a different colour */}
+      {/* 4. Point badge */}
+      <AbsoluteFill>
+        {BADGES.map((b) => {
+          const d = sec(b.to - b.from);
+          return (
+            <Sequence key={b.from} from={tl(b.from)} durationInFrames={d} layout="none">
+              <PointBadge n={b.n} durationInFrames={d} />
+            </Sequence>
+          );
+        })}
+      </AbsoluteFill>
+
+      {/* 5. Graphics popping on the word */}
+      <AbsoluteFill>
+        {POPS.map((p) => {
+          const d = sec(p.dur);
+          return (
+            <Sequence key={p.at} name={`Поп ${p.kind}`} from={tl(p.at)} durationInFrames={d}>
+              {POP_EL[p.kind](d)}
+            </Sequence>
+          );
+        })}
+      </AbsoluteFill>
+
+      {/* 6. Kinetic captions */}
+      <AbsoluteFill>
+        {CAPTIONS.map((c, i) => {
+          const hidden = SCENES.some((s) => c.from < s.to && c.to > s.from);
+          if (hidden) return null;
+          const next = CAPTIONS[i + 1];
+          const end = next ? Math.min(c.to, next.from) : c.to;
+          const d = Math.max(sec(end - c.from), 6);
+          return (
+            <Sequence key={`${c.from}`} from={tl(c.from)} durationInFrames={d} layout="none">
+              <AbsoluteFill
+                style={{
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  paddingBottom: 440,
+                  paddingLeft: 70,
+                  paddingRight: 70,
+                }}
+              >
+                <Cap chunk={c} durationInFrames={d} />
+              </AbsoluteFill>
+            </Sequence>
+          );
+        })}
+      </AbsoluteFill>
+
+      {/* 7. Full-screen hits */}
       <AbsoluteFill>
         {SCENES.map((s) => {
           const d = sec(s.to - s.from);
@@ -227,31 +323,35 @@ export const ReelNoAI: React.FC = () => {
         })}
       </AbsoluteFill>
 
-      {/* Flash on every scene entry and on the harder re-frames */}
-      {[...SCENES.map((s) => s.from), 17.68, 24.68, 31.5, 38.36].map((at) => (
+      {/* 8. Flash on every hit and on the harder re-frames */}
+      {[6.85, 25.07, 41.17, 52.41, 18.27, 34.15, 44.61].map((at) => (
         <Sequence key={`f${at}`} from={tl(at)} durationInFrames={4}>
           <FlashCut color={CYAN} />
         </Sequence>
       ))}
 
-      <Grain opacity={0.045} />
+      <Grain opacity={0.04} />
 
       {/* Sound cut to each visual */}
-      <Sfx file="Digital_12.wav" at={2.2} dur={0.4} volume={0.4} />
-      <Sfx file="Digital_15.wav" at={4.3} dur={0.45} volume={0.4} />
-      <Sfx file="Cam_2.mp3" at={10.26} dur={0.45} />
-      <Sfx file="Icon_2.wav" at={10.5} dur={0.6} volume={0.4} />
-      <Sfx file="Click_10.wav" at={17.68} dur={0.4} volume={0.3} />
-      <Sfx file="Click_11.wav" at={24.68} dur={0.4} volume={0.3} />
-      <Sfx file="Cam_4.mp3" at={26.1} dur={0.45} />
-      <Sfx file="Data_5.wav" at={26.3} dur={2.4} volume={0.22} />
-      <Sfx file="Click_10.wav" at={31.5} dur={0.4} volume={0.3} />
-      <Sfx file="Click_11.wav" at={38.36} dur={0.4} volume={0.3} />
-      <Sfx file="Cam_3.mp3" at={41.28} dur={0.45} />
-      <Sfx file="Icon_2.wav" at={41.5} dur={0.6} volume={0.4} />
-      <Sfx file="Cam_5.mp3" at={48.58} dur={0.8} volume={0.32} />
-      <Sfx file="Digital_4.wav" at={49.1} dur={0.4} volume={0.4} />
-      <Sfx file="Digital_14.wav" at={51.44} dur={0.7} volume={0.44} />
+      <Sfx file="Digital_12.wav" at={1.37} dur={0.4} />
+      <Sfx file="Digital_15.wav" at={4.1} dur={0.4} />
+      <Sfx file="Data_5.wav" at={5.55} dur={1.1} volume={0.22} />
+      <Sfx file="Cam_2.mp3" at={6.85} dur={0.45} />
+      <Sfx file="Digital_3.wav" at={8.77} dur={0.5} />
+      <Sfx file="Click_10.wav" at={12.6} dur={0.4} volume={0.3} />
+      <Sfx file="Click_11.wav" at={18.27} dur={0.4} volume={0.3} />
+      <Sfx file="Digital_4.wav" at={21.5} dur={0.4} />
+      <Sfx file="Cam_4.mp3" at={25.07} dur={0.45} />
+      <Sfx file="Digital_8.wav" at={27.8} dur={0.3} volume={0.46} />
+      <Sfx file="Data_2.wav" at={30.2} dur={1.6} volume={0.2} />
+      <Sfx file="Digital_14.wav" at={34.15} dur={0.6} volume={0.46} />
+      <Sfx file="Digital_8.wav" at={38.7} dur={0.3} volume={0.44} />
+      <Sfx file="Cam_3.mp3" at={41.17} dur={0.45} />
+      <Sfx file="Click_10.wav" at={44.61} dur={0.4} volume={0.3} />
+      <Sfx file="Click_11.wav" at={45.7} dur={0.4} volume={0.3} />
+      <Sfx file="Click_10.wav" at={46.85} dur={0.4} volume={0.3} />
+      <Sfx file="Cam_5.mp3" at={52.41} dur={0.8} volume={0.32} />
+      <Sfx file="Digital_14.wav" at={52.9} dur={0.7} volume={0.44} />
     </AbsoluteFill>
   );
 };
