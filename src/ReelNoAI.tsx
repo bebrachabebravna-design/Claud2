@@ -11,7 +11,7 @@ import {
 import { Audio } from "@remotion/media";
 import { SCENE_EL } from "./ScenesNoAI";
 import { POP_EL, PointBadge } from "./OverlayFx";
-import { FlashCut } from "./Overlays";
+
 import {
   BADGES,
   BEHIND,
@@ -23,6 +23,8 @@ import {
   SCENES,
   SHOTS,
   TRIM_START,
+  HOOK_START,
+  HOOK_END,
 } from "./captions-data5";
 import { bebasFont, CYAN, WHITE, YELLOW } from "./fonts";
 import { Grain } from "./fx";
@@ -40,7 +42,7 @@ import { Grain } from "./fx";
  * vignette to keep the eye centred and a caption scrim at the bottom.
  */
 const SRC = "src5.mp4";
-const CUT = "cut5-hook.webm";
+const CUT = "cut5-hook0.webm";
 const sec = (s: number) => Math.round(s * FPS);
 const tl = (s: number) => sec(s - TRIM_START);
 const HOLD = 10;
@@ -57,8 +59,9 @@ const Shot: React.FC<{
   const frame = useCurrentFrame();
   const dur = sec(to - from) + HOLD;
   const s = interpolate(frame, [0, dur], [scale, scale + 0.05]);
-  const settle = interpolate(frame, [0, 6], [1.025, 1], { extrapolateRight: "clamp" });
-  const fade = interpolate(frame, [0, 4], [0, 1], { extrapolateRight: "clamp" });
+  // A longer dissolve and no scale pop: the old 4-frame cut with a 2.5%
+  // scale snap read as a glitch rather than as an edit.
+  const fade = interpolate(frame, [0, 9], [0, 1], { extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ overflow: "hidden", opacity: fade }}>
       <OffthreadVideo
@@ -69,7 +72,7 @@ const Shot: React.FC<{
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          transform: `scale(${s * settle})`,
+          transform: `scale(${s})`,
           transformOrigin: `${ox}% ${oy}%`,
         }}
       />
@@ -162,29 +165,28 @@ const Behind: React.FC<{
  */
 const Hook: React.FC = () => {
   const frame = useCurrentFrame();
-  const dur = tl(4.85);
+  const dur = tl(HOOK_END) - tl(HOOK_START);
   const push = interpolate(frame, [0, dur], [1.0, 1.06]);
-  const tx = Math.sin(frame / 44) * 9;
-  const cam = `scale(${push}) translateX(${tx}px)`;
+  const cam = `scale(${push})`;
   return (
     <AbsoluteFill style={{ backgroundColor: "#0A0A0C", overflow: "hidden" }}>
       <AbsoluteFill style={{ transform: cam }}>
         <OffthreadVideo
           src={staticFile(SRC)}
-          trimBefore={sec(TRIM_START)}
+          trimBefore={sec(HOOK_START)}
           muted
           style={{
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "brightness(0.42) blur(4px)",
+            filter: "brightness(0.45) blur(3px)",
           }}
         />
       </AbsoluteFill>
       {BEHIND.map((b) => {
         const d = sec(b.to - b.from);
         return (
-          <Sequence key={b.from} from={tl(b.from)} durationInFrames={d} layout="none">
+          <Sequence key={b.from} from={tl(b.from) - tl(HOOK_START)} durationInFrames={d} layout="none">
             <Behind text={b.text} color={b.color} top={b.top} durationInFrames={d} />
           </Sequence>
         );
@@ -192,6 +194,7 @@ const Hook: React.FC = () => {
       <AbsoluteFill style={{ transform: cam }}>
         <OffthreadVideo
           src={staticFile(CUT)}
+          trimBefore={sec(HOOK_START)}
           transparent
           muted
           style={{
@@ -204,6 +207,21 @@ const Hook: React.FC = () => {
       </AbsoluteFill>
     </AbsoluteFill>
   );
+};
+
+
+/**
+ * Soft lift on a cut. The shared FlashCut peaks at 0.55 opacity, which on a
+ * dark grade reads as a strobe rather than as an accent — this tops out at a
+ * fifth of that and fades over twice as long.
+ */
+const SoftFlash: React.FC<{ color?: string }> = ({ color = CYAN }) => {
+  const frame = useCurrentFrame();
+  const o = interpolate(frame, [0, 2, 9], [0.12, 0.07, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return <AbsoluteFill style={{ backgroundColor: color, opacity: o, pointerEvents: "none" }} />;
 };
 
 const Sfx: React.FC<{ file: string; at: number; dur: number; volume?: number }> = ({
@@ -241,7 +259,7 @@ export const ReelNoAI: React.FC = () => {
       </AbsoluteFill>
 
       {/* 2. Hook with depth type */}
-      <Sequence from={0} durationInFrames={tl(4.85)}>
+      <Sequence from={tl(HOOK_START)} durationInFrames={tl(HOOK_END) - tl(HOOK_START)}>
         <Hook />
       </Sequence>
 
@@ -266,7 +284,7 @@ export const ReelNoAI: React.FC = () => {
         {BADGES.map((b) => {
           const d = sec(b.to - b.from);
           return (
-            <Sequence key={b.from} from={tl(b.from)} durationInFrames={d} layout="none">
+            <Sequence key={b.from} from={tl(b.from) - tl(HOOK_START)} durationInFrames={d} layout="none">
               <PointBadge n={b.n} durationInFrames={d} />
             </Sequence>
           );
@@ -323,10 +341,10 @@ export const ReelNoAI: React.FC = () => {
         })}
       </AbsoluteFill>
 
-      {/* 8. Flash on every hit and on the harder re-frames */}
-      {[6.85, 25.07, 41.17, 52.41, 18.27, 34.15, 44.61].map((at) => (
-        <Sequence key={`f${at}`} from={tl(at)} durationInFrames={4}>
-          <FlashCut color={CYAN} />
+      {/* 8. Soft lift only where a point changes — not on every re-frame */}
+      {SCENES.map((sc) => (
+        <Sequence key={`f${sc.from}`} from={tl(sc.from)} durationInFrames={9}>
+          <SoftFlash />
         </Sequence>
       ))}
 

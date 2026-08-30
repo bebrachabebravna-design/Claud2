@@ -195,7 +195,9 @@ export const SceneSummary: React.FC<{ durationInFrames: number }> = ({ durationI
 /** Closing card: the code word, which is the whole point of the video. */
 export const SceneCode: React.FC<{ durationInFrames: number }> = ({ durationInFrames }) => {
   const frame = useCurrentFrame();
-  const out = useOut(durationInFrames);
+  // No exit fade: this is the final card, and fading it left the clip ending
+  // on black instead of on the code word we are asking people to type.
+  const out = 1;
   const e = useEnter();
   const pulse = 1 + Math.sin(frame / 9) * 0.03;
   return (
