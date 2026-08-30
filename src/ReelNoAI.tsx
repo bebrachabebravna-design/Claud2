@@ -42,7 +42,7 @@ import { Grain } from "./fx";
  * vignette to keep the eye centred and a caption scrim at the bottom.
  */
 const SRC = "src5.mp4";
-const CUT = "cut5-hook0.webm";
+const CUT = "cut5-hook-hq.webm";
 const sec = (s: number) => Math.round(s * FPS);
 const tl = (s: number) => sec(s - TRIM_START);
 const HOLD = 10;
@@ -203,7 +203,9 @@ const Hook: React.FC = () => {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "drop-shadow(0 22px 44px rgba(0,0,0,0.75))",
+            // No drop-shadow: it drew a dark rim around the silhouette, which
+            // is exactly what made the hair look traced. The blur difference
+            // between the two layers is enough separation on its own.
           }}
         />
       </AbsoluteFill>
