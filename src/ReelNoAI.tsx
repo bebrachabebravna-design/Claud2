@@ -179,7 +179,9 @@ const Hook: React.FC = () => {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "brightness(0.45) blur(3px)",
+            // No dimming: the room behind him stays at its natural brightness.
+            // A light blur is all that separates it from the cut-out on top.
+            filter: "blur(3px)",
           }}
         />
       </AbsoluteFill>
