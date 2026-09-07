@@ -1,4 +1,5 @@
 import { Composition } from "remotion";
+import { DURATION as PRONIN_FRAMES, ReelPronin } from "./pronin/ReelPronin";
 import { DURATION_FRAMES, ReelNoAI } from "./ReelNoAI";
 import { PILOT_FRAMES, ReelPilot } from "./ReelPilot";
 import { ReelCase } from "./ReelCase";
@@ -22,6 +23,14 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="ReelPronin"
+        component={ReelPronin}
+        durationInFrames={PRONIN_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="ReelNoAI"
         component={ReelNoAI}

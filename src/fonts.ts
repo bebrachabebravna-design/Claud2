@@ -1,5 +1,7 @@
 import {
   bebas,
+  interCyr,
+  interLat,
   goodVibes,
   montsCyr,
   montsLat,
@@ -58,6 +60,24 @@ const faces = `
   font-style: normal;
   font-display: block;
 }
+/* Inter stands in for SF Pro Text: this project only has SF Pro Display, whose
+   lightest weight is 700, and the Pronin-style layouts need a regular and a
+   medium for secondary label text. Inter matches SF Pro's proportions closely
+   enough that the two sit together without reading as two families. */
+@font-face {
+  font-family: 'Inter';
+  src: url(${interCyr}) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+  font-weight: 100 900;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url(${interLat}) format('woff2');
+  unicode-range: U+0000-00FF, U+2000-206F, U+2190-21BB;
+  font-weight: 100 900;
+  font-display: block;
+}
 @font-face {
   font-family: 'BebasNeue';
   src: url(${bebas}) format('truetype');
@@ -94,6 +114,8 @@ export const scriptFont = "GoodVibes, cursive";
 export const bebasFont = "BebasNeue, Impact, sans-serif";
 /** Geometric grotesque, the default "clean" face in Russian social design. */
 export const montsFont = "Montserrat, sans-serif";
+/** Secondary UI face for label and caption text below display weights. */
+export const uiFont = "Inter, -apple-system, sans-serif";
 
 /**
  * Neirodocs palette. Cyan is the highlight that used to be yellow, blue carries
