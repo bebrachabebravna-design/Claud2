@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, interpolate, Sequence, useCurrentFrame } from "remotion";
 import { displayFont, uiFont } from "../fonts";
 import { ACCENT, ALERT, MODE, Mode, OK, R, sec } from "./theme";
-import { Defocus, Ground, Sweep, Watermark } from "./Chrome";
+import { Defocus, Ground, Sweep } from "./Chrome";
 import { ChapterTitle, CountUp, Label, Selected, WordLine } from "./Type";
 import { AppCard, Chip, IconTile, Obj, Panel, Stat } from "./Cards";
 import { DottedArc, DottedLoop, DottedRun } from "./Flow";
@@ -36,7 +36,12 @@ import {
  * so a recorded take can be dropped underneath and nudged rather than re-timed.
  */
 
-export const HANDLE = "@NOVIKOFF_OFFICIAL";
+/**
+ * No handle burned into the frame. The references carry one, but a watermark
+ * costs attention in the opening seconds and Instagram already labels the
+ * author above the video — `Watermark` stays in Chrome.tsx for the day it is
+ * wanted, unused here.
+ */
 
 /** Chapter boundaries in seconds. The sweep sits at the head of each chapter. */
 const CH = {
@@ -84,7 +89,6 @@ const Chapter: React.FC<{
         <Defocus at={dur - SWEEP} durationInFrames={SWEEP} active={tail}>
           {children}
         </Defocus>
-        <Watermark mode={mode} handle={HANDLE} />
       </AbsoluteFill>
       {head ? (
         <Sequence durationInFrames={SWEEP} layout="none">
