@@ -50,6 +50,39 @@ export const Obj: React.FC<{ name: string; size?: number; tilt?: number; float?:
   );
 };
 
+/**
+ * The supplied 3D pack: real renders with a transparent background, which is
+ * what the Fluent emoji above were only ever standing in for.
+ *
+ * These carry their own lighting, so the drop shadow is much lighter than the
+ * flat art needed — a heavy one under an already-shaded object reads as a
+ * sticker pasted on the frame.
+ */
+export const Icon3D: React.FC<{
+  name: string;
+  size?: number;
+  tilt?: number;
+  float?: boolean;
+  /** Phase offset, so a row of objects does not bob in unison. */
+  phase?: number;
+}> = ({ name, size = 160, tilt = 0, float = false, phase = 0 }) => {
+  const frame = useCurrentFrame();
+  const y = float ? Math.sin(frame / 26 + phase) * 7 : 0;
+  const r = float ? Math.sin(frame / 34 + phase) * 1.6 : 0;
+  return (
+    <img
+      src={staticFile(`icons3d/${name}.png`)}
+      width={size}
+      height={size}
+      style={{
+        display: "block",
+        transform: `translateY(${y}px) rotate(${tilt + r}deg)`,
+        filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.28))",
+      }}
+    />
+  );
+};
+
 /** Rounded square holding an app glyph, matching an iOS icon's proportions. */
 export const IconTile: React.FC<{
   children: React.ReactNode;

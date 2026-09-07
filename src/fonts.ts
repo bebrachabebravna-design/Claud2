@@ -2,6 +2,9 @@ import {
   bebas,
   interCyr,
   interLat,
+  sfProMedium,
+  sfProRegular,
+  sfProSemibold,
   goodVibes,
   montsCyr,
   montsLat,
@@ -60,10 +63,31 @@ const faces = `
   font-style: normal;
   font-display: block;
 }
-/* Inter stands in for SF Pro Text: this project only has SF Pro Display, whose
-   lightest weight is 700, and the Pronin-style layouts need a regular and a
-   medium for secondary label text. Inter matches SF Pro's proportions closely
-   enough that the two sit together without reading as two families. */
+/* The light half of SF Pro Display, supplied by the user. Label and body text
+   in this style is set in the same family as the headlines — mixing a second
+   grotesque for small text was the one thing that read as "not quite Apple".
+   Inter stays below as the fallback for anything SF Pro does not cover. */
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url(${sfProRegular}) format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url(${sfProMedium}) format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'SFProDisplay';
+  src: url(${sfProSemibold}) format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
 @font-face {
   font-family: 'Inter';
   src: url(${interCyr}) format('woff2');
@@ -115,7 +139,7 @@ export const bebasFont = "BebasNeue, Impact, sans-serif";
 /** Geometric grotesque, the default "clean" face in Russian social design. */
 export const montsFont = "Montserrat, sans-serif";
 /** Secondary UI face for label and caption text below display weights. */
-export const uiFont = "Inter, -apple-system, sans-serif";
+export const uiFont = "SFProDisplay, Inter, -apple-system, sans-serif";
 
 /**
  * Neirodocs palette. Cyan is the highlight that used to be yellow, blue carries
