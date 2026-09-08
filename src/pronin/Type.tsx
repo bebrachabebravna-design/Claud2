@@ -39,7 +39,12 @@ export const WordLine: React.FC<{
   stagger?: number;
   /** Frame at which the first word starts arriving. */
   from?: number;
-}> = ({ words, mode, size = T.line, gap = 18, stagger = 4, from = 0 }) => {
+  /** Colour for the un-hit words. Lines over footage need a brighter one than
+   *  the canvas grey, which disappears against a lit wall. */
+  muted?: string;
+  /** Shadow behind the type, for the same reason. */
+  shadow?: string;
+}> = ({ words, mode, size = T.line, gap = 18, stagger = 4, from = 0, muted, shadow }) => {
   return (
     <div
       style={{
@@ -52,18 +57,28 @@ export const WordLine: React.FC<{
       }}
     >
       {words.map((w, i) => (
-        <WordCell key={`${w.text}-${i}`} w={w} mode={mode} size={size} delay={from + i * stagger} />
+        <WordCell
+          key={`${w.text}-${i}`}
+          w={w}
+          mode={mode}
+          size={size}
+          delay={from + i * stagger}
+          muted={muted}
+          shadow={shadow}
+        />
       ))}
     </div>
   );
 };
 
-const WordCell: React.FC<{ w: Word; mode: Mode; size: number; delay: number }> = ({
-  w,
-  mode,
-  size,
-  delay,
-}) => {
+const WordCell: React.FC<{
+  w: Word;
+  mode: Mode;
+  size: number;
+  delay: number;
+  muted?: string;
+  shadow?: string;
+}> = ({ w, mode, size, delay, muted, shadow }) => {
   const m = MODE[mode];
   const e = useSpring(delay);
   const body = (
@@ -74,7 +89,8 @@ const WordCell: React.FC<{ w: Word; mode: Mode; size: number; delay: number }> =
         fontSize: size,
         lineHeight: 1.12,
         letterSpacing: -0.5,
-        color: w.hit || w.select ? m.ink : m.mute,
+        color: w.hit || w.select ? m.ink : muted ?? m.mute,
+        textShadow: shadow,
         whiteSpace: "pre",
       }}
     >
