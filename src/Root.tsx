@@ -2,6 +2,7 @@ import { Composition } from "remotion";
 import { DURATION as PRONIN_FRAMES, ReelPronin } from "./pronin/ReelPronin";
 import { HYBRID_DURATION, ReelHybrid } from "./pronin/ReelHybrid";
 import { CIFRA_DURATION, ReelCifra } from "./pronin/ReelCifra";
+import { NOFACE_DURATION, ReelNoFace } from "./pronin/ReelNoFace";
 import { DURATION_FRAMES, ReelNoAI } from "./ReelNoAI";
 import { PILOT_FRAMES, ReelPilot } from "./ReelPilot";
 import { ReelCase } from "./ReelCase";
@@ -25,6 +26,14 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="ReelNoFace"
+        component={ReelNoFace}
+        durationInFrames={NOFACE_DURATION}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="ReelCifra"
         component={ReelCifra}

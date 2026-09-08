@@ -47,15 +47,29 @@ export const Caption: React.FC<{
   durationInFrames: number;
   size?: number;
   onVideo?: boolean;
-}> = ({ words, durationInFrames, size = 68, onVideo = true }) => {
+  /** Colour of the non-accent words. White reads on a dark ground; on the
+   *  near-white one it disappears, so light chapters pass ink here. */
+  base?: string;
+}> = ({ words, durationInFrames, size = 68, onVideo = true, base = "#FFFFFF" }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
+  // The line assembles fast and then holds absolutely still.
+  //
+  // Spreading the word arrivals across the whole cue — karaoke — keeps the frame
+  // moving every single frame somebody is talking. Measured against the
+  // references that is fatal: their floor is zero motion for half the running
+  // time, which is what makes their arrivals land. Ours never stopped, so every
+  // graphic had to compete with a caption that was always animating.
+  //
+  // Building the whole line inside half a second gives the same readability, one
+  // clean arrival, and then a genuinely frozen frame until the next line.
+  const BUILD = Math.min(14, durationInFrames * 0.5);
   const lens = words.map((w) => Math.max(2, w.text.length));
   const total = lens.reduce((a, b) => a + b, 0);
   let acc = 0;
   const starts = lens.map((l) => {
-    const s = (acc / total) * durationInFrames;
+    const s = (acc / total) * BUILD;
     acc += l;
     return s;
   });
@@ -81,15 +95,14 @@ export const Caption: React.FC<{
     >
       {words.map((w, i) => {
         const start = starts[i];
-        const next = i + 1 < starts.length ? starts[i + 1] : durationInFrames;
         const e = spring({
           frame: frame - start,
           fps,
           config: { damping: 14, stiffness: 240, mass: 0.5 },
         });
-        // "Live" while this word is the one being spoken.
-        const live = frame >= start && frame < next + 4;
-        const lift = live ? interpolate(Math.min(1, (frame - start) / 5), [0, 1], [0, 1]) : 0;
+        // No running highlight: it kept the line moving for the whole cue, which
+        // is exactly the floor that has to stay at zero between arrivals.
+        const lift = 0;
         return (
           <span
             key={`${w.text}-${i}`}
@@ -99,7 +112,7 @@ export const Caption: React.FC<{
               fontSize: size,
               lineHeight: 1.18,
               letterSpacing: -0.5,
-              color: w.hot ? CAP_YELLOW : "#FFFFFF",
+              color: w.hot ? CAP_YELLOW : base,
               display: "inline-block",
               opacity: e,
               transform: `translateY(${(1 - e) * 22}px) scale(${1 + lift * 0.06})`,
@@ -107,7 +120,9 @@ export const Caption: React.FC<{
               // a box behind text, but white on a lit wall needs some help.
               textShadow: onVideo
                 ? "0 2px 10px rgba(0,0,0,0.55), 0 6px 30px rgba(0,0,0,0.45)"
-                : "0 2px 14px rgba(0,0,0,0.25)",
+                : w.hot
+                  ? "0 0 1px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.18)"
+                  : "none",
               filter: `blur(${(1 - e) * 6}px)`,
             }}
           >
