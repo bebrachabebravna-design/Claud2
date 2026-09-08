@@ -130,6 +130,66 @@ export const Icon3D: React.FC<{
   );
 };
 
+
+/**
+ * Glass. The material the references actually use, read off a 4x blow-up of a
+ * card: the fill is almost nothing — the grid stays faintly visible through it —
+ * and what draws the shape is a hairline that is bright along the top-left edge
+ * and fades to almost nothing at the bottom-right, the way a real bevel catches
+ * light from one side.
+ *
+ * A flat fill with a uniform border, which is what this project had, reads as
+ * plastic no matter how good the radius is. The gradient edge is the whole
+ * trick, and it costs one extra element: the outer div carries the gradient and
+ * a hair of padding, the inner one carries the translucent fill.
+ */
+export const Glass: React.FC<{
+  mode: Mode;
+  children?: React.ReactNode;
+  radius?: number;
+  pad?: number | string;
+  width?: number | string;
+  style?: React.CSSProperties;
+  /** Stronger edge and a touch more fill, for the one card that leads a beat. */
+  hero?: boolean;
+}> = ({ mode, children, radius = R.card, pad = 22, width, style, hero = false }) => {
+  const dark = mode === "dark";
+  const edgeTop = dark ? (hero ? 0.62 : 0.46) : hero ? 0.95 : 0.85;
+  const edgeBottom = dark ? 0.08 : 0.35;
+  const fill = dark
+    ? `rgba(255,255,255,${hero ? 0.045 : 0.028})`
+    : `rgba(255,255,255,${hero ? 0.74 : 0.58})`;
+  return (
+    <div
+      style={{
+        width,
+        padding: 1.5,
+        borderRadius: radius,
+        background: `linear-gradient(150deg, rgba(255,255,255,${edgeTop}) 0%, rgba(255,255,255,${
+          (edgeTop + edgeBottom) / 2
+        }) 34%, rgba(255,255,255,${edgeBottom}) 78%)`,
+        boxShadow: dark
+          ? "0 26px 70px rgba(0,0,0,0.55)"
+          : "0 22px 60px rgba(16,18,26,0.10)",
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          borderRadius: radius - 1.5,
+          padding: pad,
+          background: fill,
+          // Frosted, not merely tinted: the ground behind genuinely blurs.
+          backdropFilter: "blur(16px) saturate(1.12)",
+          WebkitBackdropFilter: "blur(16px) saturate(1.12)",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
 /** Rounded square holding an app glyph, matching an iOS icon's proportions. */
 export const IconTile: React.FC<{
   children: React.ReactNode;
@@ -225,24 +285,20 @@ export const Panel: React.FC<{
   delay?: number;
   style?: React.CSSProperties;
 }> = ({ mode, children, width, height, radius = R.panel, pad = 26, delay = 0, style }) => {
-  const m = MODE[mode];
   const e = useSpring(delay);
   return (
     <div
       style={{
         width,
         height,
-        padding: pad,
-        borderRadius: radius,
-        background: m.card,
-        border: `1px solid ${m.cardLine}`,
-        boxShadow: m.shadow,
         opacity: e,
         transform: `translateY(${(1 - e) * 30}px) scale(${interpolate(e, [0, 1], [0.94, 1])})`,
         ...style,
       }}
     >
-      {children}
+      <Glass mode={mode} radius={radius} pad={pad} hero>
+        {children}
+      </Glass>
     </div>
   );
 };
@@ -346,27 +402,32 @@ export const Chip: React.FC<{
 }> = ({ mode, children, delay = 0, icon, tone = "plain" }) => {
   const m = MODE[mode];
   const e = useSpring(delay);
-  const bg = tone === "accent" ? ACCENT : m.inset;
-  const fg = tone === "accent" ? "#fff" : m.mute;
+  const fg = mode === "dark" ? "rgba(255,255,255,0.86)" : m.ink;
   return (
     <div
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 10,
-        padding: "10px 18px",
-        borderRadius: R.chip,
-        background: bg,
-        border: `1px solid ${m.cardLine}`,
-        fontFamily: uiFont,
-        fontSize: T.small,
-        color: fg,
+        display: "inline-block",
         opacity: e,
         transform: `scale(${interpolate(e, [0, 1], [0.8, 1])})`,
       }}
     >
-      {icon}
-      {children}
+      <Glass mode={mode} radius={R.chip} pad="10px 20px">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            fontFamily: uiFont,
+            fontWeight: 500,
+            fontSize: T.small,
+            color: tone === "accent" ? "#fff" : fg,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {icon}
+          {children}
+        </div>
+      </Glass>
     </div>
   );
 };

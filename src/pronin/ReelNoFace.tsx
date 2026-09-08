@@ -13,7 +13,7 @@ import { displayFont, uiFont } from "../fonts";
 import { MODE, Mode, R, sec } from "./theme";
 import { Ground } from "./Chrome";
 import { CountUp } from "./Type";
-import { Chip, Icon3D, Panel } from "./Cards";
+import { Chip, Glass, Icon3D, Panel } from "./Cards";
 import { DottedRun } from "./Flow";
 import { Caption, CAP_YELLOW } from "./Caps";
 import { Cue, SfxTrack } from "./Sound";
@@ -228,21 +228,25 @@ const Ledger: React.FC<{ mode: Mode }> = ({ mode }) => {
             <div
               key={r}
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "14px 20px",
-                borderRadius: 18,
-                background: m.inset,
-                border: `1px solid ${m.cardLine}`,
                 opacity: e * (1 - reveal * 0.72),
                 transform: `translateX(${(1 - e) * -22}px)`,
               }}
             >
-              <span style={{ fontFamily: uiFont, fontSize: 32, color: m.ink }}>{r}</span>
-              <span style={{ fontFamily: uiFont, fontSize: 30, color: m.mute }}>
-                {["420 000", "1 850 000", "610 000", "2 300 000", "180 000"][i]} ₽
-              </span>
+              <div
+                style={{
+                  borderRadius: 18,
+                  padding: "14px 20px",
+                  background: mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(16,18,26,0.04)",
+                  border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.13)" : "rgba(16,18,26,0.07)"}`,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontFamily: uiFont, fontSize: 32, color: m.ink }}>{r}</span>
+                  <span style={{ fontFamily: uiFont, fontSize: 30, color: m.mute }}>
+                    {["420 000", "1 850 000", "610 000", "2 300 000", "180 000"][i]} ₽
+                  </span>
+                </div>
+              </div>
             </div>
           );
         })}
@@ -254,6 +258,7 @@ const Ledger: React.FC<{ mode: Mode }> = ({ mode }) => {
             justifyContent: "space-between",
             padding: "14px 20px",
             borderRadius: 18,
+            background: reveal > 0.2 ? "rgba(255,214,10,0.12)" : "rgba(255,255,255,0.03)",
             border: `2px dashed ${reveal > 0.2 ? CAP_YELLOW : m.cardLine}`,
             opacity: interpolate(frame, [60, 76], [0, 1], {
               extrapolateLeft: "clamp",
@@ -282,9 +287,8 @@ const Ledger: React.FC<{ mode: Mode }> = ({ mode }) => {
 /* ------------------------------------------------------------------ */
 /* Chapter 3 — the working day, and how much of it is search            */
 
-const DayBar: React.FC<{ mode: Mode; litFrom: number }> = ({ mode, litFrom }) => {
+const DayBar: React.FC<{ litFrom: number }> = ({ litFrom }) => {
   const frame = useCurrentFrame();
-  const m = MODE[mode];
   return (
     <div style={{ display: "flex", gap: 10 }}>
       {Array.from({ length: 8 }).map((_, i) => {
@@ -301,8 +305,9 @@ const DayBar: React.FC<{ mode: Mode; litFrom: number }> = ({ mode, litFrom }) =>
               width: 118,
               height: 62,
               borderRadius: 12,
-              background: lit ? CAP_YELLOW : m.inset,
-              border: `1px solid ${m.cardLine}`,
+              background: lit ? CAP_YELLOW : "rgba(255,255,255,0.07)",
+              backdropFilter: "blur(16px)",
+              border: `1px solid rgba(255,255,255,${lit ? 0.5 : 0.22})`,
               opacity: e,
               transform: `scaleY(${interpolate(e, [0, 1], [0.4, 1])})`,
             }}
@@ -384,8 +389,9 @@ const Crew: React.FC<{ mode: Mode; delay: number }> = ({ mode, delay }) => {
               width: 78,
               height: 78,
               borderRadius: 22,
-              background: m.inset,
-              border: `1px solid ${m.cardLine}`,
+              background: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(16,18,26,0.05)",
+              backdropFilter: "blur(18px)",
+              border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.20)" : "rgba(16,18,26,0.10)"}`,
               opacity: e,
               transform: `scale(${interpolate(e, [0, 1], [0.3, 1])})`,
               display: "flex",
@@ -423,8 +429,9 @@ const Race: React.FC<{ mode: Mode }> = ({ mode }) => {
           style={{
             height: 42,
             borderRadius: 14,
-            background: m.inset,
-            border: `1px solid ${m.cardLine}`,
+            background: "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(16px)",
+            border: "1px solid rgba(255,255,255,0.22)",
             overflow: "hidden",
           }}
         >
@@ -463,9 +470,16 @@ const Graphics: React.FC = () => (
         </div>
       </Beat>
       <Beat at={5.3} dur={2.6}>
-        <div style={{ position: "absolute", left: 80, top: 430 }}>
+        <div style={{ position: "absolute", left: 60, top: 400 }}>
           <Icon3D name="target-arrow" size={330} float life={sec(2.6)} fromX={-150} spin={24} />
         </div>
+      </Beat>
+      <Beat at={6.5} dur={1.7}>
+        <Center top={1010}>
+          <In delay={0} life={sec(1.7)}>
+            <Chip mode="dark">она есть — просто не записана</Chip>
+          </In>
+        </Center>
       </Beat>
     </Beat>
 
@@ -511,9 +525,16 @@ const Graphics: React.FC = () => (
         ))}
       </div>
       <Beat at={2.6} dur={2.9}>
-        <div style={{ position: "absolute", left: 0, right: 0, top: 1030, display: "flex", justifyContent: "center" }}>
-          <Icon3D name="magnifier" size={310} float life={sec(2.9)} fromY={90} />
+        <div style={{ position: "absolute", left: 0, right: 0, top: 880, display: "flex", justifyContent: "center" }}>
+          <Icon3D name="magnifier" size={240} float life={sec(2.9)} fromY={90} />
         </div>
+      </Beat>
+      <Beat at={4.0} dur={1.5}>
+        <Center top={700}>
+          <In delay={0} life={sec(1.5)}>
+            <Chip mode="light">каждый день</Chip>
+          </In>
+        </Center>
       </Beat>
     </Beat>
 
@@ -532,7 +553,7 @@ const Graphics: React.FC = () => (
       </Center>
       <Center top={950} gap={18}>
         <In delay={52}>
-          <DayBar mode="dark" litFrom={52} />
+          <DayBar litFrom={52} />
         </In>
         <In delay={78}>
           <Sub mode="dark" size={30}>рабочий день — 8 часов</Sub>
@@ -544,7 +565,7 @@ const Graphics: React.FC = () => (
     <Beat at={19.6} dur={6.0}>
       <Center top={500} gap={26}>
         <In delay={2}>
-          <Icon3D name="users-group" size={310} float />
+          <Icon3D name="users-group" size={230} float />
         </In>
         <div style={{ display: "flex", gap: 18 }}>
           <In delay={14}>
@@ -560,6 +581,15 @@ const Graphics: React.FC = () => (
           <Crew mode="light" delay={40} />
         </In>
       </Center>
+      <Beat at={2.2} dur={3.0}>
+        <div style={{ position: "absolute", right: 70, top: 360 }}>
+          <In delay={0}>
+            <Glass mode="light" radius={26} pad="14px 28px">
+              <CountUp mode="light" to={24} durationInFrames={30} size={86} group={false} />
+            </Glass>
+          </In>
+        </div>
+      </Beat>
     </Beat>
 
     {/* 5. The measurement and the money. 25.9 – 32.0 */}
@@ -634,9 +664,9 @@ const Graphics: React.FC = () => (
 
     {/* 7. The competitor. 36.4 – 44.0 */}
     <Beat at={36.4} dur={7.6}>
-      <Center top={470} gap={28}>
+      <Center top={420} gap={26}>
         <In delay={2}>
-          <Icon3D name="target-arrow" size={330} float />
+          <Icon3D name="target-arrow" size={250} float />
         </In>
         <div style={{ display: "flex", gap: 18 }}>
           <In delay={16}>
@@ -660,8 +690,8 @@ const Graphics: React.FC = () => (
         </Center>
       </Beat>
       <Beat at={3.8} dur={3.8}>
-        <div style={{ position: "absolute", right: 90, top: 1080 }}>
-          <Icon3D name="rocket-launch" size={340} float life={sec(3.8)} fromY={190} spin={-28} />
+        <div style={{ position: "absolute", right: 30, top: 790 }}>
+          <Icon3D name="rocket-launch" size={210} float life={sec(3.8)} fromX={-260} fromY={40} spin={-24} />
         </div>
       </Beat>
       <Beat at={4.4} dur={1.0}>
