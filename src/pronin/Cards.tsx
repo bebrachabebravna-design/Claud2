@@ -51,12 +51,15 @@ export const Obj: React.FC<{ name: string; size?: number; tilt?: number; float?:
 };
 
 /**
- * The supplied 3D pack: real renders with a transparent background, which is
- * what the Fluent emoji above were only ever standing in for.
+ * The supplied 3D pack: real renders with a transparent background.
  *
- * These carry their own lighting, so the drop shadow is much lighter than the
- * flat art needed — a heavy one under an already-shaded object reads as a
- * sticker pasted on the frame.
+ * Every object arrives travelling and blurred and settles on an overshooting
+ * spring, and leaves by scaling down rather than cutting. Objects that appear
+ * and disappear on a hard frame are the single clearest tell of an edit
+ * assembled rather than animated.
+ *
+ * They carry their own lighting, so the drop shadow stays light — a heavy one
+ * under an already-shaded render reads as a sticker pasted on the frame.
  */
 export const Icon3D: React.FC<{
   name: string;
@@ -65,10 +68,51 @@ export const Icon3D: React.FC<{
   float?: boolean;
   /** Phase offset, so a row of objects does not bob in unison. */
   phase?: number;
-}> = ({ name, size = 160, tilt = 0, float = false, phase = 0 }) => {
+  /** Frame it arrives on, relative to its Sequence. */
+  delay?: number;
+  /** Total life in frames. Given one, the object also leaves properly. */
+  life?: number;
+  /** Arrival direction, in canvas pixels travelled. */
+  fromX?: number;
+  fromY?: number;
+  spin?: number;
+}> = ({
+  name,
+  size = 160,
+  tilt = 0,
+  float = false,
+  phase = 0,
+  delay = 0,
+  life,
+  fromX = 0,
+  fromY = 90,
+  spin = -18,
+}) => {
   const frame = useCurrentFrame();
-  const y = float ? Math.sin(frame / 26 + phase) * 7 : 0;
-  const r = float ? Math.sin(frame / 34 + phase) * 1.6 : 0;
+  const { fps } = useVideoConfig();
+
+  // Arrival: a spring that overshoots, travelling in from a direction and
+  // unblurring as it settles. A plain opacity pop is what made the previous cut
+  // look like slides — an object has to arrive from somewhere.
+  const e = spring({
+    frame: frame - delay,
+    fps,
+    config: { damping: 13, stiffness: 170, mass: 0.9 },
+  });
+
+  // Departure: scale down and blur out rather than vanishing on a frame.
+  const leave = life
+    ? interpolate(frame, [delay + life - 10, delay + life], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 0;
+
+  const y = (float ? Math.sin(frame / 26 + phase) * 8 : 0) + (1 - e) * fromY;
+  const x = (float ? Math.cos(frame / 34 + phase) * 5 : 0) + (1 - e) * fromX;
+  const r = tilt + (float ? Math.sin(frame / 30 + phase) * 2.2 : 0) + (1 - e) * spin;
+  const scale = interpolate(e, [0, 1], [0.35, 1]) * (1 - leave * 0.25);
+
   return (
     <img
       src={staticFile(`icons3d/${name}.png`)}
@@ -76,8 +120,11 @@ export const Icon3D: React.FC<{
       height={size}
       style={{
         display: "block",
-        transform: `translateY(${y}px) rotate(${tilt + r}deg)`,
-        filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.28))",
+        opacity: e * (1 - leave),
+        transform: `translate(${x}px, ${y}px) rotate(${r}deg) scale(${scale})`,
+        filter: `drop-shadow(0 20px 30px rgba(0,0,0,0.28)) blur(${
+          (1 - e) * 10 + leave * 8
+        }px)`,
       }}
     />
   );

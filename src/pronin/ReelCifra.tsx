@@ -11,613 +11,563 @@ import {
   useVideoConfig,
 } from "remotion";
 import { displayFont, uiFont } from "../fonts";
-import { ACCENT, ALERT, FPS, MODE, Mode, OK, POP, R, sec } from "./theme";
-import { Defocus, Ground, Sweep } from "./Chrome";
-import { ChapterTitle, CountUp, Label, Selected, WordLine } from "./Type";
-import { Chip, Icon3D, Panel, Stat } from "./Cards";
-import { DottedRun } from "./Flow";
+import { MODE, Mode, sec } from "./theme";
+import { Ground } from "./Chrome";
+import { CountUp } from "./Type";
+import { Chip, Icon3D } from "./Cards";
+import { Caption, CAP_YELLOW } from "./Caps";
 import { Cue, SfxTrack } from "./Sound";
-import { BEATS, CHAPTERS, Chap, PHRASES, REEL_END, TRIM } from "./cifra-data";
+import {
+  BEATS,
+  CAPS,
+  CAP_TOP,
+  CUTOUTS,
+  FRAMES,
+  GROUNDS,
+  REEL_END,
+  Rect,
+  SHOTS,
+  TRIM,
+  t,
+} from "./cifra-data";
 
 /**
- * «Самая дорогая статья расходов» — the full reel, in the reference style.
+ * «Самая дорогая статья расходов».
  *
- * The take is a static talking head, so the edit alternates two grounds: the
- * face full frame for the claims a person has to be trusted for, and the pure
- * canvas for everything that is really a number. Chapters join with the light
- * sweep and never hard-cut, exactly as in the references.
- *
- * The voice runs as its own track across the whole composition, so it keeps
- * going while the picture leaves the speaker — which is what makes the graphic
- * chapters read as illustration rather than as an interruption.
+ * Built as one continuous world rather than as alternating blocks. The ground
+ * cross-fades between the two palettes, the speaker travels between framings as
+ * a card in the same system as everything else, captions run unbroken along the
+ * bottom, and objects arrive and leave with real motion. Nothing in the reel
+ * cuts; every change is a move.
  */
 
 export const CIFRA_DURATION = sec(REEL_END);
-const SWEEP = 14;
 
 /* ------------------------------------------------------------------ */
 
-/**
- * The take, full frame, with a slow push so a locked-off camera never sits
- * still, and a soft scrim top and bottom so white type stays legible over the
- * lit wall without a plate under it.
- */
-const Speaker: React.FC<{ chap: Chap; durationInFrames: number }> = ({
-  chap,
-  durationInFrames,
-}) => {
+/** Interpolate the speaker's rectangle across the keyframes in SHOTS. */
+const useShot = (): { r: Rect; travel: number } => {
   const frame = useCurrentFrame();
-  const [z0, z1] = chap.zoom ?? [1, 1.05];
-  const z = interpolate(frame, [0, durationInFrames], [z0, z1]);
+  const { fps } = useVideoConfig();
+  const now = frame / fps;
+
+  let i = 0;
+  for (let k = 0; k < SHOTS.length; k++) if (now >= SHOTS[k].at) i = k;
+  const cur = FRAMES[SHOTS[i].frame];
+  const prev = i > 0 ? FRAMES[SHOTS[i - 1].frame] : cur;
+
+  // A sprung move, not a linear one: the card should arrive and settle the way
+  // every other element in this system does.
+  const p =
+    i === 0
+      ? 1
+      : spring({
+          frame: frame - Math.round(SHOTS[i].at * fps),
+          fps,
+          config: { damping: 20, stiffness: 90, mass: 1.1 },
+        });
+
+  const mix = (a: number, b: number) => a + (b - a) * p;
+  return {
+    r: {
+      x: mix(prev.x, cur.x),
+      y: mix(prev.y, cur.y),
+      w: mix(prev.w, cur.w),
+      h: mix(prev.h, cur.h),
+      radius: mix(prev.radius, cur.radius),
+      oy: mix(prev.oy, cur.oy),
+    },
+    // 0 while parked, up to 1 mid-move — used to add a touch of blur so the
+    // travel reads as motion rather than as a resize.
+    travel: i === 0 ? 0 : Math.sin(p * Math.PI),
+  };
+};
+
+/**
+ * The speaker. One element for the whole reel: it never unmounts, so the take
+ * plays continuously and the framing changes are moves rather than cuts.
+ */
+const Speaker: React.FC<{ mode: Mode }> = ({ mode }) => {
+  const frame = useCurrentFrame();
+  const { r, travel } = useShot();
+  const m = MODE[mode];
+  // Hand over to the matted version where one exists, rather than showing both.
+  const cutFade = CUTOUTS.reduce((acc, c) => {
+    const inAt = sec(c.from);
+    const outAt = sec(c.from + c.dur);
+    const f = interpolate(
+      frame,
+      [inAt - 6, inAt + 2, outAt - 2, outAt + 6],
+      [0, 1, 1, 0],
+      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    );
+    return Math.max(acc, f);
+  }, 0);
+  const full = r.w > 1040;
+  // A slow drift so the locked-off camera never sits perfectly still.
+  // Always above 1: the plate is 1072 wide on a 1080 canvas, so any scale
+  // below unity opens a black band down the edge.
+  const drift = 1.02 + Math.sin(frame / 150) * 0.012;
   return (
-    <AbsoluteFill style={{ overflow: "hidden", background: "#000" }}>
-      <AbsoluteFill style={{ transform: `scale(${z})` }}>
-        <OffthreadVideo
-          src={staticFile("speaker-cifra.mp4")}
-          startFrom={Math.round((chap.from + TRIM) * FPS)}
-          muted
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: `50% ${chap.oy ?? 44}%`,
-          }}
-        />
-      </AbsoluteFill>
-      <AbsoluteFill
+    <div
+      style={{
+        position: "absolute",
+        left: r.x,
+        top: r.y,
+        width: r.w,
+        height: r.h,
+        borderRadius: r.radius,
+        overflow: "hidden",
+        background: "#000",
+        border: full ? "none" : `1px solid ${m.cardLine}`,
+        boxShadow: full ? "none" : m.shadow,
+        filter: `blur(${travel * 2.5}px)`,
+        opacity: 1 - cutFade,
+      }}
+    >
+      <OffthreadVideo
+        src={staticFile("speaker-cifra.mp4")}
+        startFrom={sec(TRIM)}
+        muted
         style={{
-          background:
-            "linear-gradient(180deg, rgba(8,6,14,0.45) 0%, rgba(8,6,14,0) 26%, rgba(8,6,14,0) 52%, rgba(8,6,14,0.62) 100%)",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: `50% ${r.oy}%`,
+          transform: `scale(${drift})`,
         }}
       />
-    </AbsoluteFill>
+      {/* Scrim only while full bleed — a card is small enough that the caption
+          never sits over it. */}
+      {full ? (
+        <AbsoluteFill
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(8,6,14,0.40) 0%, rgba(8,6,14,0) 24%, rgba(8,6,14,0) 46%, rgba(8,6,14,0.70) 100%)",
+          }}
+        />
+      ) : null}
+    </div>
   );
 };
 
-/** A spoken line, held only while it is being said. */
-const Phrase: React.FC<{
-  words: React.ComponentProps<typeof WordLine>["words"];
-  size?: number;
-  top: number;
-  durationInFrames: number;
-  mode: Mode;
-  /** Set on speaker chapters, where the ground is a lit wall rather than a flat
-   *  canvas and the canvas grey would disappear into it. */
-  onVideo?: boolean;
-}> = ({ words, size = 66, top, durationInFrames, mode, onVideo }) => {
+/**
+ * The matted speaker, standing on the canvas itself.
+ *
+ * This is the depth beat: because he is cut out of his plate, an object rendered
+ * before this layer genuinely passes behind him. It reads as dimensional in a
+ * way that no amount of overlay does, and it is the single most expensive-looking
+ * move available with one static camera.
+ */
+const CutOut: React.FC = () => {
   const frame = useCurrentFrame();
-  const out = interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], {
+  return (
+    <>
+      {CUTOUTS.map((c) => {
+        const inAt = sec(c.from);
+        const outAt = sec(c.from + c.dur);
+        const o = interpolate(
+          frame,
+          [inAt - 6, inAt + 2, outAt - 2, outAt + 6],
+          [0, 1, 1, 0],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+        );
+        if (o <= 0) return null;
+        return (
+          <Sequence
+            key={c.src}
+            from={inAt}
+            durationInFrames={Math.round(c.dur * 30) + 8}
+            layout="none"
+          >
+            <AbsoluteFill style={{ opacity: o }}>
+              <OffthreadVideo
+                src={staticFile(c.src)}
+                transparent
+                muted
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </AbsoluteFill>
+          </Sequence>
+        );
+      })}
+    </>
+  );
+};
+
+/** Cross-fading ground, so the two worlds never hard-cut. */
+const Grounds: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const now = frame / fps;
+  let i = 0;
+  for (let k = 0; k < GROUNDS.length; k++) if (now >= GROUNDS[k].at) i = k;
+  const p =
+    i === 0
+      ? 1
+      : interpolate(frame, [sec(GROUNDS[i].at), sec(GROUNDS[i].at) + 12], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        });
+  const prev = i > 0 ? GROUNDS[i - 1].mode : GROUNDS[0].mode;
+  return (
+    <>
+      <Ground mode={prev} />
+      <AbsoluteFill style={{ opacity: p }}>
+        <Ground mode={GROUNDS[i].mode} />
+      </AbsoluteFill>
+    </>
+  );
+};
+
+/** The ground's mode at a given reel second, for colouring elements. */
+const modeAt = (s: number): Mode => {
+  let m: Mode = "dark";
+  for (const g of GROUNDS) if (s >= g.at) m = g.mode;
+  return m;
+};
+
+/* ------------------------------------------------------------------ */
+/* Graphic beats. Each is a Sequence placed on the composition clock.    */
+
+const Beat: React.FC<{ at: number; dur: number; children: React.ReactNode }> = ({
+  at,
+  dur,
+  children,
+}) => (
+  <Sequence from={sec(at)} durationInFrames={sec(dur)} layout="none">
+    {children}
+  </Sequence>
+);
+
+/** A number that owns the frame, with its caption under it. */
+const Figure: React.FC<{
+  value: React.ReactNode;
+  caption: string;
+  mode: Mode;
+  life: number;
+  size?: number;
+}> = ({ value, caption, mode, life, size = 168 }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const m = MODE[mode];
+  const e = spring({ frame, fps, config: { damping: 15, stiffness: 150, mass: 0.9 } });
+  const out = interpolate(frame, [life - 12, life], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   return (
-    <div
-      style={{
-        position: "absolute",
-        top,
-        left: 60,
-        right: 60,
-        display: "flex",
-        justifyContent: "center",
-        opacity: out,
-      }}
-    >
-      <WordLine
-        mode={mode}
-        words={words}
-        size={size}
-        stagger={3}
-        muted={onVideo ? "rgba(255,255,255,0.78)" : undefined}
-        shadow={onVideo ? "0 3px 22px rgba(0,0,0,0.55)" : undefined}
-      />
-    </div>
-  );
-};
-
-const usePop = (delay: number) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  return spring({ frame: frame - delay, fps, config: POP });
-};
-
-/** Object that flies in beside the speaker, on the beat of a word. */
-const SideObject: React.FC<{
-  name: string;
-  size?: number;
-  left?: number;
-  right?: number;
-  top: number;
-}> = ({ name, size = 190, left, right, top }) => {
-  const e = usePop(0);
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left,
-        right,
-        top,
-        opacity: e,
-        transform: `scale(${interpolate(e, [0, 1], [0.4, 1])}) rotate(${(1 - e) * -14}deg)`,
-      }}
-    >
-      <Icon3D name={name} size={size} float />
-    </div>
-  );
-};
-
-/* ------------------------------------------------------------------ */
-/* Graphic chapters                                                     */
-
-/** 2. What the invisible cost actually is: the search itself. */
-const SearchChapter: React.FC = () => {
-  const frame = useCurrentFrame();
-  return (
-    <AbsoluteFill>
-      <div style={{ position: "absolute", top: 250, left: 0, right: 0 }}>
-        <ChapterTitle
-          mode="light"
-          left="это"
-          right="время"
-          size={96}
-          object={<Icon3D name="magnifier" size={116} float />}
-        />
-      </div>
-      {/* Folders piling up one per beat: the pile is the point, not any one of
-          them, so they land fast and slightly scattered. */}
-      {Array.from({ length: 6 }).map((_, i) => {
-        const e = spring({ frame: frame - (14 + i * 7), fps: FPS, config: POP });
-        const col = i % 3;
-        const row = Math.floor(i / 3);
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: 190 + col * 250,
-              top: 560 + row * 230,
-              opacity: e,
-              transform: `scale(${interpolate(e, [0, 1], [0.5, 1])}) rotate(${
-                (i % 2 ? 5 : -5) * (1 - e * 0.6)
-              }deg)`,
-            }}
-          >
-            <Icon3D name="folder" size={175} float phase={i} />
-          </div>
-        );
-      })}
-    </AbsoluteFill>
-  );
-};
-
-/** 3. The research figure, alone on a dark ground. */
-const ResearchChapter: React.FC = () => (
-  <AbsoluteFill>
-    <div style={{ position: "absolute", top: 330, left: 0, right: 0, textAlign: "center" }}>
-      <Label mode="dark" size={36}>
-        по исследованиям, в среднем
-      </Label>
-    </div>
-    <div
-      style={{
-        position: "absolute",
-        top: 560,
-        left: 0,
-        right: 0,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 10,
-      }}
-    >
-      <Sequence from={16} layout="none">
-        <BigFigure value="1,5 часа" caption="в день на человека" mode="dark" />
-      </Sequence>
-    </div>
-    <div style={{ position: "absolute", top: 1050, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
-      <Sequence from={22} layout="none">
-        <Icon3D name="analytics-search" size={230} float />
-      </Sequence>
-    </div>
-  </AbsoluteFill>
-);
-
-const BigFigure: React.FC<{
-  value: React.ReactNode;
-  caption: string;
-  mode: Mode;
-  color?: string;
-}> = ({ value, caption, mode, color }) => {
-  const e = usePop(0);
-  const m = MODE[mode];
-  return (
-    <div style={{ textAlign: "center", opacity: e }}>
+    <div style={{ textAlign: "center", opacity: e * out }}>
       <div
         style={{
           fontFamily: displayFont,
           fontWeight: 800,
-          fontSize: 156,
+          fontSize: size,
           letterSpacing: -3,
           lineHeight: 1,
-          color: color ?? m.ink,
-          transform: `scale(${interpolate(e, [0, 1], [0.7, 1])})`,
+          color: m.ink,
+          transform: `translateY(${(1 - e) * 40}px) scale(${interpolate(e, [0, 1], [0.72, 1])})`,
+          filter: `blur(${(1 - e) * 8}px)`,
         }}
       >
         {value}
       </div>
-      <div style={{ fontFamily: uiFont, fontSize: 36, color: m.mute, marginTop: 8 }}>{caption}</div>
+      <div
+        style={{
+          fontFamily: uiFont,
+          fontWeight: 500,
+          fontSize: 38,
+          color: m.mute,
+          marginTop: 10,
+          opacity: interpolate(e, [0.5, 1], [0, 1], { extrapolateLeft: "clamp" }),
+        }}
+      >
+        {caption}
+      </div>
     </div>
   );
 };
 
-/** 5. The case: what was measured, and what it came to in money. */
-const CaseChapter: React.FC = () => (
-  <AbsoluteFill>
-    <div style={{ position: "absolute", top: 240, left: 0, right: 0 }}>
-      <ChapterTitle
-        mode="light"
-        left="засекли"
-        right="секундомером"
-        size={62}
-        object={<Icon3D name="analytics-search" size={98} float />}
-      />
-    </div>
-    <div style={{ position: "absolute", top: 470, left: 0, right: 0, textAlign: "center" }}>
-      <Sequence from={10} layout="none">
-        <Label mode="light" size={36}>
-          за сколько менеджер отвечает на обычный вопрос
-        </Label>
-      </Sequence>
-    </div>
-
-    <div
-      style={{
-        position: "absolute",
-        top: 640,
-        left: 0,
-        right: 0,
-        display: "flex",
-        justifyContent: "center",
-        gap: 40,
-      }}
-    >
-      <Sequence from={112} layout="none">
-        <Stat mode="light" value="11 минут" caption="на один вопрос" />
-      </Sequence>
-    </div>
-
-    <div
-      style={{
-        position: "absolute",
-        top: 830,
-        left: 0,
-        right: 0,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Sequence from={134} layout="none">
-        <>
-          <CountUp mode="light" to={238000} durationInFrames={36} size={150} suffix=" ₽" />
-          <div style={{ textAlign: "center" }}>
-            <Label mode="light" size={36} delay={20}>
-              в месяц — на одном отделе
-            </Label>
-          </div>
-        </>
-      </Sequence>
-    </div>
-
-    <div style={{ position: "absolute", top: 1210, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
-      <Sequence from={160} layout="none">
-        <Icon3D name="growth-chart" size={220} float />
-      </Sequence>
-    </div>
-  </AbsoluteFill>
+/** Row helper for objects that live in the graphics band under the card. */
+const Band: React.FC<{ top: number; children: React.ReactNode; gap?: number }> = ({
+  top,
+  children,
+  gap = 40,
+}) => (
+  <div
+    style={{
+      position: "absolute",
+      top,
+      left: 0,
+      right: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap,
+    }}
+  >
+    {children}
+  </div>
 );
 
-/**
- * 6. The seventh folder. A row of folders where only the last one is lit is the
- * whole joke of the line, so it gets the frame to itself.
- */
-const FoldersChapter: React.FC = () => {
-  const frame = useCurrentFrame();
-  return (
-    <AbsoluteFill>
-      <div style={{ position: "absolute", top: 300, left: 0, right: 0, textAlign: "center" }}>
-        <Label mode="dark" size={38}>
-          люди просто открывают
-        </Label>
+const Graphics: React.FC = () => (
+  <>
+    {/* Hook: two objects, arriving from opposite sides beside his head. */}
+    <Beat at={BEATS.hookSearch} dur={2.5}>
+      <div style={{ position: "absolute", right: 60, top: 560 }}>
+        <Icon3D name="analytics-search" size={210} float life={sec(2.5)} fromX={160} fromY={40} />
       </div>
+    </Beat>
+    {/* Rises from below and passes behind the matted speaker. */}
+    <Beat at={BEATS.hookRival} dur={2.4}>
+      <div style={{ position: "absolute", left: 560, top: 620 }}>
+        <Icon3D name="target-arrow" size={430} float life={sec(2.4)} fromY={430} spin={26} />
+      </div>
+    </Beat>
+
+    {/* Folders piling up under the card, one per beat. */}
+    <Beat at={BEATS.folders} dur={5.4}>
+      <Band top={870} gap={26}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Icon3D
+            key={i}
+            name="folder"
+            size={168}
+            float
+            phase={i}
+            delay={i * 8}
+            life={sec(5.4) - i * 8}
+            fromY={70 + i * 8}
+            spin={i % 2 ? 16 : -16}
+          />
+        ))}
+      </Band>
+    </Beat>
+
+    {/* The research figure, with him shrunk into the corner. */}
+    <Beat at={BEATS.hours} dur={4.2}>
+      <div style={{ position: "absolute", left: 60, top: 620, width: 560 }}>
+        <Figure value="1,5 часа" caption="в день на человека" mode="dark" life={sec(4.2)} size={148} />
+      </div>
+      <div style={{ position: "absolute", left: 190, top: 980 }}>
+        <Icon3D name="analytics-search" size={230} float delay={10} life={sec(4.2) - 10} fromY={80} />
+      </div>
+    </Beat>
+
+    {/* Who the case is about, over the full-bleed shot. */}
+    <Beat at={BEATS.caseChips} dur={2.8}>
+      <Band top={880} gap={22}>
+        <Chip mode="dark" icon={<Icon3D name="users-group" size={36} />}>
+          24 менеджера
+        </Chip>
+        <Chip mode="dark" delay={7}>
+          бытовая техника
+        </Chip>
+      </Band>
+    </Beat>
+
+    {/* What was measured. */}
+    <Beat at={BEATS.stopwatch} dur={3.6}>
+      <Band top={900}>
+        <Icon3D name="analytics-search" size={240} float life={sec(3.6)} fromY={90} />
+      </Band>
+    </Beat>
+
+    {/* The two numbers, arriving one after the other. */}
+    <Beat at={BEATS.minutes} dur={1.9}>
+      <Band top={860}>
+        <Figure value="11 минут" caption="на один вопрос клиента" mode="light" life={sec(1.9)} size={132} />
+      </Band>
+    </Beat>
+    <Beat at={BEATS.money} dur={2.6}>
+      <Band top={840}>
+        <div style={{ textAlign: "center" }}>
+          <CountUp mode="light" to={238000} durationInFrames={30} size={158} suffix=" ₽" />
+          <div style={{ fontFamily: uiFont, fontWeight: 500, fontSize: 38, color: MODE.light.mute }}>
+            в месяц — на одном отделе
+          </div>
+        </div>
+      </Band>
+    </Beat>
+
+    {/* Seven folders, only the last one lit. */}
+    <Beat at={BEATS.seventh} dur={3.8}>
       <div
         style={{
           position: "absolute",
-          top: 560,
-          left: 0,
-          right: 0,
+          left: 70,
+          top: 700,
+          width: 540,
           display: "flex",
-          justifyContent: "center",
           flexWrap: "wrap",
-          gap: 26,
-          maxWidth: 900,
-          margin: "0 auto",
+          gap: 18,
         }}
       >
         {Array.from({ length: 7 }).map((_, i) => {
-          const e = spring({ frame: frame - (6 + i * 5), fps: FPS, config: POP });
           const last = i === 6;
           return (
             <div
               key={i}
               style={{
-                opacity: last ? e : e * 0.62,
-                transform: `scale(${interpolate(e, [0, 1], [0.5, last ? 1.2 : 1])})`,
-                filter: last ? "none" : "grayscale(0.55) brightness(0.85)",
+                opacity: last ? 1 : 0.42,
+                filter: last ? "none" : "grayscale(0.5) brightness(0.8)",
               }}
             >
-              <Icon3D name="folder" size={150} float={last} phase={i} />
+              <Icon3D
+                name="folder"
+                size={last ? 168 : 140}
+                float={last}
+                phase={i}
+                delay={i * 5}
+                life={sec(3.8) - i * 5}
+                fromY={50}
+                spin={last ? -22 : 8}
+              />
             </div>
           );
         })}
       </div>
-    </AbsoluteFill>
+    </Beat>
+
+    {/* The competitor: chips, then the rocket. */}
+    <Beat at={BEATS.rival} dur={5.8}>
+      <Band top={840} gap={26}>
+        <Chip mode="light" icon={<Icon3D name="ai-chip" size={36} />}>
+          нашёл заранее
+        </Chip>
+        <Chip mode="light" delay={8} icon={<Icon3D name="shield-check" size={36} />}>
+          убрал через ИИ
+        </Chip>
+      </Band>
+    </Beat>
+    <Beat at={BEATS.rocket} dur={3.8}>
+      <Band top={950}>
+        <Icon3D name="rocket-launch" size={300} float life={sec(3.8)} fromY={150} spin={-26} />
+      </Band>
+    </Beat>
+
+    {/* The ask. */}
+    <Beat at={BEATS.cta} dur={5.0}>
+      <div style={{ position: "absolute", right: 70, top: 430 }}>
+        <Icon3D name="chat-bubbles" size={200} float fromX={150} fromY={0} />
+      </div>
+      <Band top={980}>
+        <CodeWord />
+      </Band>
+    </Beat>
+  </>
+);
+
+/**
+ * The code word, in the reel's own accent rather than the interface blue: it is
+ * the one thing on screen the viewer is asked to type.
+ */
+const CodeWord: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const e = spring({ frame, fps, config: { damping: 12, stiffness: 200, mass: 0.7 } });
+  const pulse = 1 + Math.sin(frame / 10) * 0.02;
+  return (
+    <div style={{ textAlign: "center" }}>
+      <div
+        style={{
+          fontFamily: uiFont,
+          fontWeight: 500,
+          fontSize: 40,
+          color: "rgba(255,255,255,0.86)",
+          opacity: e,
+          marginBottom: 14,
+        }}
+      >
+        напиши в комментариях
+      </div>
+      <div
+        style={{
+          display: "inline-block",
+          padding: "12px 42px",
+          borderRadius: 22,
+          background: CAP_YELLOW,
+          transform: `scale(${interpolate(e, [0, 1], [0.6, 1]) * pulse}) rotate(${(1 - e) * -5}deg)`,
+          opacity: e,
+          boxShadow: "0 24px 60px rgba(0,0,0,0.45)",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: displayFont,
+            fontWeight: 800,
+            fontSize: 132,
+            letterSpacing: -2,
+            color: "#0B0B0C",
+          }}
+        >
+          цифру
+        </span>
+      </div>
+    </div>
   );
 };
 
-/** 7. The competitor, who found the number first. */
-const CompetitorChapter: React.FC = () => (
-  <AbsoluteFill>
-    <div style={{ position: "absolute", top: 260, left: 0, right: 0 }}>
-      <ChapterTitle
-        mode="light"
-        left="а он"
-        right="уже убрал"
-        size={78}
-        object={<Icon3D name="target-arrow" size={110} float />}
-      />
-    </div>
-
-    <div
-      style={{
-        position: "absolute",
-        top: 560,
-        left: 0,
-        right: 0,
-        display: "flex",
-        justifyContent: "center",
-        gap: 34,
-      }}
-    >
-      <Sequence from={14} layout="none">
-        <Chip mode="light" icon={<Icon3D name="ai-chip" size={34} />}>
-          нашёл заранее
-        </Chip>
-      </Sequence>
-      <Sequence from={22} layout="none">
-        <Chip mode="light" icon={<Icon3D name="shield-check" size={34} />}>
-          убрал через ИИ
-        </Chip>
-      </Sequence>
-    </div>
-
-    <div style={{ position: "absolute", top: 720, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
-      <Sequence from={62} layout="none">
-        <Icon3D name="rocket-launch" size={300} float />
-      </Sequence>
-    </div>
-
-    <div style={{ position: "absolute", top: 1080, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
-      <Sequence from={96} layout="none">
-        <Panel mode="light" width={780} pad={26} radius={R.card}>
-          <div
-            style={{
-              fontFamily: uiFont,
-              fontSize: 36,
-              color: MODE.light.ink,
-              textAlign: "center",
-              lineHeight: 1.3,
-            }}
-          >
-            обгоняет ровно{" "}
-            <span style={{ fontWeight: 700, color: OK }}>на эти же деньги</span>
-          </div>
-        </Panel>
-      </Sequence>
-    </div>
-  </AbsoluteFill>
-);
-
 /* ------------------------------------------------------------------ */
 
-/** Overlay graphics that sit on top of the speaker chapters. */
-const HookOverlay: React.FC = () => (
-  <>
-    {/* Chapter 0 starts at composition frame 0, so these offsets coincide. */}
-    <Sequence from={sec(4.68 - TRIM)} durationInFrames={sec(2.4)} layout="none">
-      <SideObject name="analytics-search" right={70} top={640} size={200} />
-    </Sequence>
-    <Sequence from={sec(7.32 - TRIM)} durationInFrames={sec(2.6)} layout="none">
-      <SideObject name="target-arrow" left={70} top={640} size={210} />
-    </Sequence>
-  </>
-);
-
-const CaseIntroOverlay: React.FC = () => (
-  <Sequence from={12} layout="none">
-    <div
-      style={{
-        position: "absolute",
-        top: 700,
-        left: 0,
-        right: 0,
-        display: "flex",
-        justifyContent: "center",
-        gap: 20,
-      }}
-    >
-      <Chip mode="dark" icon={<Icon3D name="users-group" size={34} />}>
-        24 менеджера
-      </Chip>
-      <Chip mode="dark" delay={6}>
-        бытовая техника
-      </Chip>
-    </div>
-  </Sequence>
-);
-
-/**
- * The close: the code word from the script, set as a selection.
- *
- * Offsets here are relative to the chapter, not to the composition — this
- * overlay is mounted inside the chapter's own Sequence.
- */
-const CTA_CHAP_START = CHAPTERS[CHAPTERS.length - 1].from;
-
-const CtaOverlay: React.FC = () => (
-  <>
-    <Sequence from={sec(BEATS.cta - CTA_CHAP_START)} layout="none">
-      <>
-        <div style={{ position: "absolute", top: 380, right: 80 }}>
-          <Icon3D name="chat-bubbles" size={190} float />
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            top: 1030,
-            left: 0,
-            right: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 20,
-          }}
-        >
-          <Label mode="dark" size={42} delay={6} color="#FFFFFF">
-            напиши в комментариях
-          </Label>
-          <Selected mode="dark" delay={12}>
-            <span
-              style={{ fontFamily: displayFont, fontWeight: 800, fontSize: 138, letterSpacing: -2 }}
-            >
-              цифру
-            </span>
-          </Selected>
-        </div>
-      </>
-    </Sequence>
-    <Sequence from={sec(BEATS.ctaTail - CTA_CHAP_START)} layout="none">
-      <div style={{ position: "absolute", top: 1330, left: 0, right: 0, textAlign: "center" }}>
-        <Label mode="dark" size={40} color="rgba(255,255,255,0.9)">
-          скину калькулятор потерь
-        </Label>
-      </div>
-    </Sequence>
-  </>
-);
-
-/* ------------------------------------------------------------------ */
-
-const CHAP_EL: Record<number, React.ReactNode> = {
-  1: <SearchChapter />,
-  2: <ResearchChapter />,
-  4: <CaseChapter />,
-  5: <FoldersChapter />,
-  6: <CompetitorChapter />,
-};
-
-const OVERLAY_EL: Record<number, React.ReactNode> = {
-  0: <HookOverlay />,
-  3: <CaseIntroOverlay />,
-  7: <CtaOverlay />,
-};
-
-/**
- * Cue sheet, built from the same tables that drive the picture so a retimed
- * beat cannot silently lose its sound.
- */
 const CUES: Cue[] = [
-  // A sweep for every chapter boundary except the first.
-  ...CHAPTERS.slice(1).map(
-    (c, i): Cue => ({ at: c.from, sfx: i % 2 ? "whoosh2" : "whoosh", volume: 0.32 })
-  ),
-  // A soft tick as each spoken line lands.
-  ...PHRASES.map((p): Cue => ({ at: p.from, sfx: "tick", volume: 0.2 })),
-  // The beats that are objects or numbers rather than words.
-  { at: BEATS.researchBig, sfx: "digital2", volume: 0.32 },
-  { at: BEATS.minutes, sfx: "data", volume: 0.28 },
-  { at: BEATS.money, sfx: "digital3", volume: 0.34 },
-  { at: BEATS.folders + 0.9, sfx: "pop", volume: 0.3 },
-  { at: BEATS.rocket, sfx: "data2", volume: 0.3 },
-  { at: BEATS.cta, sfx: "digital", volume: 0.3 },
-  { at: BEATS.cta + 0.55, sfx: "digital2", volume: 0.34 },
-  // Folder pile in the search chapter.
-  ...Array.from({ length: 6 }, (_, i): Cue => ({
-    at: 8.66 + 0.47 + i * 0.23,
+  ...SHOTS.slice(1).map((s, i): Cue => ({
+    at: s.at,
+    sfx: i % 2 ? "whoosh" : "whoosh2",
+    volume: 0.3,
+  })),
+  ...CAPS.map((c): Cue => ({ at: c.from, sfx: "tick", volume: 0.14 })),
+  { at: BEATS.hookSearch, sfx: "pop", volume: 0.26 },
+  { at: BEATS.hookRival, sfx: "digital2", volume: 0.3 },
+  ...Array.from({ length: 5 }, (_, i): Cue => ({
+    at: BEATS.folders + i * 0.267,
     sfx: (["tick2", "tick3", "pop"] as const)[i % 3],
     volume: 0.22,
   })),
-  // The seven folders.
+  { at: BEATS.hours, sfx: "digital3", volume: 0.32 },
+  { at: BEATS.stopwatch, sfx: "data", volume: 0.26 },
+  { at: BEATS.minutes, sfx: "data2", volume: 0.3 },
+  { at: BEATS.money, sfx: "digital3", volume: 0.34 },
   ...Array.from({ length: 7 }, (_, i): Cue => ({
-    at: BEATS.folders + 0.2 + i * 0.167,
+    at: BEATS.seventh + i * 0.167,
     sfx: i === 6 ? "digital2" : "tick3",
-    volume: i === 6 ? 0.32 : 0.16,
+    volume: i === 6 ? 0.32 : 0.15,
   })),
+  { at: BEATS.rocket, sfx: "digital", volume: 0.3 },
+  { at: BEATS.cta, sfx: "digital2", volume: 0.34 },
 ];
 
 export const ReelCifra: React.FC = () => (
   <AbsoluteFill style={{ background: MODE.dark.bg }}>
-    {CHAPTERS.map((c, i) => {
+    <Grounds />
+    <Graphics />
+    <CutOut />
+    <Speaker mode="dark" />
+
+    {/* Captions sit above everything, in one place, all the way through. */}
+    {CAPS.map((c) => {
       const dur = sec(c.to) - sec(c.from);
-      const mode: Mode = c.kind === "light" ? "light" : "dark";
-      const last = i === CHAPTERS.length - 1;
       return (
-        <Sequence key={i} from={sec(c.from)} durationInFrames={dur} layout="none">
-          <AbsoluteFill>
-            {c.kind === "speaker" ? (
-              <Speaker chap={c} durationInFrames={dur} />
-            ) : (
-              <Ground mode={mode} />
-            )}
-            <Defocus at={dur - SWEEP} durationInFrames={SWEEP} active={!last}>
-              <AbsoluteFill>
-                {CHAP_EL[i] ?? null}
-                {OVERLAY_EL[i] ?? null}
-                {/* Lines are placed against the composition clock, then offset
-                    into this chapter, so a phrase never has to be re-timed when
-                    a chapter boundary moves. */}
-                {PHRASES.filter((p) => p.from >= c.from - 0.001 && p.from < c.to).map((p) => (
-                  <Sequence
-                    key={p.from}
-                    from={sec(p.from) - sec(c.from)}
-                    durationInFrames={sec(p.to) - sec(p.from)}
-                    layout="none"
-                  >
-                    <Phrase
-                      words={p.words}
-                      size={p.size}
-                      top={p.top}
-                      durationInFrames={sec(p.to) - sec(p.from)}
-                      mode={c.kind === "light" ? "light" : "dark"}
-                      onVideo={c.kind === "speaker"}
-                    />
-                  </Sequence>
-                ))}
-              </AbsoluteFill>
-            </Defocus>
-          </AbsoluteFill>
-          {i > 0 ? (
-            <Sequence durationInFrames={SWEEP} layout="none">
-              <Sweep toward={mode} durationInFrames={SWEEP} />
-            </Sequence>
-          ) : null}
+        <Sequence key={c.from} from={sec(c.from)} durationInFrames={dur} layout="none">
+          <div
+            style={{
+              position: "absolute",
+              top: CAP_TOP,
+              left: 70,
+              right: 70,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Caption words={c.words} durationInFrames={dur} size={c.size ?? 66} />
+          </div>
         </Sequence>
       );
     })}
 
-    {/* The voice runs unbroken under the whole edit. */}
     <Audio src={staticFile("speaker-cifra.mp4")} startFrom={sec(TRIM)} />
     <SfxTrack cues={CUES} />
   </AbsoluteFill>
 );
 
-export { ACCENT, ALERT, DottedRun };
+export { modeAt, t };
