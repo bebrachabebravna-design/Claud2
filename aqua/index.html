@@ -1,0 +1,35 @@
+<!doctype html><meta charset="utf-8"><title>{{NAME}}</title>
+<style>
+body{margin:0;background:#0b1220;color:#dbeafe;font:15px system-ui;display:flex;flex-direction:column;height:100vh}
+header{padding:10px 16px;background:#0f1b33;display:flex;gap:12px;align-items:center}
+h1{font-size:18px;margin:0;flex:1;color:#38bdf8}
+button{background:#1e3a5f;color:#dbeafe;border:0;padding:6px 12px;border-radius:6px;cursor:pointer}
+button.on{background:#b91c1c}
+#log{flex:1;overflow:auto;padding:16px}
+.m{margin:6px 0;padding:8px 12px;border-radius:10px;max-width:75%;white-space:pre-wrap}
+.u{background:#1e3a5f;margin-left:auto}.a{background:#12304d}
+#ask{background:#3b2f0b;padding:8px 16px;display:none}
+form{display:flex;gap:8px;padding:12px;background:#0f1b33}
+input{flex:1;padding:10px;border-radius:6px;border:0;background:#0b1220;color:#dbeafe}
+</style>
+<header><h1>💧 {{NAME}}</h1>
+<label><input type="checkbox" id="sp" style="flex:none"> голос</label>
+<button id="dry">Dry-run</button><button id="kill">KILL</button></header>
+<div id="log"></div><div id="ask"></div>
+<form id="f"><input id="t" placeholder="Напиши {{NAME}}..." autofocus><button>→</button></form>
+<script>
+const $=id=>document.getElementById(id),log=$('log');
+const post=(u,d)=>fetch(u,{method:'POST',body:JSON.stringify(d)}).then(r=>r.json());
+function add(c,t){const d=document.createElement('div');d.className='m '+c;d.textContent=t;log.append(d);log.scrollTop=1e9}
+$('f').onsubmit=async e=>{e.preventDefault();const t=$('t').value.trim();if(!t)return;$('t').value='';add('u',t);
+ const r=await post('/api/chat',{text:t,speak:$('sp').checked});add('a',r.answer)};
+async function state(){const s=await (await fetch('/api/state')).json();
+ $('dry').className=s.dry?'on':'';$('kill').className=s.kill?'on':''}
+$('dry').onclick=async()=>{const s=await (await fetch('/api/state')).json();await post('/api/dry',{on:!s.dry});state()};
+$('kill').onclick=async()=>{const s=await (await fetch('/api/state')).json();await post('/api/kill',{on:!s.kill});state()};
+setInterval(async()=>{const p=await (await fetch('/api/pending')).json(),a=$('ask');
+ if(!p.length){a.style.display='none';return}
+ a.style.display='block';a.innerHTML='';const x=p[0];a.append('Разрешить? '+x.desc+' ');
+ for(const [l,ok] of [['Да',1],['Нет',0]]){const b=document.createElement('button');b.textContent=l;
+  b.onclick=()=>post('/api/confirm',{id:x.id,ok});a.append(b)}},1000);state();
+</script>
