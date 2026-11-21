@@ -1,13 +1,15 @@
 """Мозг: облачная модель + цикл вызова инструментов (Gemini или Claude)."""
 import requests
-from . import config, guard
+from . import cache, config, guard
 from .tools import TOOLS
 
 MAX_STEPS = 15
-history: list[dict] = []   # [{"role": "user"|"assistant", "text": str}]
+history: list[dict] = []
+tools_used = {"n": 0}   # [{"role": "user"|"assistant", "text": str}]
 
 
 def _exec(name, args):
+    tools_used["n"] += 1
     t = TOOLS.get(name)
     if not t:
         return f"нет инструмента {name}"
@@ -111,6 +113,16 @@ def _claude(user_text):
 
 
 def ask(text: str) -> str:
+    if text.strip() == "/clearcache":
+        cache.clear()
+        return "Кэш очищен."
+    fresh = text.startswith("/fresh ")
+    if fresh:
+        text = text[7:]
+    use_cache = cache.cacheable(text)
+    if use_cache and not fresh and (hit := cache.get(text)):
+        return hit
+    tools_used["n"] = 0
     if config.PROVIDER == "openai":
         if not (config.OPENAI_BASE and config.OPENAI_KEY and config.OPENAI_MODEL):
             return "Заполни OPENAI_BASE_URL, OPENAI_API_KEY и OPENAI_MODEL в .env"
@@ -127,6 +139,8 @@ def ask(text: str) -> str:
         if not config.GEMINI_KEY:
             return "Нет GEMINI_API_KEY в .env"
         answer = _gemini(text)
+    if use_cache and tools_used["n"] == 0 and answer:
+        cache.put(text, answer)   # ответы, где были действия на ПК, не кэшируем
     history.append({"role": "user", "text": text})
     history.append({"role": "assistant", "text": answer or "…"})
     del history[:-40]
