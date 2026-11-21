@@ -3,7 +3,7 @@ import requests
 from . import config, guard
 from .tools import TOOLS
 
-MAX_STEPS = 6
+MAX_STEPS = 15
 history: list[dict] = []   # [{"role": "user"|"assistant", "text": str}]
 
 

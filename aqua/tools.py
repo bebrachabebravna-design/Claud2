@@ -22,9 +22,22 @@ S = {"type": "string"}
 I = {"type": "integer"}
 
 
-def _sh(cmd, timeout=20):
+PROJECT = {"dir": Path.home() / "aqua_projects"}
+PROJECT["dir"].mkdir(exist_ok=True)
+
+
+def _p(path):
+    """Путь внутри текущего проекта (выход за его пределы запрещён)."""
+    base = PROJECT["dir"].resolve()
+    full = (base / path).resolve() if not Path(path).is_absolute() else Path(path).resolve()
+    if base != full and base not in full.parents:
+        raise ValueError("путь вне папки проекта")
+    return full
+
+
+def _sh(cmd, timeout=20, cwd=None):
     r = subprocess.run(cmd, shell=isinstance(cmd, str), capture_output=True,
-                       text=True, timeout=timeout)
+                       text=True, timeout=timeout, cwd=cwd)
     return (r.stdout + r.stderr).strip()[:3000]
 
 
@@ -120,3 +133,54 @@ def note_recent():
 def note_delete(id):
     notes.delete(int(id))
     return "удалено"
+
+
+# ---------- Работа с проектами ----------
+@tool("project_open", "Выбрать или создать проект (папка в ~/aqua_projects). Дальше все project_* и run_in_project работают в ней", {"name": S}, 1)
+def project_open(name):
+    d = (Path.home() / "aqua_projects" / Path(name).name)
+    d.mkdir(parents=True, exist_ok=True)
+    PROJECT["dir"] = d
+    return f"проект: {d}"
+
+
+@tool("project_tree", "Показать файлы текущего проекта", {})
+def project_tree():
+    base = PROJECT["dir"]
+    out = [str(f.relative_to(base)) for f in sorted(base.rglob("*"))
+           if f.is_file() and not any(x in f.parts for x in (".git", "node_modules", "__pycache__", "venv"))]
+    return "\n".join(out[:300]) or "(пусто)"
+
+
+@tool("project_read", "Прочитать файл проекта", {"path": S})
+def project_read(path):
+    return _p(path).read_text(errors="replace")[:12000]
+
+
+@tool("project_write", "Создать или перезаписать файл проекта", {"path": S, "content": S}, 1)
+def project_write(path, content):
+    f = _p(path)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(content, encoding="utf-8")
+    return f"записано {f.name} ({len(content)} символов)"
+
+
+@tool("project_edit", "Заменить кусок текста в файле проекта (old должен встречаться ровно один раз)", {"path": S, "old": S, "new": S}, 1)
+def project_edit(path, old, new):
+    f = _p(path)
+    t = f.read_text(encoding="utf-8")
+    if t.count(old) != 1:
+        return f"old встречается {t.count(old)} раз, нужно ровно 1"
+    f.write_text(t.replace(old, new), encoding="utf-8")
+    return "исправлено"
+
+
+@tool("project_search", "Найти текст в файлах проекта", {"query": S})
+def project_search(query):
+    return _sh(["grep", "-rn", "--exclude-dir=.git", "--exclude-dir=node_modules",
+                "-I", query, "."], cwd=PROJECT["dir"])[:4000] or "ничего"
+
+
+@tool("run_in_project", "Выполнить команду в папке проекта (запуск, тесты, pip install и т.п.)", {"command": S}, 1)
+def run_in_project(command):
+    return _sh(command, 120, cwd=PROJECT["dir"])
