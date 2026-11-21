@@ -57,6 +57,34 @@ def _gemini(user_text):
     return "Слишком много шагов, остановилась."
 
 
+# ---------- DeepSeek (формат OpenAI) ----------
+def _deepseek(user_text):
+    import json
+    tools = [{"type": "function", "function": {"name": n, "description": t["desc"],
+              "parameters": t["schema"]}} for n, t in TOOLS.items()]
+    msgs = [{"role": "system", "content": config.PERSONA}]
+    msgs += [{"role": m["role"], "content": m["text"]} for m in history[-20:]]
+    msgs.append({"role": "user", "content": user_text})
+    for _ in range(MAX_STEPS):
+        r = requests.post("https://api.deepseek.com/chat/completions", timeout=90,
+                          headers={"Authorization": f"Bearer {config.DEEPSEEK_KEY}"},
+                          json={"model": config.DEEPSEEK_MODEL, "messages": msgs, "tools": tools})
+        r.raise_for_status()
+        m = r.json()["choices"][0]["message"]
+        calls = m.get("tool_calls")
+        if not calls:
+            return (m.get("content") or "").strip()
+        msgs.append(m)
+        for c in calls:
+            try:
+                args = json.loads(c["function"]["arguments"] or "{}")
+            except ValueError:
+                args = {}
+            msgs.append({"role": "tool", "tool_call_id": c["id"],
+                         "content": _exec(c["function"]["name"], args)})
+    return "Слишком много шагов, остановилась."
+
+
 # ---------- Claude ----------
 def _claude(user_text):
     tools = [{"name": n, "description": t["desc"], "input_schema": t["schema"]}
@@ -81,7 +109,11 @@ def _claude(user_text):
 
 
 def ask(text: str) -> str:
-    if config.PROVIDER == "anthropic":
+    if config.PROVIDER == "deepseek":
+        if not config.DEEPSEEK_KEY:
+            return "Нет DEEPSEEK_API_KEY в .env"
+        answer = _deepseek(text)
+    elif config.PROVIDER == "anthropic":
         if not config.ANTHROPIC_KEY:
             return "Нет ANTHROPIC_API_KEY в .env"
         answer = _claude(text)

@@ -10,7 +10,15 @@ pip install -r requirements.txt --break-system-packages 2>/dev/null || pip insta
 echo; echo "== Ключи (ввод скрыт, ничего никуда не отправляется, кроме Telegram/Gemini) =="
 read -rsp "Токен бота от @BotFather: " TOK; echo
 read -rp  "Твой Telegram id (число от @userinfobot): " UID_
-read -rsp "Ключ Gemini (aistudio.google.com/apikey): " GK; echo
+echo "Какой мозг? 1 = DeepSeek (работает без VPN), 2 = Gemini (нужен VPN в РФ)"
+read -rp "Выбери 1 или 2: " CH
+if [ "$CH" = "2" ]; then
+  PROV=gemini; KEYNAME=GEMINI_API_KEY
+  read -rsp "Ключ Gemini (aistudio.google.com/apikey): " GK; echo
+else
+  PROV=deepseek; KEYNAME=DEEPSEEK_API_KEY
+  read -rsp "Ключ DeepSeek (platform.deepseek.com/api_keys): " GK; echo
+fi
 
 echo "== Проверяю токен =="
 R=$(curl -s "https://api.telegram.org/bot${TOK}/getMe")
@@ -19,8 +27,8 @@ echo "Бот найден: $(echo "$R" | grep -o '"username":"[^"]*"')"
 
 cat > .env <<ENV
 AQUA_NAME=Аква
-AQUA_PROVIDER=gemini
-GEMINI_API_KEY=${GK}
+AQUA_PROVIDER=${PROV}
+${KEYNAME}=${GK}
 TELEGRAM_TOKEN=${TOK}
 TELEGRAM_OWNER_ID=${UID_}
 ENV

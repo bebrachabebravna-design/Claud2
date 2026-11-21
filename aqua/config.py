@@ -20,7 +20,9 @@ def _load_env():
 _load_env()
 
 NAME = os.environ.get("AQUA_NAME", "Аква")
-PROVIDER = os.environ.get("AQUA_PROVIDER", "gemini")  # gemini | anthropic
+PROVIDER = os.environ.get("AQUA_PROVIDER", "deepseek")  # deepseek | gemini | anthropic
+DEEPSEEK_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
