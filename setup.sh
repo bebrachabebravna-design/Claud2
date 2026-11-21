@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 echo "== Ставлю пакеты (попросит пароль) =="
-sudo apt update -y
+sudo apt update -y || echo "(apt update ругнулся на сторонний репозиторий, продолжаю)"
 sudo apt install -y python3-pip espeak-ng playerctl libnotify-bin pulseaudio-utils curl
 pip install -r requirements.txt --break-system-packages 2>/dev/null || pip install -r requirements.txt
 
