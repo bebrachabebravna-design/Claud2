@@ -58,17 +58,19 @@ def _gemini(user_text):
 
 
 # ---------- DeepSeek (формат OpenAI) ----------
-def _deepseek(user_text):
+def _deepseek(user_text, base="https://api.deepseek.com", key=None, model=None):
     import json
+    key = key or config.DEEPSEEK_KEY
+    model = model or config.DEEPSEEK_MODEL
     tools = [{"type": "function", "function": {"name": n, "description": t["desc"],
               "parameters": t["schema"]}} for n, t in TOOLS.items()]
     msgs = [{"role": "system", "content": config.PERSONA}]
     msgs += [{"role": m["role"], "content": m["text"]} for m in history[-20:]]
     msgs.append({"role": "user", "content": user_text})
     for _ in range(MAX_STEPS):
-        r = requests.post("https://api.deepseek.com/chat/completions", timeout=90,
-                          headers={"Authorization": f"Bearer {config.DEEPSEEK_KEY}"},
-                          json={"model": config.DEEPSEEK_MODEL, "messages": msgs, "tools": tools})
+        r = requests.post(base.rstrip("/") + "/chat/completions", timeout=90,
+                          headers={"Authorization": f"Bearer {key}"},
+                          json={"model": model, "messages": msgs, "tools": tools})
         r.raise_for_status()
         m = r.json()["choices"][0]["message"]
         calls = m.get("tool_calls")
@@ -109,7 +111,11 @@ def _claude(user_text):
 
 
 def ask(text: str) -> str:
-    if config.PROVIDER == "deepseek":
+    if config.PROVIDER == "openai":
+        if not (config.OPENAI_BASE and config.OPENAI_KEY and config.OPENAI_MODEL):
+            return "Заполни OPENAI_BASE_URL, OPENAI_API_KEY и OPENAI_MODEL в .env"
+        answer = _deepseek(text, config.OPENAI_BASE, config.OPENAI_KEY, config.OPENAI_MODEL)
+    elif config.PROVIDER == "deepseek":
         if not config.DEEPSEEK_KEY:
             return "Нет DEEPSEEK_API_KEY в .env"
         answer = _deepseek(text)
